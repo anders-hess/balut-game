@@ -1,0 +1,89 @@
+.dice-area {
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.5rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: var(--shadow-inset), 0 0 0 1px rgba(0,0,0,0.2);
+}
+
+.dice-tray {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-bottom: 22px; /* room for HELD label */
+}
+
+.dice-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.btn-roll {
+  background: var(--color-accent);
+  color: var(--color-parchment);
+  border: none;
+  padding: 0.7rem 2.2rem;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.12);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-med);
+  min-width: 145px;
+}
+
+.btn-roll:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.12);
+  background: var(--color-accent-light);
+}
+
+.btn-roll:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-roll:disabled {
+  background: #4a2020;
+  box-shadow: none;
+  opacity: 0.55;
+}
+
+/* Roll pips */
+.rolls-pips {
+  display: flex;
+  gap: 7px;
+}
+
+.rolls-pip {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 2px solid rgba(255,255,255,0.25);
+  transition: background var(--transition-med), border-color var(--transition-med), box-shadow var(--transition-med);
+}
+
+.rolls-pip--active {
+  background: var(--color-gold);
+  border-color: var(--color-gold-light);
+  box-shadow: 0 0 7px rgba(201,168,76,0.55);
+}
+
+.dice-hint {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.38);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .dice-tray { gap: 0.55rem; }
+  .btn-roll  { padding: 0.65rem 1.5rem; font-size: 0.9rem; min-width: 120px; }
+}

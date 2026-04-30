@@ -1,0 +1,266 @@
+.oracle {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(201, 168, 76, 0.28);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header row (always visible) ─────────────────────── */
+.oracle__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+  background: rgba(0,0,0,0.2);
+}
+
+.oracle__star {
+  font-size: 0.75rem;
+  color: var(--color-gold);
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.oracle__title {
+  flex: 1;
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  letter-spacing: 0.08em;
+}
+
+.oracle__toggle {
+  background: none;
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  color: rgba(201, 168, 76, 0.7);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.oracle__toggle:hover {
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--color-gold);
+}
+
+/* ── Body ────────────────────────────────────────────── */
+.oracle__body {
+  padding: 0.75rem 0.85rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ── Placeholder ─────────────────────────────────────── */
+.oracle__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: rgba(255,255,255,0.35);
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+}
+
+.oracle__placeholder-icon {
+  font-size: 2rem;
+  opacity: 0.5;
+  margin-bottom: 0.25rem;
+}
+
+.oracle__placeholder-sub {
+  font-size: 0.72rem;
+  opacity: 0.6;
+}
+
+/* ── Intro line ──────────────────────────────────────── */
+.oracle__intro {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 0.1rem;
+}
+
+/* ── List ────────────────────────────────────────────── */
+.oracle__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+/* ── Item ────────────────────────────────────────────── */
+.oracle__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid transparent;
+  transition: background 0.12s;
+}
+
+.oracle__item:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.oracle__item--top {
+  background: rgba(201, 168, 76, 0.11);
+  border-color: rgba(201, 168, 76, 0.32);
+}
+
+.oracle__item--top:hover {
+  background: rgba(201, 168, 76, 0.17);
+}
+
+/* ── Rank badge ──────────────────────────────────────── */
+.oracle__rank {
+  flex-shrink: 0;
+  width: 19px;
+  height: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(255,255,255,0.09);
+  color: rgba(255,255,255,0.4);
+}
+
+.oracle__item--top .oracle__rank {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+
+/* ── Content ─────────────────────────────────────────── */
+.oracle__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.oracle__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.oracle__item--top .oracle__label {
+  color: var(--color-gold-light);
+}
+
+.oracle__detail {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.42);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.oracle__ev {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.25);
+}
+
+/* ── Info tooltip ────────────────────────────────────── */
+.oracle__tip-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.oracle__info-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.45);
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-style: italic;
+  font-family: Georgia, serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  line-height: 1;
+}
+
+.oracle__info-btn:hover,
+.oracle__info-btn--active {
+  background: rgba(201,168,76,0.2);
+  border-color: rgba(201,168,76,0.55);
+  color: var(--color-gold-light);
+}
+
+.oracle__tooltip {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  width: 200px;
+  background: rgba(20,15,8,0.97);
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.75rem;
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+}
+
+/* Arrow */
+.oracle__tooltip::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  background: rgba(20,15,8,0.97);
+  border-left: 1px solid rgba(201,168,76,0.35);
+  border-top: 1px solid rgba(201,168,76,0.35);
+  transform: rotate(45deg);
+}
+
+.oracle__tooltip-placeholder {
+  font-size: 0.73rem;
+  color: rgba(255,255,255,0.45);
+  font-style: italic;
+  line-height: 1.45;
+}
+
+/* ── Mobile: full-width, not sticky ─────────────────── */
+@media (max-width: 800px) {
+  .oracle__list {
+    gap: 0.25rem;
+  }
+
+  .oracle__item {
+    padding: 0.35rem 0.45rem;
+  }
+
+  .oracle__label {
+    font-size: 0.75rem;
+  }
+}

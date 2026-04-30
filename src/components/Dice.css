@@ -1,0 +1,80 @@
+.die {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  padding: 3px;
+  background: none;
+  border: 3px solid transparent;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), filter var(--transition-fast);
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.45));
+}
+
+/* Holdable hover */
+.die--holdable:hover {
+  transform: translateY(-4px);
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5)) brightness(1.04);
+}
+
+/* Held state */
+.die--held {
+  transform: translateY(-8px);
+  border-color: var(--color-gold);
+  filter: drop-shadow(0 10px 16px rgba(0,0,0,0.5)) drop-shadow(0 0 8px rgba(201,168,76,0.4));
+}
+
+.die--held:hover {
+  transform: translateY(-10px);
+}
+
+/* Rolling animation */
+@keyframes dieRoll {
+  0%   { transform: translateY(0)     rotate(0deg)   scale(1);    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.45)); }
+  20%  { transform: translateY(-10px) rotate(-18deg) scale(1.06); filter: drop-shadow(0 12px 14px rgba(0,0,0,0.4)); }
+  45%  { transform: translateY(-4px)  rotate(12deg)  scale(0.96); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.45)); }
+  65%  { transform: translateY(-12px) rotate(-8deg)  scale(1.04); filter: drop-shadow(0 14px 16px rgba(0,0,0,0.38)); }
+  85%  { transform: translateY(-2px)  rotate(4deg)   scale(0.99); filter: drop-shadow(0 5px 9px rgba(0,0,0,0.42)); }
+  100% { transform: translateY(0)     rotate(0deg)   scale(1);    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.45)); }
+}
+
+.die--rolling {
+  animation: dieRoll 0.42s cubic-bezier(0.36,0.07,0.19,0.97) forwards;
+  pointer-events: none;
+}
+
+/* Unrolled */
+.die--unrolled {
+  opacity: 0.38;
+  cursor: default;
+  filter: none;
+}
+
+.die__blank {
+  display: block;
+  width: 68px;
+  height: 68px;
+  background: linear-gradient(160deg, #f0ece4, #e8e0d0);
+  border-radius: 14px;
+}
+
+/* HELD label */
+.die__held-label {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--color-gold);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.die:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+}

@@ -1,0 +1,172 @@
+import { CATEGORIES, CATEGORY_LABELS, BIG_POINT_RULES, NUM_COLUMNS } from '../logic/gameConstants.js';
+import { calculateScore, calcTotals, countBaluts, nextColumn } from '../logic/scoring.js';
+import './Scorecard.css';
+
+const MAX_ROLLS_IMPORT = 3;
+
+export default function Scorecard({ scorecard, dice, rollsLeft, onScore }) {
+  const hasRolled = rollsLeft < MAX_ROLLS_IMPORT;
+  const diceValues = dice.map(d => d.value);
+  const allRolled  = diceValues.every(v => v > 0);
+
+  const { totalSmall, totalBig, bonus, categoryBigPoints, categoryTotals } = calcTotals(scorecard);
+  const balutCount   = countBaluts(scorecard);
+  const catBigTotal  = totalBig - bonus;
+
+  function getCellState(category) {
+    if (!hasRolled || !allRolled) return 'empty';
+    if (nextColumn(scorecard, category) === -1) return 'full';
+    const score = calculateScore(category, diceValues);
+    if (score === null || score === 0) return 'zero';
+    return 'valid';
+  }
+
+  function getPotentialScore(category) {
+    const s = calculateScore(category, diceValues);
+    return s ?? 0;
+  }
+
+  return (
+    <div className="scorecard">
+      <div className="scorecard-header">
+        <h2 className="scorecard-title">Scorecard</h2>
+      </div>
+
+      <div className="scorecard-scroll">
+        <table className="scorecard-table">
+          <thead>
+            <tr>
+              <th className="th-category">Category</th>
+              {Array(NUM_COLUMNS).fill(0).map((_, i) => (
+                <th key={i} className="th-entry">#{i + 1}</th>
+              ))}
+              <th className="th-sum">Sum</th>
+              <th className="th-big">Big</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {CATEGORIES.map(cat => {
+              const cellState  = getCellState(cat);
+              const potential  = getPotentialScore(cat);
+              const nextCol    = nextColumn(scorecard, cat);
+              const catTotal   = categoryTotals[cat];
+              const bigPts     = categoryBigPoints[cat];
+              const isComplete = scorecard[cat].every(s => s !== null);
+
+              return (
+                <tr key={cat} className="srow">
+                  <td className="td-category">
+                    <span className="cat-label">{CATEGORY_LABELS[cat]}</span>
+                  </td>
+
+                  {scorecard[cat].map((score, colIdx) => {
+                    const isFilled    = score !== null;
+                    const isNext      = colIdx === nextCol;
+                    const isAvailable = isNext && (cellState === 'valid' || cellState === 'zero');
+
+                    return (
+                      <td
+                        key={colIdx}
+                        className={[
+                          'td-entry',
+                          isFilled ? 'td-entry--filled' : 'td-entry--empty',
+                          isAvailable && cellState === 'valid' ? 'td-entry--available' : '',
+                          isAvailable && cellState === 'zero'  ? 'td-entry--zero'      : '',
+                        ].filter(Boolean).join(' ')}
+                        onClick={() => isAvailable && onScore(cat)}
+                        title={isAvailable ? `Score ${potential} pts for ${CATEGORY_LABELS[cat]}` : undefined}
+                        role={isAvailable ? 'button' : undefined}
+                        tabIndex={isAvailable ? 0 : undefined}
+                        onKeyDown={e => isAvailable && e.key === 'Enter' && onScore(cat)}
+                      >
+                        {isFilled
+                          ? score
+                          : isAvailable
+                            ? <span className="ghost-score">{potential}</span>
+                            : ''}
+                      </td>
+                    );
+                  })}
+
+                  <td className="td-sum">
+                    {catTotal > 0 ? catTotal : ''}
+                  </td>
+                  <td className="td-big">
+                    {bigPts > 0
+                      ? <span className="big-pts-earned">+{bigPts}</span>
+                      : isComplete
+                        ? <span className="big-pts-zero">0</span>
+                        : <span className="big-pts-target">{bigPtTarget(BIG_POINT_RULES[cat])}</span>
+                    }
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+
+          <tfoot>
+            <tr className="srow srow--subtotal">
+              <td className="td-category">
+                <span className="foot-label">Total</span>
+              </td>
+              <td colSpan={NUM_COLUMNS} />
+              <td className="td-sum td-sum--total">{totalSmall}</td>
+              <td className="td-big td-big--total">{catBigTotal > 0 ? catBigTotal : 0}</td>
+            </tr>
+            <tr className="srow srow--subtotal">
+              <td className="td-category">
+                <span className="foot-label">Bonus</span>
+                <span className="foot-hint">{bonusHint(totalSmall)}</span>
+              </td>
+              <td colSpan={NUM_COLUMNS} />
+              <td className="td-sum" />
+              <td className="td-big td-big--bonus">
+                {bonus >= 0 ? `+${bonus}` : bonus}
+              </td>
+            </tr>
+            <tr className="srow srow--grand-total">
+              <td className="td-category">
+                <span className="foot-label">Grand Total</span>
+              </td>
+              <td colSpan={NUM_COLUMNS} />
+              <td className="td-sum" />
+              <td className="td-big td-big--grand">{totalBig}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div className="scorecard-footer">
+        <div className="running-total running-total--big">
+          <span className="rt-label">Big Points</span>
+          <span className="rt-value">{totalBig}</span>
+        </div>
+        <div className="running-total running-total--small">
+          <span className="rt-label">Small Points</span>
+          <span className="rt-value">{totalSmall}</span>
+        </div>
+        <div className="running-total running-total--balut">
+          <span className="rt-label">Baluts</span>
+          <span className="rt-value">{balutCount}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function bigPtTarget(rule) {
+  if (rule.type === 'sum')      return `/${rule.threshold}`;
+  if (rule.type === 'filled')   return `+${rule.points}`;
+  if (rule.type === 'perBalut') return '+2 ea';
+  return '';
+}
+
+function bonusHint(total) {
+  if (total < 300)  return 'Need 300 for −1';
+  if (total < 350)  return '−1 big · need 350 for ±0';
+  if (total < 400)  return '±0 · need 400 for +1';
+  if (total < 450)  return '+1 big · need 450 for +2';
+  const extra = Math.floor((total - 450) / 50);
+  return `+${2 + extra} big pts bonus`;
+}
