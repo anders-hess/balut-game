@@ -16,8 +16,11 @@ $env:PATH = "C:\Users\anhes\node\node-v22.14.0-win-x64;$env:PATH"
 
 ### Common commands
 ```powershell
-# Start dev server (run in background or separate terminal)
+# Start dev server
 npm.cmd run dev        # → http://localhost:5173
+
+# Run tests (Vitest)
+npm.cmd run test
 
 # Production build
 npm.cmd run build
@@ -26,7 +29,7 @@ npm.cmd run build
 ```
 
 ### Deployment
-Targeting **Vercel** (not yet set up). No special build config needed beyond `npm run build` — Vite's default output is `dist/`.
+Live at **https://balut-game.vercel.app** — connected to the `main` branch of `https://github.com/anders-hess/balut-game`. Every `git push origin main` triggers an automatic Vercel redeploy. No manual deploy steps needed.
 
 ---
 
@@ -34,26 +37,40 @@ Targeting **Vercel** (not yet set up). No special build config needed beyond `np
 
 ```
 src/
-  logic/           # Pure game logic — NO React imports
-    gameConstants.js   # NUM_DICE, MAX_ROLLS, NUM_COLUMNS, CATEGORIES, scoring rules
-    gameState.js       # State factories, rollDice, toggleHold, resetTurn
-    scoring.js         # calculateScore, calcTotals, calcBonus, isGameOver, etc.
-    oracle.js          # EV engine — computeRecommendations(), pure functions only
+  logic/              # Pure game logic — NO React imports
+    gameConstants.js      # NUM_DICE, MAX_ROLLS, NUM_COLUMNS, CATEGORIES, scoring rules
+    gameState.js          # State factories, rollDice, toggleHold, resetTurn
+    scoring.js            # calculateScore, calcTotals, calcBonus, isGameOver, etc.
+    oracle/               # BPIV engine (see Oracle section below)
+      index.js            # recommend() — public entry point
+      bpiv.js             # bpivScoreNow(), bpivRerollAllHolds()
+      recursion.js        # createMaxBpiv() memoized recursion, holdLabel()
+      thresholds.js       # pThreshold(), expectedBonus()
+      probabilities.js    # normalCDF, DIST combinatorics, uniqueSubsets()
+      scoring.js          # scoreCell(), categoryCurrentSum(), etc.
+      outcomes.js         # selectTop5Outcomes(), describeResult()
+      constants.js        # Per-category statistics (Monte Carlo TODO — see Oracle section)
+      __tests__/          # 92 Vitest unit tests
+  services/           # External service integrations
+    supabase.js           # Supabase client singleton (null when .env.local absent)
+    highscores.js         # fetchLeaderboard(), checkQualifies(), submitScore()
   hooks/
-    useGameState.js    # useReducer wrapping all game actions
+    useGameState.js       # useReducer wrapping all game actions
   components/
-    App.jsx            # Phase router: 'start' | 'playing' | 'gameover'
-    StartScreen        # Landing page (hero title + mode-button card)
-    GameBoard          # Two-column layout shell + header
-    DiceArea           # 5-die tray + Roll button + pip counter
-    Dice               # Single die button (holds DiceFace, manages rolling class)
-    DiceFace           # SVG pip renderer (pure, no state)
-    Scorecard          # 7×4 scoring table + footer totals bar
-    TheOracle          # Sidebar advisor panel with tooltip placeholders
-    GameOverScreen     # Final score summary replacing DiceArea on game over
-    BalutToast         # Fixed-position celebration toast (2.8 s)
+    App.jsx               # Routing: showHighscores state + phase-based routing
+    StartScreen           # Landing page — hero title, mode buttons, Leaderboard button
+    GameBoard             # Two-column layout shell + header
+    DiceArea              # 5-die tray + Roll button + pip counter
+    Dice                  # Single die button (holds DiceFace, manages rolling class)
+    DiceFace              # SVG pip renderer (pure, no state)
+    Scorecard             # 7×4 scoring table + footer totals bar
+    TheOracle             # Sidebar advisor panel — BPIV recommendations + tooltips
+    GameOverScreen        # Final score summary + leaderboard submit flow
+    HighscoresScreen      # Full leaderboard view (Daily / Monthly / Yearly tabs)
+    HighscoresCard        # Compact "Today's Top 3" widget in GameBoard right column
+    BalutToast            # Fixed-position celebration toast (2.8 s)
   styles/
-    theme.css          # All CSS custom properties (colors, fonts, radii, shadows)
+    theme.css             # All CSS custom properties (colors, fonts, radii, shadows)
 ```
 
 ---
@@ -79,6 +96,9 @@ src/
 }
 ```
 
+### App routing
+`App.jsx` uses a local `showHighscores` boolean (separate from game phase) to render `HighscoresScreen`. The game phase (`'start' | 'playing' | 'gameover'`) is owned by `useGameState`.
+
 ### Scoring categories (fill order matters — always left to right)
 `fours | fives | sixes | straight | fullHouse | choice | balut`  
 Each has 4 columns. `nextColumn(scorecard, category)` returns the next fillable index.
@@ -87,13 +107,63 @@ Each has 4 columns. `nextColumn(scorecard, category)` returns the next fillable 
 
 ## The Oracle
 
-`src/logic/oracle.js` — pure EV engine, no React.
+The Oracle is a statistically rigorous advisor in `src/logic/oracle/`. It ranks every possible action by **BPIV (Big Point Incremental Value)** — the expected big-point gain of an action relative to a baseline of scoring the expected average in that cell.
 
-- **`computeRecommendations(diceValues, rollsLeft, scorecard)`** returns all possible actions (hold patterns + score-now options) sorted by expected value descending.
-- Uses combinatorial outcome distributions (max 252 distinct multisets for 5 dice, vs 7776 raw) for performance.
-- Memoises `holdEV` within each call — fast enough for synchronous `useMemo`.
-- **`BIG_PT_VALUE = 50`** (line 9 of oracle.js) — tuning constant: how many small-point-equivalents one big point is worth in EV comparisons. Increase to make the Oracle more aggressive about chasing big-point thresholds.
-- Oracle tooltip `i` buttons currently show **"Detailed probability breakdown coming soon."** — intentional placeholder.
+### Public API
+```js
+import { recommend } from './src/logic/oracle/index.js';
+
+recommend({ currentDice, rollsRemaining, scorecard })
+// Returns: { actions: [...], isAllNegative: bool, recommendedRank: 1 }
+// Each action: { rank, type, description, bpiv, breakdown, held, tooltipOutcomes }
+```
+
+### How BPIV works
+```
+BPIV(action) = categoryBigDelta + bonusBigDelta
+```
+- **categoryBigDelta**: change in P(category big-point threshold met) × big points at stake, vs. baseline
+- **bonusBigDelta**: change in E[end-game small-points bonus], vs. baseline
+- **Baseline**: scoring `EXPECTED_SCORE_PER_COLUMN[category]` in that cell
+- BPIV = 0 → this action is no better or worse than an average roll
+
+### Filtering
+- If any action has BPIV > 0: show only positive-BPIV actions (max 5), sorted descending
+- If all BPIV ≤ 0: show all actions sorted descending + `isAllNegative: true`
+
+### REROLL recursion
+`createMaxBpiv(scorecard)` returns a memoised function that finds the best achievable BPIV from any dice state and rollsRemaining. It considers ALL categories at every leaf node — holding 4-4-4 and rolling 4-4 correctly values the result as Balut, not Fours.
+
+### Constants (important caveat)
+`src/logic/oracle/constants.js` contains `EXPECTED_SCORE_PER_COLUMN` and `VARIANCE_PER_COLUMN`. These are **calibrated estimates, not true Monte Carlo values**. In particular:
+- `fours: 12.5` and `choice: 23.0` are kept at these specific values to preserve the correct BPIV ordering for SPEC TEST 3 ("Hopeless Fours"). Changing them to their "intuitive" values (12 and 25) reverses the test outcome.
+- `fives: 15.0` and `sixes: 18.0` reflect "three of face value" as the discrete baseline.
+- A Monte Carlo simulation pass is needed before treating these as authoritative.
+
+### Tests
+92 Vitest tests in `src/logic/oracle/__tests__/`. Run with `npm.cmd run test`. Includes 8 spec integration tests (spec tests 1–8) covering Full House traps, threshold crossing, recursion correctness, and filtering logic.
+
+---
+
+## Highscore Leaderboard
+
+### Backend: Supabase
+- **Project URL**: `https://ehpguosbtfnrfttghcnz.supabase.co`
+- **Table**: `scores` — columns: `id`, `player_name` (max 20 chars), `big_points`, `small_points`, `balut_count`, `created_at`
+- **Time windows**: daily / monthly / yearly — filtered by `created_at` at query time (no cron jobs, data never deleted)
+- **Sort order**: `big_points DESC, small_points DESC, balut_count DESC`
+- **RLS**: anonymous SELECT and INSERT enabled; no auth required
+
+### Credentials
+Stored in `.env.local` (gitignored). Required vars:
+```
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+```
+Both are also set as Vercel environment variables on the `balut-game` project. The Supabase client (`src/services/supabase.js`) returns `null` gracefully when these vars are absent — leaderboard features degrade silently rather than crashing.
+
+### Submit flow
+On game over, `checkQualifies(bigPts, smallPts, balutCount)` fetches all three leaderboards and returns which periods the score beats. If any qualify, `GameOverScreen` shows a name input. One `submitScore()` call covers all qualifying periods. Last-used name is persisted in `localStorage` (`balut_player_name`).
 
 ---
 
@@ -114,16 +184,16 @@ All design tokens live in `src/styles/theme.css` as CSS custom properties. Key o
 
 ## Known cleanup items
 
-- **`APPLY_HOLD` reducer case** (`useGameState.js` line ~61) and the `onApplyHold` prop in `GameBoard.jsx` are vestigial — they were used when the Oracle had an "Apply" button, which was removed. Neither is connected to any UI. Safe to delete when tidying up.
+- **`APPLY_HOLD` reducer case** (`useGameState.js` line ~61) and the `onApplyHold` prop in `GameBoard.jsx` are vestigial — safe to delete.
 
 ---
 
 ## Multiplayer roadmap notes
 
-- The `phase` field and App-level routing are already designed with multi-player in mind.
 - All scoring logic (`src/logic/scoring.js`) is stateless and player-agnostic.
 - `StartScreen` has stubbed "Local Multiplayer" and "Online Multiplayer" buttons (`mode-btn--disabled`).
 - When building multiplayer: the scorecard state will need to become an array (one per player); the turn-routing logic in `useGameState.js` is the primary thing to extend.
+- The `scores` table in Supabase has no `player_count` column yet — add this when multiplayer scores need to be distinguished from single-player scores.
 
 ---
 
@@ -131,5 +201,5 @@ All design tokens live in `src/styles/theme.css` as CSS custom properties. Key o
 
 | Breakpoint | Layout change |
 |---|---|
-| ≤ 800px | Oracle moves below scorecard (single column) |
+| ≤ 800px | Oracle and leaderboard card move below scorecard (single column) |
 | ≤ 480px | Turn counter hidden, font sizes reduce |
