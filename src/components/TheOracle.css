@@ -216,17 +216,16 @@
   color: var(--color-gold-light);
 }
 
+/* position:fixed lets the tooltip escape overflow:hidden on .oracle */
 .oracle__tooltip {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 6px);
-  width: 200px;
+  position: fixed;
+  width: 240px;
   background: rgba(20,15,8,0.97);
   border: 1px solid rgba(201,168,76,0.35);
   border-radius: var(--radius-md);
   padding: 0.65rem 0.75rem;
   box-shadow: var(--shadow-lg);
-  z-index: 100;
+  z-index: 200;
 }
 
 /* Arrow */
@@ -328,24 +327,65 @@
 .oracle__tooltip-prob {
   color: rgba(201,168,76,0.8);
   white-space: nowrap;
-  text-align: right;
-  padding-right: 0.4rem;
+  text-align: center;
+  font-size: 0.73rem;
+  font-variant-numeric: tabular-nums;
 }
 
-.oracle__tooltip-action {
-  color: rgba(255,255,255,0.5);
+/* ── Held dice icons (replaces "Reroll X dice" detail) ──── */
+.oracle__held-dice {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  margin-top: 2px;
+}
+
+/* ── Tooltip table columns ───────────────────────────────── */
+.oracle__tooltip-table th,
+.oracle__tooltip-table td {
+  padding: 0.12rem 0.25rem;
+  vertical-align: middle;
+}
+
+.oracle__tooltip-th {
   font-size: 0.62rem;
+  font-weight: 700;
+  color: #1a1008;
+  background: rgba(201,168,76,0.75);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(201,168,76,0.5);
+  padding-bottom: 0.2rem;
+  text-align: left;
 }
 
-.oracle__tooltip-avg {
-  margin: 0;
-  font-weight: 600;
-  color: var(--color-gold);
-  font-size: 0.72rem;
+.oracle__tooltip-th--num {
+  text-align: center;
 }
 
-.oracle__tooltip {
-  width: 280px;
+.oracle__tooltip-result {
+  color: rgba(255,255,255,0.85);
+  font-size: 0.73rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.oracle__tooltip-bpiv--pos {
+  color: #4caf50;
+  font-weight: 700;
+  font-size: 0.73rem;
+  text-align: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.oracle__tooltip-bpiv--neg {
+  color: #e53935;
+  font-weight: 700;
+  font-size: 0.73rem;
+  text-align: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Mobile: full-width, not sticky ─────────────────── */

@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildScoreNowTooltip, selectTop5Outcomes } from '../outcomes.js';
-import { bpivScoreNow } from '../bpiv.js';
+import { selectTop5Outcomes, describeResult } from '../outcomes.js';
 import { bpivRerollAllHolds as bpivRoll } from '../recursion.js';
 
 const emptySc = {
@@ -13,31 +12,41 @@ const emptySc = {
   balut:     [null, null, null, null],
 };
 
-describe('buildScoreNowTooltip', () => {
-  it('returns exactly 1 entry', () => {
-    const r = bpivScoreNow('fours', [4, 4, 1, 2, 3], emptySc);
-    const tooltip = buildScoreNowTooltip('fours', r);
-    expect(tooltip).toHaveLength(1);
+describe('describeResult', () => {
+  it('names fours/fives/sixes by count', () => {
+    expect(describeResult('fours', 0)).toBe('No 4s');
+    expect(describeResult('fours', 8)).toBe('Two 4s');
+    expect(describeResult('fours', 12)).toBe('Three 4s');
+    expect(describeResult('fours', 16)).toBe('Four 4s');
+    expect(describeResult('fives', 15)).toBe('Three 5s');
+    expect(describeResult('sixes', 18)).toBe('Three 6s');
+    expect(describeResult('sixes', 24)).toBe('Four 6s');
   });
 
-  it('entry has probability=1 and includes breakdown', () => {
-    const r = bpivScoreNow('choice', [4, 5, 6, 3, 2], emptySc);
-    const [entry] = buildScoreNowTooltip('choice', r);
-    expect(entry.probability).toBe(1);
-    expect(entry.downstreamBpiv).toBeCloseTo(r.bpiv, 6);
-    expect(entry.breakdown).toBeDefined();
+  it('names straight by low/high', () => {
+    expect(describeResult('straight', 15)).toBe('Low Straight');
+    expect(describeResult('straight', 20)).toBe('High Straight');
+  });
+
+  it('names fullHouse, choice, and balut', () => {
+    expect(describeResult('fullHouse', 28)).toBe('Full House');
+    expect(describeResult('choice', 27)).toBe('Choice');
+    expect(describeResult('balut', 40)).toBe('Balut (4s)');   // 5×4+20=40
+    expect(describeResult('balut', 50)).toBe('Balut (6s)');   // 5×6+20=50
+    expect(describeResult('balut', 0)).toBe('Missed Balut');
   });
 });
 
 describe('selectTop5Outcomes', () => {
-  it('returns at most 6 entries (5 top + Other)', () => {
+  it('returns at most 5 entries (grouped, no Other row)', () => {
     const results = bpivRoll([4, 4, 4, 1, 2], 1, emptySc);
     const hold444 = results.find(r => r.held.join(',') === '4,4,4');
     const tooltip = selectTop5Outcomes(hold444.rawOutcomes, emptySc);
-    expect(tooltip.length).toBeLessThanOrEqual(6);
+    expect(tooltip.length).toBeGreaterThan(0);
+    expect(tooltip.length).toBeLessThanOrEqual(5);
   });
 
-  it('probabilities in top-5 rows are positive', () => {
+  it('probabilities in all rows are positive', () => {
     const results = bpivRoll([4, 4, 4, 1, 2], 1, emptySc);
     const hold444 = results.find(r => r.held.join(',') === '4,4,4');
     const tooltip = selectTop5Outcomes(hold444.rawOutcomes, emptySc);
@@ -46,22 +55,30 @@ describe('selectTop5Outcomes', () => {
     }
   });
 
-  it('total probability of all rows sums to ≈1', () => {
-    const results = bpivRoll([4, 4, 4, 1, 2], 1, emptySc);
-    const hold444 = results.find(r => r.held.join(',') === '4,4,4');
-    const tooltip = selectTop5Outcomes(hold444.rawOutcomes, emptySc);
-    const total = tooltip.reduce((s, r) => s + r.probability, 0);
-    expect(total).toBeCloseTo(1, 5);
-  });
-
-  it('each entry has a description, bestDownstreamAction, and downstreamBpiv', () => {
+  it('each entry has description (string), probability, and downstreamBpiv', () => {
     const results = bpivRoll([1, 2, 3, 4, 5], 1, emptySc);
-    const holdAll = results.find(r => r.held.join(',') === '1,2,3,4,5');
-    const tooltip = selectTop5Outcomes(holdAll ? holdAll.rawOutcomes : results[0].rawOutcomes, emptySc);
+    const tooltip = selectTop5Outcomes(results[0].rawOutcomes, emptySc);
     for (const row of tooltip) {
       expect(typeof row.description).toBe('string');
-      expect(typeof row.bestDownstreamAction).toBe('string');
+      expect(typeof row.probability).toBe('number');
       expect(typeof row.downstreamBpiv).toBe('number');
     }
+  });
+
+  it('groups all choice outcomes into one "Choice" row', () => {
+    // Rerolling all 5 dice will produce many choice scores, but all should group
+    const results = bpivRoll([1, 1, 1, 1, 1], 1, emptySc);
+    const rerollAll = results.find(r => r.held.length === 0);
+    const tooltip = selectTop5Outcomes(rerollAll.rawOutcomes, emptySc);
+    const choiceRows = tooltip.filter(r => r.description === 'Choice');
+    expect(choiceRows.length).toBeLessThanOrEqual(1);
+  });
+
+  it('Balut appears as a top outcome when holding four 4s', () => {
+    const results = bpivRoll([4, 4, 4, 4, 1], 1, emptySc);
+    const hold4444 = results.find(r => r.held.join(',') === '4,4,4,4');
+    const tooltip = selectTop5Outcomes(hold4444.rawOutcomes, emptySc);
+    const hasBalut = tooltip.some(r => r.description.startsWith('Balut'));
+    expect(hasBalut).toBe(true);
   });
 });

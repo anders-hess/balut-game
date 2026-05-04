@@ -1,82 +1,94 @@
-import { CATEGORIES, CATEGORY_LABELS } from '../gameConstants.js';
+import { CATEGORIES } from '../gameConstants.js';
 import { bpivScoreNow } from './bpiv.js';
-import { nextColumn } from './scoring.js';
 
 // ─── SCORE_NOW tooltip ────────────────────────────────────────────────────────
-// Deterministic: one outcome, shows the full breakdown.
+// Not used by the tooltip renderer — SCORE_NOW uses action.breakdown directly.
+// Kept for structural completeness.
 
-export function buildScoreNowTooltip(cat, bpivResult) {
-  return [{
-    description: `Score ${bpivResult.smallPoints} pts in ${CATEGORY_LABELS[cat]}`,
-    probability: 1,
-    bestDownstreamAction: `Score ${bpivResult.smallPoints} in ${CATEGORY_LABELS[cat]}`,
-    downstreamBpiv: bpivResult.bpiv,
-    breakdown: bpivResult.breakdown,
-  }];
+export function buildScoreNowTooltip(_cat, _bpivResult) {
+  return [];
 }
 
-// ─── REROLL tooltip: top-5 outcomes ──────────────────────────────────────────
-// rawOutcomes: [{ held, rolled, prob, newDice, downstreamBpiv }]
-// Selects up to 5 outcomes that best help the user understand the distribution.
-// Strategy: rank by |prob × downstreamBpiv| (impact), take top 5, then append
-// an aggregated "Other" row for the remainder if there are more than 5.
+// ─── REROLL tooltip: top outcomes by result type ──────────────────────────────
+// Groups rawOutcomes by the best-scoring category + score.
+// Returns up to 5 { description, probability, downstreamBpiv } objects,
+// sorted by probability × |BPIV| (impact) descending.
 
 export function selectTop5Outcomes(rawOutcomes, scorecard) {
-  // Annotate each outcome with the best SCORE_NOW description
-  const annotated = rawOutcomes.map(o => ({
-    ...o,
-    impact: o.prob * Math.abs(o.downstreamBpiv),
-    bestAction: _bestActionLabel(o.newDice, scorecard),
-  }));
+  const groups = new Map(); // groupKey → { description, probability, bpivWeightedSum }
 
-  // Sort by impact descending
-  annotated.sort((a, b) => b.impact - a.impact);
+  for (const o of rawOutcomes) {
+    const best = _findBestAction(o.newDice, scorecard);
+    if (!best) continue;
 
-  const top5 = annotated.slice(0, 5);
-  const rest  = annotated.slice(5);
+    const key   = _groupKey(best.cat, best.score);
+    const label = describeResult(best.cat, best.score);
 
-  const result = top5.map(o => ({
-    description:        _diceDescription(o.held, o.rolled, o.newDice),
-    probability:        o.prob,
-    bestDownstreamAction: o.bestAction,
-    downstreamBpiv:     o.downstreamBpiv,
-  }));
-
-  // Aggregate remaining outcomes into "Other" row
-  if (rest.length > 0) {
-    const otherProb = rest.reduce((s, o) => s + o.prob, 0);
-    const otherBpiv = rest.reduce((s, o) => s + o.prob * o.downstreamBpiv, 0) / (otherProb || 1);
-    result.push({
-      description:        'Other outcomes',
-      probability:        otherProb,
-      bestDownstreamAction: rest[0]?.bestAction ?? '—',
-      downstreamBpiv:     otherBpiv,
-    });
+    const g = groups.get(key);
+    if (g) {
+      g.probability    += o.prob;
+      g.bpivWeightedSum += o.prob * o.downstreamBpiv;
+    } else {
+      groups.set(key, {
+        description:     label,
+        probability:     o.prob,
+        bpivWeightedSum: o.prob * o.downstreamBpiv,
+      });
+    }
   }
 
-  return result;
+  const list = [...groups.values()].map(g => ({
+    description:    g.description,
+    probability:    g.probability,
+    downstreamBpiv: g.bpivWeightedSum / g.probability,
+  }));
+
+  list.sort((a, b) => b.downstreamBpiv - a.downstreamBpiv);
+
+  return list.slice(0, 5);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function _bestActionLabel(dice, scorecard) {
-  let bestCat = null;
-  let bestBpiv = -Infinity;
+function _findBestAction(dice, scorecard) {
+  let bestCat = null, bestScore = 0, bestBpiv = -Infinity;
   for (const cat of CATEGORIES) {
     const r = bpivScoreNow(cat, dice, scorecard);
     if (r !== null && r.bpiv > bestBpiv) {
-      bestBpiv = r.bpiv;
-      bestCat  = cat;
+      bestBpiv  = r.bpiv;
+      bestCat   = cat;
+      bestScore = r.smallPoints;
     }
   }
-  if (!bestCat) return '—';
-  const r = bpivScoreNow(bestCat, dice, scorecard);
-  const sign = bestBpiv >= 0 ? '+' : '';
-  return `Score ${r.smallPoints} in ${CATEGORY_LABELS[bestCat]} (${sign}${bestBpiv.toFixed(2)})`;
+  return bestCat ? { cat: bestCat, score: bestScore, bpiv: bestBpiv } : null;
 }
 
-function _diceDescription(held, rolled, newDice) {
-  const heldStr = held.length > 0 ? held.join('-') : '—';
-  const rolledStr = rolled.length > 0 ? rolled.join('-') : '(nothing)';
-  return `Hold [${heldStr}] + Roll [${rolledStr}] → [${newDice.join('-')}]`;
+// Group choice by category (all sums into one row); all others by (cat, score).
+function _groupKey(cat, score) {
+  return cat === 'choice' ? 'choice' : `${cat}-${score}`;
+}
+
+// Human-readable outcome name shown in the tooltip Result column.
+export function describeResult(cat, score) {
+  switch (cat) {
+    case 'fours':    return _countName(score, 4, '4');
+    case 'fives':    return _countName(score, 5, '5');
+    case 'sixes':    return _countName(score, 6, '6');
+    case 'straight': return score === 15 ? 'Low Straight' : 'High Straight';
+    case 'fullHouse': return 'Full House';
+    case 'choice':   return 'Choice';
+    case 'balut': {
+      if (score === 0) return 'Missed Balut';
+      const face = Math.round((score - 20) / 5); // score = 5×face + 20
+      return `Balut (${face}s)`;
+    }
+    default: return cat;
+  }
+}
+
+function _countName(score, faceValue, faceStr) {
+  if (score === 0) return `No ${faceStr}s`;
+  const count = score / faceValue;
+  const words = ['', 'One', 'Two', 'Three', 'Four', 'Five'];
+  return `${words[count] || count} ${faceStr}${count !== 1 ? 's' : ''}`;
 }

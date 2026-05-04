@@ -61,7 +61,7 @@ export function recommend({ currentDice, rollsRemaining, scorecard }) {
   displayed.sort((a, b) => b.bpiv - a.bpiv);
 
   return {
-    actions:        displayed.map((a, i) => ({ ...a, rank: i + 1 })),
+    actions:        displayed.slice(0, 5).map((a, i) => ({ ...a, rank: i + 1 })),
     isAllNegative:  !hasPositive,
     recommendedRank: 1,
   };
