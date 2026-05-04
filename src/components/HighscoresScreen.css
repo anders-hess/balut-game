@@ -1,0 +1,172 @@
+/* ── Full-page leaderboard ───────────────────────────────────────────────── */
+.hs-screen {
+  min-height: 100vh;
+  background: var(--color-felt);
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.hs-screen__inner {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.hs-screen__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hs-screen__back {
+  background: none;
+  border: 1px solid rgba(201,168,76,0.35);
+  color: rgba(201,168,76,0.8);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.hs-screen__back:hover {
+  background: rgba(201,168,76,0.12);
+  color: var(--color-gold);
+}
+
+.hs-screen__title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+/* ── Period tabs ─────────────────────────────────────────────────────────── */
+.hs-screen__tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+  padding-bottom: 0;
+}
+
+.hs-screen__tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(255,255,255,0.45);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  letter-spacing: 0.03em;
+  margin-bottom: -1px;
+}
+
+.hs-screen__tab:hover {
+  color: rgba(255,255,255,0.8);
+}
+
+.hs-screen__tab--active {
+  color: var(--color-gold);
+  border-bottom-color: var(--color-gold);
+}
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+.hs-screen__body {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  min-height: 200px;
+}
+
+.hs-screen__status {
+  color: rgba(255,255,255,0.4);
+  text-align: center;
+  font-size: 0.9rem;
+  padding: 2rem 0;
+  margin: 0;
+}
+
+.hs-screen__status--error {
+  color: #e53935;
+}
+
+/* ── Table ───────────────────────────────────────────────────────────────── */
+.hs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.hs-table__th {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #1a1008;
+  background: rgba(201,168,76,0.75);
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(201,168,76,0.4);
+}
+
+.hs-table__th--num  { text-align: right; }
+.hs-table__th--rank { text-align: center; width: 2rem; }
+.hs-table__th--date { text-align: right; }
+
+.hs-table__row {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.1s;
+}
+
+.hs-table__row:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+.hs-table__row--top {
+  background: rgba(201,168,76,0.08);
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+}
+
+.hs-table__row--top:hover {
+  background: rgba(201,168,76,0.13);
+}
+
+.hs-table__td {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.8);
+  padding: 0.55rem 0.6rem;
+}
+
+.hs-table__td--rank {
+  text-align: center;
+  font-weight: 700;
+  color: rgba(255,255,255,0.4);
+}
+
+.hs-table__row--top .hs-table__td--rank {
+  color: var(--color-gold);
+}
+
+.hs-table__td--name {
+  font-weight: 600;
+}
+
+.hs-table__td--num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.hs-table__td--date {
+  text-align: right;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.35);
+}

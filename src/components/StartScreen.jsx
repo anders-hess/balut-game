@@ -1,12 +1,12 @@
 import './StartScreen.css';
 
-export default function StartScreen({ onStart }) {
+export default function StartScreen({ onStart, onHighscores }) {
   return (
     <div className="start-screen">
       {/* Title lives on the felt — no card width constraint */}
       <div className="start-hero">
         <h1 className="start-title">BALUT</h1>
-        <p className="start-subtitle">The Danish Dice Game</p>
+        <p className="start-subtitle">The Classic Dice Game</p>
       </div>
 
       {/* Narrow card only holds the mode buttons */}
@@ -24,6 +24,10 @@ export default function StartScreen({ onStart }) {
           <button className="mode-btn mode-btn--disabled" disabled>
             Online Multiplayer
             <span className="coming-soon">Coming Soon</span>
+          </button>
+
+          <button className="mode-btn mode-btn--secondary" onClick={onHighscores}>
+            🏆 Leaderboard
           </button>
         </div>
       </div>

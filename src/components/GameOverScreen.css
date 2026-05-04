@@ -150,6 +150,127 @@
   color: var(--color-ink-light);
 }
 
+/* ── Leaderboard section ─────────────────────────────── */
+.gameover__leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid rgba(180,150,100,0.2);
+}
+
+.gameover__hs-checking {
+  font-size: 0.78rem;
+  color: rgba(80,60,40,0.5);
+  text-align: center;
+  margin: 0;
+}
+
+.gameover__hs-qualify {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.gameover__hs-title {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0;
+  text-align: center;
+}
+
+.gameover__hs-badges {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.gameover__hs-badge {
+  background: rgba(201,168,76,0.18);
+  border: 1px solid rgba(201,168,76,0.5);
+  color: #7a5c00;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+}
+
+.gameover__hs-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.gameover__hs-input {
+  flex: 1;
+  border: 1px solid rgba(180,150,100,0.5);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.7);
+  padding: 0.45rem 0.6rem;
+  font-size: 0.85rem;
+  color: var(--color-ink);
+  outline: none;
+}
+
+.gameover__hs-input:focus {
+  border-color: var(--color-gold);
+  background: #fff;
+}
+
+.gameover__hs-submit {
+  background: var(--color-felt);
+  color: var(--color-parchment);
+  border: none;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.gameover__hs-submit:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.gameover__hs-error {
+  font-size: 0.75rem;
+  color: #c0392b;
+  margin: 0;
+  text-align: center;
+}
+
+.gameover__hs-done {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2e7d32;
+  text-align: center;
+  margin: 0;
+}
+
+.gameover__hs-view {
+  background: none;
+  border: 1px solid rgba(180,150,100,0.35);
+  color: rgba(80,60,40,0.65);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  align-self: center;
+  transition: color 0.12s, border-color 0.12s;
+}
+
+.gameover__hs-view:hover {
+  color: var(--color-ink);
+  border-color: rgba(180,150,100,0.7);
+}
+
 /* ── Play again ──────────────────────────────────────── */
 .gameover__play-again {
   margin: 0.75rem 1.25rem 1.25rem;
