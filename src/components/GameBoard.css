@@ -140,6 +140,50 @@
   background: var(--color-accent-light);
 }
 
+/* ── Player tabs (multiplayer scorecard toggle) ───────── */
+.player-tabs {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.player-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.5);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.player-tab:hover {
+  background: rgba(255,255,255,0.09);
+  color: rgba(255,255,255,0.75);
+}
+
+.player-tab--active {
+  border-color: rgba(201,168,76,0.5);
+  color: var(--color-gold);
+}
+
+.player-tab--viewing {
+  background: rgba(201,168,76,0.12);
+  border-color: rgba(201,168,76,0.5);
+  color: var(--color-gold);
+}
+
+.player-tab__pts {
+  font-size: 0.68rem;
+  opacity: 0.65;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ── Responsive: stack on narrow screens ─────────────── */
 @media (max-width: 800px) {
   .board-layout {

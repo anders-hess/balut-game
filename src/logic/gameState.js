@@ -8,13 +8,19 @@ export function createInitialDice() {
   return Array(NUM_DICE).fill(0).map(() => ({ value: 0, held: false }));
 }
 
+export function createInitialPlayer(name = 'You') {
+  return { name, scorecard: createInitialScorecard() };
+}
+
 export function createInitialState() {
   return {
-    phase: 'start',       // 'start' | 'playing' | 'gameover'
-    scorecard: createInitialScorecard(),
+    phase: 'start',          // 'start' | 'setup' | 'playing' | 'gameover'
+    players: [createInitialPlayer('You')],
+    currentPlayerIndex: 0,
+    showHandoff: false,
     dice: createInitialDice(),
     rollsLeft: MAX_ROLLS,
-    turnNumber: 1,        // 1-based, max = NUM_COLUMNS * CATEGORIES.length
+    turnNumber: 1,
     oracleEnabled: true,
     justScoredBalut: false,
   };

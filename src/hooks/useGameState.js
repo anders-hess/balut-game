@@ -2,6 +2,7 @@ import { useReducer } from 'react';
 import { MAX_ROLLS } from '../logic/gameConstants.js';
 import {
   createInitialState,
+  createInitialPlayer,
   rollDice,
   toggleHold,
   resetTurn,
@@ -12,6 +13,15 @@ function reducer(state, action) {
   switch (action.type) {
     case 'START_GAME':
       return { ...createInitialState(), phase: 'playing' };
+
+    case 'SETUP_MULTIPLAYER': {
+      const { names } = action;
+      return {
+        ...createInitialState(),
+        phase: 'playing',
+        players: names.map(name => createInitialPlayer(name)),
+      };
+    }
 
     case 'ROLL': {
       if (state.rollsLeft === 0) return state;
@@ -31,32 +41,67 @@ function reducer(state, action) {
 
     case 'SCORE': {
       const { category } = action;
-      const col = nextColumn(state.scorecard, category);
+      const currentPlayer = state.players[state.currentPlayerIndex];
+      const col = nextColumn(currentPlayer.scorecard, category);
       if (col === -1) return state;
 
-      const diceValues  = state.dice.map(d => d.value);
-      const score       = calculateScore(category, diceValues);
-      const finalScore  = score === null ? 0 : score;
-      const isBalut     = category === 'balut' && finalScore > 0;
+      const diceValues = state.dice.map(d => d.value);
+      const score      = calculateScore(category, diceValues);
+      const finalScore = score === null ? 0 : score;
+      const isBalut    = category === 'balut' && finalScore > 0;
 
       const newScorecard = {
-        ...state.scorecard,
-        [category]: state.scorecard[category].map((v, i) => i === col ? finalScore : v),
+        ...currentPlayer.scorecard,
+        [category]: currentPlayer.scorecard[category].map((v, i) => i === col ? finalScore : v),
       };
+
+      const newPlayers = state.players.map((p, i) =>
+        i === state.currentPlayerIndex ? { ...p, scorecard: newScorecard } : p
+      );
+
+      const allDone = newPlayers.every(p => isGameOver(p.scorecard));
+
+      if (allDone) {
+        return {
+          ...state,
+          players: newPlayers,
+          dice: resetTurn(state.dice),
+          rollsLeft: MAX_ROLLS,
+          turnNumber: state.turnNumber + 1,
+          phase: 'gameover',
+          justScoredBalut: isBalut,
+          showHandoff: false,
+        };
+      }
+
+      // Find next player who still has unfilled cells
+      let nextIdx = state.currentPlayerIndex;
+      for (let i = 1; i <= state.players.length; i++) {
+        const idx = (state.currentPlayerIndex + i) % state.players.length;
+        if (!isGameOver(newPlayers[idx].scorecard)) {
+          nextIdx = idx;
+          break;
+        }
+      }
 
       return {
         ...state,
-        scorecard: newScorecard,
+        players: newPlayers,
+        currentPlayerIndex: nextIdx,
         dice: resetTurn(state.dice),
         rollsLeft: MAX_ROLLS,
         turnNumber: state.turnNumber + 1,
-        phase: isGameOver(newScorecard) ? 'gameover' : 'playing',
+        phase: 'playing',
         justScoredBalut: isBalut,
+        showHandoff: state.players.length > 1,
       };
     }
 
+    case 'DISMISS_HANDOFF':
+      return { ...state, showHandoff: false, justScoredBalut: false };
+
     case 'GO_HOME':
-      return createInitialState(); // phase: 'start', resets everything
+      return createInitialState();
 
     case 'TOGGLE_ORACLE':
       return { ...state, oracleEnabled: !state.oracleEnabled };
@@ -81,12 +126,14 @@ export function useGameState() {
 
   return {
     state,
-    startGame:     ()             => dispatch({ type: 'START_GAME' }),
-    goHome:        ()             => dispatch({ type: 'GO_HOME' }),
-    roll:          ()             => dispatch({ type: 'ROLL' }),
-    toggleHold:    (index)        => dispatch({ type: 'TOGGLE_HOLD', index }),
-    scoreCategory: (category)     => dispatch({ type: 'SCORE', category }),
-    toggleOracle:  ()             => dispatch({ type: 'TOGGLE_ORACLE' }),
-    applyHold:     (valuesToHold) => dispatch({ type: 'APPLY_HOLD', valuesToHold }),
+    startGame:        ()              => dispatch({ type: 'START_GAME' }),
+    setupMultiplayer: (names)         => dispatch({ type: 'SETUP_MULTIPLAYER', names }),
+    dismissHandoff:   ()              => dispatch({ type: 'DISMISS_HANDOFF' }),
+    goHome:           ()              => dispatch({ type: 'GO_HOME' }),
+    roll:             ()              => dispatch({ type: 'ROLL' }),
+    toggleHold:       (index)         => dispatch({ type: 'TOGGLE_HOLD', index }),
+    scoreCategory:    (category)      => dispatch({ type: 'SCORE', category }),
+    toggleOracle:     ()              => dispatch({ type: 'TOGGLE_ORACLE' }),
+    applyHold:        (valuesToHold)  => dispatch({ type: 'APPLY_HOLD', valuesToHold }),
   };
 }

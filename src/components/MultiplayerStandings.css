@@ -1,0 +1,49 @@
+.mp-standings {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.mp-standings__badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  font-size: 0.72rem;
+}
+
+.mp-standings__badge--active {
+  border-color: rgba(201,168,76,0.6);
+  background: rgba(201,168,76,0.14);
+}
+
+.mp-standings__name {
+  font-weight: 600;
+  color: rgba(255,255,255,0.65);
+  white-space: nowrap;
+}
+
+.mp-standings__badge--active .mp-standings__name {
+  color: var(--color-gold);
+}
+
+.mp-standings__pts {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.68rem;
+}
+
+.mp-standings__badge--active .mp-standings__pts {
+  color: rgba(201,168,76,0.8);
+}
+
+.mp-standings__check {
+  font-size: 0.65rem;
+  color: #4caf50;
+  font-weight: 700;
+}

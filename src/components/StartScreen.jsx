@@ -1,6 +1,6 @@
 import './StartScreen.css';
 
-export default function StartScreen({ onStart, onHighscores }) {
+export default function StartScreen({ onStart, onMultiplayer, onHighscores }) {
   return (
     <div className="start-screen">
       {/* Title lives on the felt — no card width constraint */}
@@ -16,9 +16,8 @@ export default function StartScreen({ onStart, onHighscores }) {
             Single Player
           </button>
 
-          <button className="mode-btn mode-btn--disabled" disabled>
+          <button className="mode-btn mode-btn--primary" onClick={onMultiplayer}>
             Local Multiplayer
-            <span className="coming-soon">Coming Soon</span>
           </button>
 
           <button className="mode-btn mode-btn--disabled" disabled>
