@@ -1,7 +1,7 @@
 # Balut App — Claude Context
 
 ## What this is
-A single-player Balut dice game built with React + Vite. Multiplayer (local and online) is the planned next major feature; the game logic is already architected to support it.
+A Balut dice game built with React + Vite supporting single player and local multiplayer (2–4 players). Online multiplayer is the next planned feature.
 
 ---
 
@@ -29,7 +29,7 @@ npm.cmd run build
 ```
 
 ### Deployment
-Live at **https://balut-game.vercel.app** — connected to the `main` branch of `https://github.com/anders-hess/balut-game`. Every `git push origin main` triggers an automatic Vercel redeploy. No manual deploy steps needed.
+Live at **https://balut-game.vercel.app** — connected to the `main` branch of `https://github.com/anders-hess/balut-game`. Every `git push origin main` triggers an automatic Vercel redeploy.
 
 ---
 
@@ -39,7 +39,7 @@ Live at **https://balut-game.vercel.app** — connected to the `main` branch of 
 src/
   logic/              # Pure game logic — NO React imports
     gameConstants.js      # NUM_DICE, MAX_ROLLS, NUM_COLUMNS, CATEGORIES, scoring rules
-    gameState.js          # State factories, rollDice, toggleHold, resetTurn
+    gameState.js          # State factories incl. createInitialPlayer()
     scoring.js            # calculateScore, calcTotals, calcBonus, isGameOver, etc.
     oracle/               # BPIV engine (see Oracle section below)
       index.js            # recommend() — public entry point
@@ -49,24 +49,28 @@ src/
       probabilities.js    # normalCDF, DIST combinatorics, uniqueSubsets()
       scoring.js          # scoreCell(), categoryCurrentSum(), etc.
       outcomes.js         # selectTop5Outcomes(), describeResult()
-      constants.js        # Per-category statistics (Monte Carlo TODO — see Oracle section)
+      constants.js        # Per-category statistics (Monte Carlo TODO)
       __tests__/          # 92 Vitest unit tests
   services/           # External service integrations
     supabase.js           # Supabase client singleton (null when .env.local absent)
     highscores.js         # fetchLeaderboard(), checkQualifies(), submitScore()
   hooks/
-    useGameState.js       # useReducer wrapping all game actions
+    useGameState.js       # useReducer — all game actions including multiplayer
   components/
-    App.jsx               # Routing: showHighscores state + phase-based routing
-    StartScreen           # Landing page — hero title, mode buttons, Leaderboard button
-    GameBoard             # Two-column layout shell + header
+    App.jsx               # Routing: showHighscores + showSetup booleans + phase
+    StartScreen           # Landing page — Single Player, Local Multiplayer, Leaderboard
+    PlayerSetupScreen     # Multiplayer setup — player count (2–4) + name inputs
+    HandoffOverlay        # Full-screen "pass the device" overlay between turns
+    GameBoard             # Two-column layout; reads from players[currentPlayerIndex]
+    MultiplayerStandings  # Header badge strip showing all players' live big-point totals
+    MultiplayerGameOverScreen  # Ranked results table + per-player leaderboard submit
     DiceArea              # 5-die tray + Roll button + pip counter
-    Dice                  # Single die button (holds DiceFace, manages rolling class)
+    Dice                  # Single die button
     DiceFace              # SVG pip renderer (pure, no state)
     Scorecard             # 7×4 scoring table + footer totals bar
-    TheOracle             # Sidebar advisor panel — BPIV recommendations + tooltips
-    GameOverScreen        # Final score summary + leaderboard submit flow
-    HighscoresScreen      # Full leaderboard view (Daily / Monthly / Yearly tabs)
+    TheOracle             # Sidebar advisor — BPIV recommendations + tooltips
+    GameOverScreen        # Single-player game over + leaderboard submit
+    HighscoresScreen      # Full leaderboard (Daily / Monthly / Yearly tabs)
     HighscoresCard        # Compact "Today's Top 3" widget in GameBoard right column
     BalutToast            # Fixed-position celebration toast (2.8 s)
   styles/
@@ -78,30 +82,58 @@ src/
 ## Architecture rules
 
 ### Game logic is strictly separated from UI
-`src/logic/` contains only pure functions with zero React imports. This is intentional for multiplayer — the same logic will drive multiple players. **Never import React into logic files.**
+`src/logic/` contains only pure functions with zero React imports. **Never import React into logic files.**
 
 ### State lives in one place
-`useGameState.js` owns all game state via `useReducer`. Components receive data and callbacks as props; they do not hold game state locally.
+`useGameState.js` owns all game state via `useReducer`. Components receive data and callbacks as props.
 
 ### State shape
 ```js
 {
-  phase:            'start' | 'playing' | 'gameover',
-  dice:             [{ value: 0–6, held: bool }, ×5],  // value 0 = unrolled
-  rollsLeft:        0–3,
-  scorecard:        { [category]: [null|number, ×4] },  // null = unfilled
-  turnNumber:       number,   // 1-based
-  oracleEnabled:    bool,     // true by default
-  justScoredBalut:  bool,     // resets to false on next ROLL
+  phase:              'start' | 'playing' | 'gameover',
+  players:            [{ name: string, scorecard: { [cat]: [null|number, ×4] } }, ...],
+  currentPlayerIndex: number,   // index into players[]
+  showHandoff:        bool,     // true after SCORE in multiplayer; cleared by DISMISS_HANDOFF
+  dice:               [{ value: 0–6, held: bool }, ×5],
+  rollsLeft:          0–3,
+  turnNumber:         number,
+  oracleEnabled:      bool,
+  justScoredBalut:    bool,
 }
 ```
 
-### App routing
-`App.jsx` uses a local `showHighscores` boolean (separate from game phase) to render `HighscoresScreen`. The game phase (`'start' | 'playing' | 'gameover'`) is owned by `useGameState`.
+Single player uses `players.length === 1` — no separate code path. `players[0].scorecard` is always the canonical scorecard for single player.
 
-### Scoring categories (fill order matters — always left to right)
-`fours | fives | sixes | straight | fullHouse | choice | balut`  
+### Actions in `useGameState.js`
+| Action | Effect |
+|---|---|
+| `START_GAME` | Single-player game; `players: [{ name: 'You', scorecard: empty }]` |
+| `SETUP_MULTIPLAYER({ names })` | Multiplayer; builds `players[]` from names array |
+| `ROLL` | Rerolls unheld dice, decrements rollsLeft |
+| `TOGGLE_HOLD` | Toggles held flag on a die |
+| `SCORE` | Scores for current player; rotates to next unfinished player; sets `showHandoff: true` in multiplayer |
+| `DISMISS_HANDOFF` | Clears `showHandoff` |
+| `GO_HOME` | Full reset |
+| `TOGGLE_ORACLE` | Toggles Oracle panel |
+
+### App routing
+`App.jsx` uses two local booleans (`showHighscores`, `showSetup`) alongside the reducer phase. `showSetup` controls the multiplayer `PlayerSetupScreen` — it's not a reducer phase, just a UI layer.
+
+### Scoring categories (fill order — always left to right)
+`fours | fives | sixes | straight | fullHouse | choice | balut`
 Each has 4 columns. `nextColumn(scorecard, category)` returns the next fillable index.
+
+---
+
+## Local Multiplayer
+
+- 2–4 players on a shared device; free choice of category each turn
+- **Setup**: "Local Multiplayer" → `PlayerSetupScreen` (player count + names) → `SETUP_MULTIPLAYER`
+- **Turn flow**: roll → score → `HandoffOverlay` ("🎲 [Name]'s turn — tap to start") → next player
+- **Scorecard toggle**: player tabs above the scorecard let any player peek at others' scorecards (read-only); tab resets to current player on each turn change via `useEffect`
+- **Standings**: `MultiplayerStandings` shows live big-point totals for all players in the header
+- **Game over**: `MultiplayerGameOverScreen` shows ranked table; each qualifying score gets its own leaderboard submit prompt (same `checkQualifies`/`submitScore` as single player)
+- `GameBoard` reads `players[currentPlayerIndex]` for dice/Oracle; `players[displayIdx]` for the Scorecard tab being viewed
 
 ---
 
@@ -111,37 +143,25 @@ The Oracle is a statistically rigorous advisor in `src/logic/oracle/`. It ranks 
 
 ### Public API
 ```js
-import { recommend } from './src/logic/oracle/index.js';
-
 recommend({ currentDice, rollsRemaining, scorecard })
 // Returns: { actions: [...], isAllNegative: bool, recommendedRank: 1 }
-// Each action: { rank, type, description, bpiv, breakdown, held, tooltipOutcomes }
 ```
 
 ### How BPIV works
 ```
 BPIV(action) = categoryBigDelta + bonusBigDelta
 ```
-- **categoryBigDelta**: change in P(category big-point threshold met) × big points at stake, vs. baseline
-- **bonusBigDelta**: change in E[end-game small-points bonus], vs. baseline
-- **Baseline**: scoring `EXPECTED_SCORE_PER_COLUMN[category]` in that cell
-- BPIV = 0 → this action is no better or worse than an average roll
-
-### Filtering
-- If any action has BPIV > 0: show only positive-BPIV actions (max 5), sorted descending
-- If all BPIV ≤ 0: show all actions sorted descending + `isAllNegative: true`
-
-### REROLL recursion
-`createMaxBpiv(scorecard)` returns a memoised function that finds the best achievable BPIV from any dice state and rollsRemaining. It considers ALL categories at every leaf node — holding 4-4-4 and rolling 4-4 correctly values the result as Balut, not Fours.
+- **categoryBigDelta**: change in P(threshold met) × big points at stake, vs. baseline
+- **bonusBigDelta**: change in E[end-game bonus], vs. baseline
+- **Baseline**: `EXPECTED_SCORE_PER_COLUMN[category]` for that cell
 
 ### Constants (important caveat)
-`src/logic/oracle/constants.js` contains `EXPECTED_SCORE_PER_COLUMN` and `VARIANCE_PER_COLUMN`. These are **calibrated estimates, not true Monte Carlo values**. In particular:
-- `fours: 12.5` and `choice: 23.0` are kept at these specific values to preserve the correct BPIV ordering for SPEC TEST 3 ("Hopeless Fours"). Changing them to their "intuitive" values (12 and 25) reverses the test outcome.
-- `fives: 15.0` and `sixes: 18.0` reflect "three of face value" as the discrete baseline.
-- A Monte Carlo simulation pass is needed before treating these as authoritative.
+`constants.js` values are **calibrated estimates, not Monte Carlo**:
+- `fours: 12.5` and `choice: 23.0` are kept at these values to preserve SPEC TEST 3 ordering — changing to 12/25 reverses the assertion.
+- `fives: 15.0`, `sixes: 18.0` reflect "three of face value" as discrete baseline.
 
 ### Tests
-92 Vitest tests in `src/logic/oracle/__tests__/`. Run with `npm.cmd run test`. Includes 8 spec integration tests (spec tests 1–8) covering Full House traps, threshold crossing, recursion correctness, and filtering logic.
+92 Vitest tests in `__tests__/`. Run with `npm.cmd run test`.
 
 ---
 
@@ -149,27 +169,27 @@ BPIV(action) = categoryBigDelta + bonusBigDelta
 
 ### Backend: Supabase
 - **Project URL**: `https://ehpguosbtfnrfttghcnz.supabase.co`
-- **Table**: `scores` — columns: `id`, `player_name` (max 20 chars), `big_points`, `small_points`, `balut_count`, `created_at`
-- **Time windows**: daily / monthly / yearly — filtered by `created_at` at query time (no cron jobs, data never deleted)
-- **Sort order**: `big_points DESC, small_points DESC, balut_count DESC`
-- **RLS**: anonymous SELECT and INSERT enabled; no auth required
+- **Table**: `scores` — `id`, `player_name` (max 20), `big_points`, `small_points`, `balut_count`, `created_at`
+- **Sort**: `big_points DESC, small_points DESC, balut_count DESC`
+- **Time windows**: daily / monthly / yearly filtered at query time — no resets needed
+- **RLS**: anonymous SELECT + INSERT; no auth required
 
 ### Credentials
-Stored in `.env.local` (gitignored). Required vars:
+In `.env.local` (gitignored) and Vercel env vars:
 ```
 VITE_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY
 ```
-Both are also set as Vercel environment variables on the `balut-game` project. The Supabase client (`src/services/supabase.js`) returns `null` gracefully when these vars are absent — leaderboard features degrade silently rather than crashing.
+Client returns `null` gracefully when absent — leaderboard degrades silently.
 
 ### Submit flow
-On game over, `checkQualifies(bigPts, smallPts, balutCount)` fetches all three leaderboards and returns which periods the score beats. If any qualify, `GameOverScreen` shows a name input. One `submitScore()` call covers all qualifying periods. Last-used name is persisted in `localStorage` (`balut_player_name`).
+`checkQualifies(bigPts, smallPts, balutCount)` → returns qualifying periods → name input → `submitScore()`. Last-used name persisted in `localStorage` (`balut_player_name`). Works the same for single and multiplayer (each player submits independently).
 
 ---
 
 ## Visual theme
 
-All design tokens live in `src/styles/theme.css` as CSS custom properties. Key ones:
+All tokens in `src/styles/theme.css`:
 
 | Token | Value | Use |
 |---|---|---|
@@ -184,16 +204,14 @@ All design tokens live in `src/styles/theme.css` as CSS custom properties. Key o
 
 ## Known cleanup items
 
-- **`APPLY_HOLD` reducer case** (`useGameState.js` line ~61) and the `onApplyHold` prop in `GameBoard.jsx` are vestigial — safe to delete.
+- **`APPLY_HOLD` reducer case** (`useGameState.js`) and `onApplyHold` prop in `GameBoard.jsx` are vestigial — safe to delete.
 
 ---
 
-## Multiplayer roadmap notes
+## Roadmap
 
-- All scoring logic (`src/logic/scoring.js`) is stateless and player-agnostic.
-- `StartScreen` has stubbed "Local Multiplayer" and "Online Multiplayer" buttons (`mode-btn--disabled`).
-- When building multiplayer: the scorecard state will need to become an array (one per player); the turn-routing logic in `useGameState.js` is the primary thing to extend.
-- The `scores` table in Supabase has no `player_count` column yet — add this when multiplayer scores need to be distinguished from single-player scores.
+- **Online multiplayer**: the `players[]` state shape is already multi-player aware; the main work is adding a real-time sync layer (WebSockets / Supabase Realtime) and a lobby/room system.
+- **`scores` table**: no `player_count` column — multiplayer scores submit identically to single-player scores (ranking is player-agnostic).
 
 ---
 
@@ -202,4 +220,4 @@ All design tokens live in `src/styles/theme.css` as CSS custom properties. Key o
 | Breakpoint | Layout change |
 |---|---|
 | ≤ 800px | Oracle and leaderboard card move below scorecard (single column) |
-| ≤ 480px | Turn counter hidden, font sizes reduce |
+| ≤ 480px | Turn counter / standings hidden, font sizes reduce |
