@@ -55,6 +55,9 @@ function reducer(state, action) {
       };
     }
 
+    case 'GO_HOME':
+      return createInitialState(); // phase: 'start', resets everything
+
     case 'TOGGLE_ORACLE':
       return { ...state, oracleEnabled: !state.oracleEnabled };
 
@@ -79,6 +82,7 @@ export function useGameState() {
   return {
     state,
     startGame:     ()             => dispatch({ type: 'START_GAME' }),
+    goHome:        ()             => dispatch({ type: 'GO_HOME' }),
     roll:          ()             => dispatch({ type: 'ROLL' }),
     toggleHold:    (index)        => dispatch({ type: 'TOGGLE_HOLD', index }),
     scoreCategory: (category)     => dispatch({ type: 'SCORE', category }),

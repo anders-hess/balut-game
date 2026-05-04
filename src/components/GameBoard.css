@@ -19,12 +19,24 @@
 }
 
 .board-title {
+  /* Reset button defaults */
+  background: none;
+  border: none;
+  padding: 0;
+  /* Typography — same as original h1 */
   font-family: var(--font-serif);
   font-size: 2rem;
   color: var(--color-gold);
   letter-spacing: 0.2em;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
   flex-shrink: 0;
+  /* Clickable */
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.board-title:hover {
+  opacity: 0.72;
 }
 
 .board-header__meta {

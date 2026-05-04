@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
-import { computeRecommendations } from '../logic/oracle.js';
+import { recommend } from '../logic/oracle/index.js';
 import './TheOracle.css';
 
 export default function TheOracle({
@@ -11,16 +11,14 @@ export default function TheOracle({
   const [openTip, setOpenTip] = useState(null);
   const panelRef = useRef(null);
 
-  const recommendations = useMemo(() => {
-    if (!hasRolled || isGameOver) return [];
-    return computeRecommendations(diceValues, rollsLeft, scorecard);
+  const result = useMemo(() => {
+    if (!hasRolled || isGameOver) return null;
+    return recommend({ currentDice: diceValues, rollsRemaining: rollsLeft, scorecard });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [diceValues.join(','), rollsLeft, scorecard, hasRolled, isGameOver]);
 
-  // Close tooltip when recommendations change (new roll / score)
-  useEffect(() => { setOpenTip(null); }, [recommendations]);
+  useEffect(() => { setOpenTip(null); }, [result]);
 
-  // Close tooltip on outside click
   useEffect(() => {
     if (openTip === null) return;
     const handler = (e) => {
@@ -34,6 +32,26 @@ export default function TheOracle({
 
   function toggleTip(i) {
     setOpenTip(prev => prev === i ? null : i);
+  }
+
+  function formatBpiv(bpiv) {
+    if (bpiv === null || bpiv === undefined) return '—';
+    const sign = bpiv > 0 ? '+' : '';
+    return `${sign}${bpiv.toFixed(2)}`;
+  }
+
+  function bpivClass(bpiv) {
+    if (bpiv > 0) return 'oracle__bpiv oracle__bpiv--positive';
+    if (bpiv < 0) return 'oracle__bpiv oracle__bpiv--negative';
+    return 'oracle__bpiv';
+  }
+
+  function actionDetail(action) {
+    if (action.type === 'SCORE_NOW') {
+      return `${action.smallPoints} pts`;
+    }
+    const numReroll = 5 - (action.held?.length ?? 0);
+    return `Reroll ${numReroll} ${numReroll === 1 ? 'die' : 'dice'}`;
   }
 
   return (
@@ -67,28 +85,35 @@ export default function TheOracle({
             </div>
           ) : (
             <>
-              <p className="oracle__intro">All actions ranked by expected value</p>
+              {result?.isAllNegative && (
+                <p className="oracle__no-positive-banner">
+                  No positive options available. Showing the least costly choices.
+                </p>
+              )}
+              <p className="oracle__intro">
+                BPIV = Big Point Incremental Value vs. average outcome
+              </p>
               <ol className="oracle__list">
-                {recommendations.map((action, i) => (
+                {result?.actions.map((action, i) => (
                   <li
                     key={i}
                     className={[
                       'oracle__item',
-                      i === 0                 ? 'oracle__item--top'   : '',
-                      action.type === 'score' ? 'oracle__item--score' : 'oracle__item--hold',
+                      i === 0                       ? 'oracle__item--top'   : '',
+                      action.type === 'SCORE_NOW'   ? 'oracle__item--score' : 'oracle__item--hold',
                     ].filter(Boolean).join(' ')}
                   >
-                    <span className="oracle__rank">{i + 1}</span>
+                    <span className="oracle__rank">{action.rank}</span>
 
                     <div className="oracle__content">
-                      <span className="oracle__label">{action.label}</span>
-                      <span className="oracle__detail">{action.detail}</span>
-                      {action.type === 'hold' && action.detail !== action.evText && (
-                        <span className="oracle__ev">{action.evText}</span>
-                      )}
+                      <span className="oracle__label">{action.description}</span>
+                      <span className="oracle__detail">{actionDetail(action)}</span>
                     </div>
 
-                    {/* Info tooltip button */}
+                    <span className={bpivClass(action.bpiv)} title="Big Point Incremental Value">
+                      {formatBpiv(action.bpiv)}
+                    </span>
+
                     <div className="oracle__tip-wrap">
                       <button
                         className={`oracle__info-btn ${openTip === i ? 'oracle__info-btn--active' : ''}`}
@@ -100,9 +125,7 @@ export default function TheOracle({
                       </button>
                       {openTip === i && (
                         <div className="oracle__tooltip" role="tooltip">
-                          <p className="oracle__tooltip-placeholder">
-                            Detailed probability breakdown coming soon.
-                          </p>
+                          {renderTooltip(action)}
                         </div>
                       )}
                     </div>
@@ -114,5 +137,44 @@ export default function TheOracle({
         </div>
       )}
     </aside>
+  );
+}
+
+function renderTooltip(action) {
+  if (action.type === 'SCORE_NOW') {
+    const { categoryBigDelta, bonusBigDelta } = action.breakdown;
+    return (
+      <div className="oracle__tooltip-score">
+        <p><strong>Small points scored:</strong> {action.smallPoints}</p>
+        <p><strong>Category big pt delta:</strong> {categoryBigDelta?.toFixed(2) ?? '—'}</p>
+        <p><strong>Bonus big pt delta:</strong> {bonusBigDelta?.toFixed(2) ?? '—'}</p>
+        <p><strong>Total BPIV:</strong> {action.bpiv >= 0 ? '+' : ''}{action.bpiv.toFixed(2)}</p>
+      </div>
+    );
+  }
+
+  // REROLL tooltip
+  const outcomes = action.tooltipOutcomes ?? [];
+  const weightedAvg = outcomes.reduce((s, o) => s + (o.probability * o.downstreamBpiv), 0)
+    / (outcomes.reduce((s, o) => s + o.probability, 0) || 1);
+
+  return (
+    <div className="oracle__tooltip-reroll">
+      <p className="oracle__tooltip-header">Top outcomes if you {action.description.toLowerCase()}:</p>
+      <table className="oracle__tooltip-table">
+        <tbody>
+          {outcomes.map((o, i) => (
+            <tr key={i}>
+              <td className="oracle__tooltip-desc">{o.description}</td>
+              <td className="oracle__tooltip-prob">{(o.probability * 100).toFixed(1)}%</td>
+              <td className="oracle__tooltip-action">{o.bestDownstreamAction}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="oracle__tooltip-avg">
+        Weighted average BPIV: {weightedAvg >= 0 ? '+' : ''}{weightedAvg.toFixed(2)}
+      </p>
+    </div>
   );
 }

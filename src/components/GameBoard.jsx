@@ -8,7 +8,7 @@ import './GameBoard.css';
 
 const TOTAL_TURNS = CATEGORIES.length * NUM_COLUMNS;
 
-export default function GameBoard({ state, onRoll, onToggleHold, onScore, onToggleOracle, onApplyHold, onNewGame }) {
+export default function GameBoard({ state, onRoll, onToggleHold, onScore, onToggleOracle, onGoHome, onNewGame }) {
   const { dice, rollsLeft, oracleEnabled, scorecard, phase, turnNumber, justScoredBalut } = state;
   const hasRolled  = rollsLeft < 3;
   const allRolled  = dice.every(d => d.value > 0);
@@ -19,7 +19,7 @@ export default function GameBoard({ state, onRoll, onToggleHold, onScore, onTogg
       <BalutToast trigger={justScoredBalut} />
 
       <header className="board-header">
-        <h1 className="board-title">BALUT</h1>
+        <button className="board-title" onClick={onGoHome} title="Back to menu">BALUT</button>
         <div className="board-header__meta">
           {!isGameOver && (
             <span className="turn-counter">

@@ -250,6 +250,104 @@
   line-height: 1.45;
 }
 
+/* ── BPIV value ──────────────────────────────────────── */
+.oracle__bpiv {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255,255,255,0.45);
+  min-width: 3.2rem;
+  text-align: right;
+}
+
+.oracle__bpiv--positive {
+  color: #4caf50;
+}
+
+.oracle__bpiv--negative {
+  color: #e53935;
+}
+
+/* ── All-negative banner ─────────────────────────────── */
+.oracle__no-positive-banner {
+  font-size: 0.7rem;
+  color: rgba(201,168,76,0.8);
+  font-style: italic;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: var(--radius-sm);
+  background: rgba(201,168,76,0.06);
+  line-height: 1.4;
+}
+
+/* ── Tooltip: score breakdown ────────────────────────── */
+.oracle__tooltip-score {
+  font-size: 0.73rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
+}
+
+.oracle__tooltip-score p {
+  margin: 0;
+}
+
+/* ── Tooltip: reroll outcomes table ─────────────────── */
+.oracle__tooltip-reroll {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+}
+
+.oracle__tooltip-header {
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  margin: 0 0 0.4rem;
+}
+
+.oracle__tooltip-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0.5rem;
+}
+
+.oracle__tooltip-table td {
+  padding: 0.1rem 0.2rem;
+  vertical-align: top;
+}
+
+.oracle__tooltip-desc {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.65rem;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oracle__tooltip-prob {
+  color: rgba(201,168,76,0.8);
+  white-space: nowrap;
+  text-align: right;
+  padding-right: 0.4rem;
+}
+
+.oracle__tooltip-action {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.62rem;
+}
+
+.oracle__tooltip-avg {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-gold);
+  font-size: 0.72rem;
+}
+
+.oracle__tooltip {
+  width: 280px;
+}
+
 /* ── Mobile: full-width, not sticky ─────────────────── */
 @media (max-width: 800px) {
   .oracle__list {

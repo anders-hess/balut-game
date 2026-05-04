@@ -4,7 +4,7 @@ import GameBoard from './components/GameBoard.jsx';
 import './styles/theme.css';
 
 export default function App() {
-  const { state, startGame, roll, toggleHold, scoreCategory, toggleOracle } = useGameState();
+  const { state, startGame, goHome, roll, toggleHold, scoreCategory, toggleOracle } = useGameState();
 
   if (state.phase === 'start') {
     return <StartScreen onStart={startGame} />;
@@ -17,6 +17,7 @@ export default function App() {
       onToggleHold={toggleHold}
       onScore={scoreCategory}
       onToggleOracle={toggleOracle}
+      onGoHome={goHome}
       onNewGame={startGame}
     />
   );

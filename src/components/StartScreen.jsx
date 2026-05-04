@@ -3,10 +3,14 @@ import './StartScreen.css';
 export default function StartScreen({ onStart }) {
   return (
     <div className="start-screen">
-      <div className="start-card">
+      {/* Title lives on the felt — no card width constraint */}
+      <div className="start-hero">
         <h1 className="start-title">BALUT</h1>
         <p className="start-subtitle">The Danish Dice Game</p>
+      </div>
 
+      {/* Narrow card only holds the mode buttons */}
+      <div className="start-card">
         <div className="start-modes">
           <button className="mode-btn mode-btn--primary" onClick={onStart}>
             Single Player
