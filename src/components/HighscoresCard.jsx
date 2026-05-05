@@ -10,7 +10,7 @@ export default function HighscoresCard({ onViewAll, refreshTrigger }) {
     let cancelled = false;
     setRows(null);
     setError(false);
-    fetchLeaderboard('daily')
+    fetchLeaderboard('weekly')
       .then(data => { if (!cancelled) setRows(data.slice(0, 3)); })
       .catch(() =>  { if (!cancelled) setError(true); });
     return () => { cancelled = true; };
@@ -20,7 +20,7 @@ export default function HighscoresCard({ onViewAll, refreshTrigger }) {
     <div className="hs-card">
       <div className="hs-card__header">
         <span className="hs-card__icon">🏆</span>
-        <span className="hs-card__title">Today's Top 3</span>
+        <span className="hs-card__title">This Week's Top 3</span>
         <button className="hs-card__view-all" onClick={onViewAll}>
           View all →
         </button>

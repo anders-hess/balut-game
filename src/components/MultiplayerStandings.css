@@ -17,8 +17,8 @@
 }
 
 .mp-standings__badge--active {
-  border-color: rgba(201,168,76,0.6);
-  background: rgba(201,168,76,0.14);
+  border-color: rgba(255,255,255,0.15);
+  background: transparent;
 }
 
 .mp-standings__name {
@@ -31,15 +31,8 @@
   color: var(--color-gold);
 }
 
-.mp-standings__pts {
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255,255,255,0.4);
-  font-size: 0.68rem;
-}
-
-.mp-standings__badge--active .mp-standings__pts {
-  color: rgba(201,168,76,0.8);
+.mp-standings__dice {
+  font-size: 0.75rem;
 }
 
 .mp-standings__check {

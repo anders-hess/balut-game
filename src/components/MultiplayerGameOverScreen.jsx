@@ -4,13 +4,9 @@ import { checkQualifies, submitScore } from '../services/highscores.js';
 import './MultiplayerGameOverScreen.css';
 
 const NAME_KEY = 'balut_player_name';
+const PERIOD_LABELS = { weekly: 'This Week', monthly: 'This Month', yearly: 'This Year' };
 
-function useLastName() {
-  return useState(() => localStorage.getItem(NAME_KEY) ?? '');
-}
-
-export default function MultiplayerGameOverScreen({ players, onPlayAgain, onViewHighscores, onScoreSubmitted }) {
-  // Sort players by big points desc, then small pts, then baluts
+export default function MultiplayerGameOverScreen({ players, onPlayAgain, onViewHighscores, onScoreSubmitted, submittedNames = [], onMpPlayerSubmitted }) {
   const ranked = [...players]
     .map(p => ({ ...p, ...calcTotals(p.scorecard), balutCount: countBaluts(p.scorecard) }))
     .sort((a, b) => {
@@ -56,7 +52,8 @@ export default function MultiplayerGameOverScreen({ players, onPlayAgain, onView
           <PlayerSubmit
             key={i}
             player={p}
-            defaultName={p.name}
+            alreadySubmitted={submittedNames.includes(p.name)}
+            onPlayerSubmitted={() => onMpPlayerSubmitted?.(p.name)}
             onScoreSubmitted={onScoreSubmitted}
           />
         ))}
@@ -74,24 +71,29 @@ export default function MultiplayerGameOverScreen({ players, onPlayAgain, onView
   );
 }
 
-function PlayerSubmit({ player, defaultName, onScoreSubmitted }) {
+function PlayerSubmit({ player, alreadySubmitted, onPlayerSubmitted, onScoreSubmitted }) {
   const [qualifyingPeriods, setQualifyingPeriods] = useState(null);
-  const [name, setName] = useState(defaultName);
+  const [name, setName] = useState(player.name);
   const [submitState, setSubmitState] = useState('idle');
 
   useEffect(() => {
+    if (alreadySubmitted) return;
     checkQualifies(player.totalBig, player.totalSmall, player.balutCount)
       .then(setQualifyingPeriods)
       .catch(() => setQualifyingPeriods([]));
-  }, [player.totalBig, player.totalSmall, player.balutCount]);
+  }, [player.totalBig, player.totalSmall, player.balutCount, alreadySubmitted]);
 
-  const PERIOD_LABELS = { daily: 'Today', monthly: 'This Month', yearly: 'This Year' };
   const qualifies = qualifyingPeriods && qualifyingPeriods.length > 0;
 
+  if (alreadySubmitted) {
+    return <p className="mp-gameover__submitted">✓ {player.name}'s score submitted!</p>;
+  }
+
   if (!qualifies && qualifyingPeriods !== null) return null;
-  if (submitState === 'done') return (
-    <p className="mp-gameover__submitted">✓ {player.name}'s score submitted!</p>
-  );
+
+  if (submitState === 'done') {
+    return <p className="mp-gameover__submitted">✓ {player.name}'s score submitted!</p>;
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -101,6 +103,7 @@ function PlayerSubmit({ player, defaultName, onScoreSubmitted }) {
       await submitScore(name.trim(), player.totalBig, player.totalSmall, player.balutCount);
       localStorage.setItem(NAME_KEY, name.trim());
       setSubmitState('done');
+      onPlayerSubmitted?.();
       onScoreSubmitted?.();
     } catch {
       setSubmitState('error');

@@ -13,8 +13,14 @@ import './GameBoard.css';
 
 const TOTAL_TURNS = CATEGORIES.length * NUM_COLUMNS;
 
-export default function GameBoard({ state, onRoll, onToggleHold, onScore, onToggleOracle, onGoHome, onNewGame, onViewHighscores }) {
-  const { dice, rollsLeft, oracleEnabled, players, currentPlayerIndex, phase, turnNumber, justScoredBalut } = state;
+export default function GameBoard({
+  state,
+  onRoll, onToggleHold, onScore, onToggleOracle,
+  onGoHome, onNewGame, onViewHighscores, onDismissHandoff,
+  scoreSubmitted, onScoreSubmitted,
+  mpSubmittedNames, onMpPlayerSubmitted,
+}) {
+  const { dice, rollsLeft, oracleEnabled, players, currentPlayerIndex, phase, turnNumber, justScoredBalut, showHandoff } = state;
   const isMultiplayer = players.length > 1;
   const isGameOver    = phase === 'gameover';
   const hasRolled     = rollsLeft < 3;
@@ -22,15 +28,11 @@ export default function GameBoard({ state, onRoll, onToggleHold, onScore, onTogg
 
   const currentPlayer = players[currentPlayerIndex];
 
-  // Which player's scorecard is shown — resets to current player on each turn change
   const [viewingIdx, setViewingIdx] = useState(currentPlayerIndex);
   useEffect(() => { setViewingIdx(currentPlayerIndex); }, [currentPlayerIndex]);
 
   const displayIdx     = isMultiplayer ? viewingIdx : currentPlayerIndex;
   const viewingOwnTurn = displayIdx === currentPlayerIndex;
-
-  // Keep viewingIdx in sync when currentPlayerIndex changes
-  // (handled by resetting it in the scorecard tab click handler)
 
   const [hsRefresh, setHsRefresh] = useState(0);
 
@@ -63,15 +65,26 @@ export default function GameBoard({ state, onRoll, onToggleHold, onScore, onTogg
                 onPlayAgain={onNewGame}
                 onViewHighscores={onViewHighscores}
                 onScoreSubmitted={() => setHsRefresh(n => n + 1)}
+                submittedNames={mpSubmittedNames}
+                onMpPlayerSubmitted={onMpPlayerSubmitted}
               />
             ) : (
               <GameOverScreen
                 scorecard={currentPlayer.scorecard}
                 onPlayAgain={onNewGame}
                 onViewHighscores={onViewHighscores}
-                onScoreSubmitted={() => setHsRefresh(n => n + 1)}
+                onScoreSubmitted={() => { setHsRefresh(n => n + 1); onScoreSubmitted?.(); }}
+                scoreSubmitted={scoreSubmitted}
               />
             )
+          ) : (isMultiplayer && showHandoff) ? (
+            <section className="dice-area dice-area--handoff">
+              <p className="handoff-inline__sub">Pass the device to</p>
+              <p className="handoff-inline__name">{players[currentPlayerIndex].name}</p>
+              <button className="handoff-inline__btn" onClick={onDismissHandoff}>
+                🎲 Start {players[currentPlayerIndex].name}'s Turn
+              </button>
+            </section>
           ) : (
             <DiceArea
               dice={dice}
@@ -89,14 +102,14 @@ export default function GameBoard({ state, onRoll, onToggleHold, onScore, onTogg
                   key={i}
                   className={[
                     'player-tab',
-                    i === currentPlayerIndex ? 'player-tab--active' : '',
-                    i === displayIdx ? 'player-tab--viewing' : '',
+                    i === currentPlayerIndex ? 'player-tab--active'  : '',
+                    i === displayIdx         ? 'player-tab--viewing' : '',
                   ].filter(Boolean).join(' ')}
                   onClick={() => setViewingIdx(i)}
                 >
                   {i === currentPlayerIndex ? '🎲 ' : ''}{p.name}
                   <span className="player-tab__pts">
-                    {calcTotals(p.scorecard).totalBig} bp
+                    {calcTotals(p.scorecard).totalBig} points
                   </span>
                 </button>
               ))}
@@ -108,6 +121,7 @@ export default function GameBoard({ state, onRoll, onToggleHold, onScore, onTogg
             dice={dice}
             rollsLeft={rollsLeft}
             onScore={viewingOwnTurn && !isGameOver ? onScore : null}
+            playerName={isMultiplayer ? players[displayIdx].name : null}
           />
         </div>
 

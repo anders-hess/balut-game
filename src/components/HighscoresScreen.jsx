@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { fetchLeaderboard } from '../services/highscores.js';
 import './HighscoresScreen.css';
 
-const PERIODS = ['daily', 'monthly', 'yearly'];
-const PERIOD_LABELS = { daily: 'Today', monthly: 'This Month', yearly: 'This Year' };
+const PERIODS = ['weekly', 'monthly', 'yearly'];
+const PERIOD_LABELS = { weekly: 'This Week', monthly: 'This Month', yearly: 'This Year' };
 
 export default function HighscoresScreen({ onClose }) {
-  const [activePeriod, setActivePeriod] = useState('daily');
-  const [boards, setBoards] = useState({ daily: null, monthly: null, yearly: null });
+  const [activePeriod, setActivePeriod] = useState('weekly');
+  const [boards, setBoards] = useState({ weekly: null, monthly: null, yearly: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,9 +17,9 @@ export default function HighscoresScreen({ onClose }) {
     setError(null);
 
     Promise.all(PERIODS.map(p => fetchLeaderboard(p)))
-      .then(([daily, monthly, yearly]) => {
+      .then(([weekly, monthly, yearly]) => {
         if (!cancelled) {
-          setBoards({ daily, monthly, yearly });
+          setBoards({ weekly, monthly, yearly });
           setLoading(false);
         }
       })

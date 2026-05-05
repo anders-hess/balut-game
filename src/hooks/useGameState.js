@@ -7,7 +7,7 @@ import {
   toggleHold,
   resetTurn,
 } from '../logic/gameState.js';
-import { calculateScore, isGameOver, nextColumn } from '../logic/scoring.js';
+import { calculateScore, isGameOver, nextColumn, getTargetColumn } from '../logic/scoring.js';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -42,12 +42,12 @@ function reducer(state, action) {
     case 'SCORE': {
       const { category } = action;
       const currentPlayer = state.players[state.currentPlayerIndex];
-      const col = nextColumn(currentPlayer.scorecard, category);
-      if (col === -1) return state;
 
       const diceValues = state.dice.map(d => d.value);
       const score      = calculateScore(category, diceValues);
       const finalScore = score === null ? 0 : score;
+      const col        = getTargetColumn(currentPlayer.scorecard, category, finalScore);
+      if (col === -1) return state;
       const isBalut    = category === 'balut' && finalScore > 0;
 
       const newScorecard = {

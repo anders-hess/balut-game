@@ -1,17 +1,17 @@
 import { CATEGORIES, CATEGORY_LABELS, BIG_POINT_RULES, NUM_COLUMNS } from '../logic/gameConstants.js';
-import { calculateScore, calcTotals, countBaluts, nextColumn } from '../logic/scoring.js';
+import { calculateScore, calcTotals, countBaluts, nextColumn, getTargetColumn } from '../logic/scoring.js';
 import './Scorecard.css';
 
 const MAX_ROLLS_IMPORT = 3;
 
-export default function Scorecard({ scorecard, dice, rollsLeft, onScore }) {
+export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerName }) {
   const hasRolled = rollsLeft < MAX_ROLLS_IMPORT;
   const diceValues = dice.map(d => d.value);
   const allRolled  = diceValues.every(v => v > 0);
 
   const { totalSmall, totalBig, bonus, categoryBigPoints, categoryTotals } = calcTotals(scorecard);
-  const balutCount   = countBaluts(scorecard);
-  const catBigTotal  = totalBig - bonus;
+  const balutCount  = countBaluts(scorecard);
+  const catBigTotal = totalBig - bonus;
 
   function getCellState(category) {
     if (!hasRolled || !allRolled) return 'empty';
@@ -29,7 +29,9 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore }) {
   return (
     <div className="scorecard">
       <div className="scorecard-header">
-        <h2 className="scorecard-title">Scorecard</h2>
+        <h2 className="scorecard-title">
+          {playerName ? `Scorecard – ${playerName}` : 'Scorecard'}
+        </h2>
       </div>
 
       <div className="scorecard-scroll">
@@ -49,10 +51,11 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore }) {
             {CATEGORIES.map(cat => {
               const cellState  = getCellState(cat);
               const potential  = getPotentialScore(cat);
-              const nextCol    = nextColumn(scorecard, cat);
+              const targetCol  = getTargetColumn(scorecard, cat, potential);
               const catTotal   = categoryTotals[cat];
               const bigPts     = categoryBigPoints[cat];
               const isComplete = scorecard[cat].every(s => s !== null);
+              const isGreat    = cellState === 'valid' && isGreatScore(cat, potential);
 
               return (
                 <tr key={cat} className="srow">
@@ -62,7 +65,7 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore }) {
 
                   {scorecard[cat].map((score, colIdx) => {
                     const isFilled    = score !== null;
-                    const isNext      = colIdx === nextCol;
+                    const isNext      = colIdx === targetCol;
                     const isAvailable = isNext && (cellState === 'valid' || cellState === 'zero');
 
                     return (
@@ -71,8 +74,9 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore }) {
                         className={[
                           'td-entry',
                           isFilled ? 'td-entry--filled' : 'td-entry--empty',
-                          isAvailable && cellState === 'valid' ? 'td-entry--available' : '',
-                          isAvailable && cellState === 'zero'  ? 'td-entry--zero'      : '',
+                          isAvailable && isGreat                         ? 'td-entry--great'     : '',
+                          isAvailable && !isGreat && cellState === 'valid' ? 'td-entry--available' : '',
+                          isAvailable && cellState === 'zero'             ? 'td-entry--zero'      : '',
                         ].filter(Boolean).join(' ')}
                         onClick={() => isAvailable && onScore(cat)}
                         title={isAvailable ? `Score ${potential} pts for ${CATEGORY_LABELS[cat]}` : undefined}
@@ -117,9 +121,10 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore }) {
             <tr className="srow srow--subtotal">
               <td className="td-category">
                 <span className="foot-label">Bonus</span>
+              </td>
+              <td colSpan={NUM_COLUMNS} className="td-bonus-hint-cell">
                 <span className="foot-hint">{bonusHint(totalSmall)}</span>
               </td>
-              <td colSpan={NUM_COLUMNS} />
               <td className="td-sum" />
               <td className="td-big td-big--bonus">
                 {bonus >= 0 ? `+${bonus}` : bonus}
@@ -153,6 +158,18 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore }) {
       </div>
     </div>
   );
+}
+
+function isGreatScore(category, score) {
+  if (!score || score <= 0) return false;
+  if (category === 'fours')     return score >= 12;
+  if (category === 'fives')     return score >= 15;
+  if (category === 'sixes')     return score >= 18;
+  if (category === 'straight')  return score > 0;
+  if (category === 'fullHouse') return score > 0;
+  if (category === 'choice')    return score >= 25;
+  if (category === 'balut')     return score > 0;
+  return false;
 }
 
 function bigPtTarget(rule) {

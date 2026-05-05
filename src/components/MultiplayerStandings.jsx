@@ -1,4 +1,3 @@
-import { calcTotals } from '../logic/scoring.js';
 import { isGameOver } from '../logic/scoring.js';
 import './MultiplayerStandings.css';
 
@@ -6,9 +5,8 @@ export default function MultiplayerStandings({ players, currentPlayerIndex }) {
   return (
     <div className="mp-standings">
       {players.map((p, i) => {
-        const { totalBig } = calcTotals(p.scorecard);
-        const isActive   = i === currentPlayerIndex;
-        const isDone     = isGameOver(p.scorecard);
+        const isActive = i === currentPlayerIndex;
+        const isDone   = isGameOver(p.scorecard);
         return (
           <div
             key={i}
@@ -18,8 +16,8 @@ export default function MultiplayerStandings({ players, currentPlayerIndex }) {
               isDone   ? 'mp-standings__badge--done'   : '',
             ].filter(Boolean).join(' ')}
           >
+            {isActive && <span className="mp-standings__dice">🎲</span>}
             <span className="mp-standings__name">{p.name}</span>
-            <span className="mp-standings__pts">{totalBig}</span>
             {isDone && <span className="mp-standings__check">✓</span>}
           </div>
         );

@@ -4,7 +4,11 @@ import { supabase } from './supabase.js';
 
 function windowStart(period) {
   const d = new Date();
-  if (period === 'daily')   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  if (period === 'weekly') {
+    const day = d.getDay(); // 0=Sun, 1=Mon, …
+    const daysToMonday = day === 0 ? 6 : day - 1;
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() - daysToMonday);
+  }
   if (period === 'monthly') return new Date(d.getFullYear(), d.getMonth(), 1);
   /* yearly */              return new Date(d.getFullYear(), 0, 1);
 }
@@ -32,7 +36,7 @@ export async function fetchLeaderboard(period) {
 
 export async function checkQualifies(bigPts, smallPts, balutCount) {
   if (!supabase) return [];
-  const periods = ['daily', 'monthly', 'yearly'];
+  const periods = ['weekly', 'monthly', 'yearly'];
   const boards  = await Promise.all(periods.map(fetchLeaderboard));
   return periods.filter((_, i) => _beats(bigPts, smallPts, balutCount, boards[i]));
 }

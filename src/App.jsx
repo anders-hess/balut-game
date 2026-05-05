@@ -3,7 +3,6 @@ import { useGameState } from './hooks/useGameState.js';
 import StartScreen from './components/StartScreen.jsx';
 import PlayerSetupScreen from './components/PlayerSetupScreen.jsx';
 import GameBoard from './components/GameBoard.jsx';
-import HandoffOverlay from './components/HandoffOverlay.jsx';
 import HighscoresScreen from './components/HighscoresScreen.jsx';
 import './styles/theme.css';
 
@@ -17,7 +16,24 @@ export default function App() {
   const [showHighscores, setShowHighscores] = useState(false);
   const [showSetup,      setShowSetup]      = useState(false);
 
-  const { phase, players, currentPlayerIndex, showHandoff } = state;
+  // Submission tracking — lifted here so they survive GameBoard unmount when viewing leaderboard
+  const [scoreSubmitted,    setScoreSubmitted]    = useState(false);
+  const [mpSubmittedNames,  setMpSubmittedNames]  = useState([]);
+
+  const { phase, players, currentPlayerIndex } = state;
+
+  function handleNewGame() {
+    startGame();
+    setScoreSubmitted(false);
+    setMpSubmittedNames([]);
+  }
+
+  function handleSetupMultiplayer(names) {
+    setupMultiplayer(names);
+    setScoreSubmitted(false);
+    setMpSubmittedNames([]);
+    setShowSetup(false);
+  }
 
   if (showHighscores) {
     return <HighscoresScreen onClose={() => setShowHighscores(false)} />;
@@ -27,7 +43,7 @@ export default function App() {
     if (showSetup) {
       return (
         <PlayerSetupScreen
-          onStart={names => { setupMultiplayer(names); setShowSetup(false); }}
+          onStart={handleSetupMultiplayer}
           onBack={() => setShowSetup(false)}
         />
       );
@@ -42,23 +58,20 @@ export default function App() {
   }
 
   return (
-    <>
-      {showHandoff && (
-        <HandoffOverlay
-          playerName={players[currentPlayerIndex].name}
-          onStart={dismissHandoff}
-        />
-      )}
-      <GameBoard
-        state={state}
-        onRoll={roll}
-        onToggleHold={toggleHold}
-        onScore={scoreCategory}
-        onToggleOracle={toggleOracle}
-        onGoHome={() => { goHome(); setShowSetup(false); }}
-        onNewGame={startGame}
-        onViewHighscores={() => setShowHighscores(true)}
-      />
-    </>
+    <GameBoard
+      state={state}
+      onRoll={roll}
+      onToggleHold={toggleHold}
+      onScore={scoreCategory}
+      onToggleOracle={toggleOracle}
+      onGoHome={() => { goHome(); setShowSetup(false); setScoreSubmitted(false); setMpSubmittedNames([]); }}
+      onNewGame={handleNewGame}
+      onViewHighscores={() => setShowHighscores(true)}
+      onDismissHandoff={dismissHandoff}
+      scoreSubmitted={scoreSubmitted}
+      onScoreSubmitted={() => setScoreSubmitted(true)}
+      mpSubmittedNames={mpSubmittedNames}
+      onMpPlayerSubmitted={(name) => setMpSubmittedNames(prev => [...prev, name])}
+    />
   );
 }

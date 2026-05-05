@@ -59,6 +59,10 @@ thead .th-category {
   padding-left: 1rem;
 }
 
+thead .th-sum {
+  border-left: 2px solid rgba(180, 150, 100, 0.45);
+}
+
 /* ── Body rows ──────────────────────────────────────── */
 .srow td {
   height: 40px;
@@ -95,11 +99,15 @@ thead .th-category {
 }
 
 .foot-hint {
-  display: block;
   font-size: 0.65rem;
   color: var(--color-ink-light);
   opacity: 0.7;
-  margin-top: 1px;
+}
+
+.td-bonus-hint-cell {
+  text-align: left;
+  padding-left: 0.5rem;
+  vertical-align: middle;
 }
 
 /* ── Entry cells ────────────────────────────────────── */
@@ -111,7 +119,7 @@ thead .th-category {
 }
 
 .td-entry--filled {
-  background: rgba(201, 168, 76, 0.07);
+  /* no tint on filled cells — inherit standard row color */
 }
 
 .td-entry--available {
@@ -138,14 +146,26 @@ thead .th-category {
   background: rgba(139, 26, 26, 0.1);
 }
 
+.td-entry--great {
+  background: rgba(39, 79, 34, 0.22);
+  cursor: pointer;
+  outline: 1.5px solid rgba(39, 79, 34, 0.55);
+  outline-offset: -2px;
+  border-radius: 3px;
+}
+
+.td-entry--great:hover {
+  background: rgba(39, 79, 34, 0.38);
+}
+
 .ghost-score {
-  color: var(--color-gold);
+  color: var(--color-ink);
   font-weight: 700;
 }
 
 .td-entry--zero .ghost-score {
-  color: var(--color-accent);
-  opacity: 0.55;
+  color: var(--color-ink);
+  opacity: 0.6;
   font-size: 0.82rem;
 }
 
@@ -154,6 +174,7 @@ thead .th-category {
   font-weight: 600;
   color: var(--color-ink-light);
   font-size: 0.85rem;
+  border-left: 2px solid rgba(180, 150, 100, 0.45);
 }
 
 .td-sum--total {

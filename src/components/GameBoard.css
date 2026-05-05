@@ -89,6 +89,9 @@
 .board-right {
   position: sticky;
   top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 /* ── Game Over ───────────────────────────────────────── */
@@ -168,20 +171,62 @@
 }
 
 .player-tab--active {
-  border-color: rgba(201,168,76,0.5);
-  color: var(--color-gold);
+  border-color: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.05);
 }
 
 .player-tab--viewing {
-  background: rgba(201,168,76,0.12);
-  border-color: rgba(201,168,76,0.5);
-  color: var(--color-gold);
+  background: rgba(201, 168, 76, 0.35) !important;
+  border-color: var(--color-gold);
+  color: var(--color-ink);
 }
 
 .player-tab__pts {
   font-size: 0.68rem;
   opacity: 0.65;
   font-variant-numeric: tabular-nums;
+}
+
+/* ── Inline handoff (replaces dice area between turns) ── */
+.dice-area--handoff {
+  justify-content: center;
+  gap: 0.9rem;
+  min-height: 190px;
+}
+
+.handoff-inline__sub {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.04em;
+}
+
+.handoff-inline__name {
+  font-family: var(--font-serif);
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  letter-spacing: 0.04em;
+}
+
+.handoff-inline__btn {
+  margin-top: 0.25rem;
+  background: var(--color-accent);
+  color: var(--color-parchment);
+  border: none;
+  padding: 0.7rem 2rem;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: transform 0.12s, background 0.15s;
+  box-shadow: var(--shadow-md);
+}
+
+.handoff-inline__btn:hover {
+  transform: translateY(-2px);
+  background: var(--color-accent-light);
 }
 
 /* ── Responsive: stack on narrow screens ─────────────── */

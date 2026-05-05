@@ -137,3 +137,28 @@ export function isGameOver(scorecard) {
 export function nextColumn(scorecard, category) {
   return scorecard[category].findIndex(s => s === null);
 }
+
+function isHighScore(category, score) {
+  if (!score || score <= 0) return false;
+  if (category === 'fours')    return score >= 16;
+  if (category === 'fives')    return score >= 20;
+  if (category === 'sixes')    return score >= 24;
+  if (category === 'straight') return score === 20;
+  return false;
+}
+
+/**
+ * Return the column to fill for a given score.
+ * High scores (fours≥16, fives≥20, sixes≥24, high straight) fill from the right.
+ * All other scores fill from the left.
+ */
+export function getTargetColumn(scorecard, category, score) {
+  const cols = scorecard[category];
+  if (isHighScore(category, score)) {
+    for (let i = cols.length - 1; i >= 0; i--) {
+      if (cols[i] === null) return i;
+    }
+    return -1;
+  }
+  return nextColumn(scorecard, category);
+}
