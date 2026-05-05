@@ -52,20 +52,32 @@ export function selectTop5Outcomes(rawOutcomes, scorecard) {
 
 function _findBestAction(dice, scorecard) {
   let bestCat = null, bestScore = 0, bestBpiv = -Infinity;
+  let bestPosCat = null, bestPosScore = 0, bestPosBpiv = -Infinity;
+
   for (const cat of CATEGORIES) {
     const r = bpivScoreNow(cat, dice, scorecard);
-    if (r !== null && r.bpiv > bestBpiv) {
-      bestBpiv  = r.bpiv;
-      bestCat   = cat;
-      bestScore = r.smallPoints;
+    if (r === null) continue;
+    if (r.bpiv > bestBpiv) {
+      bestBpiv = r.bpiv; bestCat = cat; bestScore = r.smallPoints;
+    }
+    // Track separately: categories that produce an actual positive score.
+    // These are preferred for the tooltip label over zero-score fallbacks
+    // (which would otherwise surface as "Missed Balut" or "No 4s" etc.).
+    if (r.smallPoints > 0 && r.bpiv > bestPosBpiv) {
+      bestPosBpiv = r.bpiv; bestPosCat = cat; bestPosScore = r.smallPoints;
     }
   }
+
+  if (bestPosCat !== null) return { cat: bestPosCat, score: bestPosScore, bpiv: bestPosBpiv };
   return bestCat ? { cat: bestCat, score: bestScore, bpiv: bestBpiv } : null;
 }
 
-// Group choice by category (all sums into one row); all others by (cat, score).
+// Group choice and fullHouse by category only (collapse all score variants into
+// one row). All other categories group by (cat, score) so different counts stay
+// separate (e.g. "Three 4s" vs "Four 4s").
 function _groupKey(cat, score) {
-  return cat === 'choice' ? 'choice' : `${cat}-${score}`;
+  if (cat === 'choice' || cat === 'fullHouse') return cat;
+  return `${cat}-${score}`;
 }
 
 // Human-readable outcome name shown in the tooltip Result column.

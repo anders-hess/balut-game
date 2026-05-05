@@ -26,11 +26,10 @@ describe('bpivScoreNow – basic behaviour', () => {
     expect(r.smallPoints).toBe(24); // 4+4+5+5+6
   });
 
-  it('BPIV = 0 when actual equals expected score and category state is neutral', () => {
-    // Scoring exactly the expected amount should produce BPIV ≈ 0
-    // For choice (expected=23), scoring 23 on an empty scorecard
+  it('BPIV > 0 when actual exceeds the discounted baseline', () => {
+    // Choice discounted baseline ≈ 21 × 0.85 = 17.85; dice score 23 — well above
     const r = bpivScoreNow('choice', [5, 5, 5, 4, 4], emptySc); // sum=23
-    expect(r.bpiv).toBeCloseTo(0, 1);
+    expect(r.bpiv).toBeGreaterThan(0);
   });
 });
 
@@ -97,14 +96,56 @@ describe('SPEC TEST 2 partial – scoring 0 in Full House is strongly negative',
   });
 });
 
-// ─── SPEC TEST 3: "Hopeless Fours" ────────────────────────────────────────────
-describe('SPEC TEST 3 – Hopeless Fours', () => {
-  // Fours 0/4 filled, Choice 0/4 filled
-  // Dice: [4,4,1,1,1] → Fours=8, Choice=11
-  it('BPIV(Score in Choice) > BPIV(Score in Fours)', () => {
+// ─── SPEC TEST 3: Adjusted Baseline — Fours Near Baseline vs. Choice Below ────
+describe('SPEC TEST 3 – Adjusted Baseline Ordering', () => {
+  // With calibrated baselines: fours expected ≈ 8.5 × 0.85 = 7.225 effective.
+  // Dice: [4,4,1,1,1] → Fours=8 (just above discounted baseline),
+  //                      Choice=11 (well below choice discounted baseline ≈ 17.85).
+  it('BPIV(Score in Fours) > BPIV(Score in Choice) when fours is above baseline but choice is below', () => {
     const dice = [4, 4, 1, 1, 1];
     const fours  = bpivScoreNow('fours',  dice, emptySc).bpiv;
     const choice = bpivScoreNow('choice', dice, emptySc).bpiv;
-    expect(choice).toBeGreaterThan(fours);
+    expect(fours).toBeGreaterThan(choice);
+  });
+
+  it('BPIV(fours=8) is positive (just above discounted baseline)', () => {
+    const r = bpivScoreNow('fours', [4, 4, 1, 1, 1], emptySc);
+    expect(r.bpiv).toBeGreaterThan(0);
+  });
+
+  it('BPIV(choice=11) is negative (well below discounted baseline)', () => {
+    const r = bpivScoreNow('choice', [4, 4, 1, 1, 1], emptySc);
+    expect(r.bpiv).toBeLessThan(0);
+  });
+});
+
+// ─── Three-of-a-Kind Ordering ─────────────────────────────────────────────────
+describe('Three-of-a-Kind in threshold category – positive BPIV', () => {
+  it('scoring three 4s (12 pts) in Fours has positive BPIV on empty scorecard', () => {
+    const r = bpivScoreNow('fours', [4, 4, 4, 1, 2], emptySc);
+    expect(r.bpiv).toBeGreaterThan(0);
+  });
+
+  it('four-of-a-kind > three-of-a-kind > two-of-a-kind > one in BPIV ordering', () => {
+    const r4 = bpivScoreNow('fours', [4, 4, 4, 4, 1], emptySc).bpiv; // 16
+    const r3 = bpivScoreNow('fours', [4, 4, 4, 1, 2], emptySc).bpiv; // 12
+    const r2 = bpivScoreNow('fours', [4, 4, 1, 1, 1], emptySc).bpiv; // 8
+    const r1 = bpivScoreNow('fours', [4, 1, 1, 1, 1], emptySc).bpiv; // 4
+    expect(r4).toBeGreaterThan(r3);
+    expect(r3).toBeGreaterThan(r2);
+    expect(r2).toBeGreaterThan(r1);
+  });
+
+  it('the gap between four-of-a-kind and three-of-a-kind is meaningful (>0.1)', () => {
+    const r4 = bpivScoreNow('fours', [4, 4, 4, 4, 1], emptySc).bpiv;
+    const r3 = bpivScoreNow('fours', [4, 4, 4, 1, 2], emptySc).bpiv;
+    expect(r4 - r3).toBeGreaterThan(0.1);
+  });
+
+  it('same ordering holds for Fives', () => {
+    const r3 = bpivScoreNow('fives', [5, 5, 5, 1, 2], emptySc).bpiv; // 15
+    const r2 = bpivScoreNow('fives', [5, 5, 1, 1, 1], emptySc).bpiv; // 10
+    expect(r3).toBeGreaterThan(r2);
+    expect(r3).toBeGreaterThan(0);
   });
 });

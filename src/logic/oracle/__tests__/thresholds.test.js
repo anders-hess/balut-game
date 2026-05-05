@@ -32,10 +32,19 @@ describe('pThreshold – sum types', () => {
     expect(p).toBeLessThan(1);
   });
 
-  it('baseline score at first column equals actual at expected score', () => {
-    const pActual   = pThreshold('fours', emptySc, 12.5);
+  it('BASELINE_SCORE maps to the discounted expected score (expected × 0.85)', () => {
+    // EXPECTED_SCORE_PER_COLUMN.fours = 8.5, BASELINE_DISCOUNT = 0.85 → 7.225
+    const discountedBaseline = 8.5 * 0.85;
+    const pActual   = pThreshold('fours', emptySc, discountedBaseline);
     const pBaseline = pThreshold('fours', emptySc, BASELINE_SCORE);
     expect(pActual).toBeCloseTo(pBaseline, 6);
+  });
+
+  it('BASELINE_SCORE is lower than the raw expected score (discount applied)', () => {
+    const pRaw      = pThreshold('fours', emptySc, 8.5);
+    const pBaseline = pThreshold('fours', emptySc, BASELINE_SCORE);
+    // Discounted baseline (7.225) < raw expected (8.5) → lower P
+    expect(pBaseline).toBeLessThan(pRaw);
   });
 
   it('higher score increases P', () => {

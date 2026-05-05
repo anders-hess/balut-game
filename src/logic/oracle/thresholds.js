@@ -5,6 +5,7 @@ import {
   EXPECTED_SCORE_PER_COLUMN,
   VARIANCE_PER_COLUMN,
   P_COMPLETE_IN_3_ROLLS,
+  BASELINE_DISCOUNT,
 } from './constants.js';
 import { categoryCurrentSum, columnsUnfilled, hasLockedFailure } from './scoring.js';
 
@@ -43,7 +44,7 @@ export function pThreshold(cat, scorecard, actionScore) {
 function _pThresholdSum(cat, scorecard, actionScore) {
   const rule = BIG_POINT_RULES[cat];
   const score = actionScore === BASELINE_SCORE
-    ? EXPECTED_SCORE_PER_COLUMN[cat]
+    ? EXPECTED_SCORE_PER_COLUMN[cat] * BASELINE_DISCOUNT
     : actionScore;
 
   const newSum = categoryCurrentSum(scorecard, cat) + score;

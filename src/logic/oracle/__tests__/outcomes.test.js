@@ -74,6 +74,29 @@ describe('selectTop5Outcomes', () => {
     expect(choiceRows.length).toBeLessThanOrEqual(1);
   });
 
+  it('groups all Full House outcomes into one "Full House" row', () => {
+    // Holding three 5s and rerolling 2 dice yields many FH variants (5-5-5-1-1,
+    // 5-5-5-2-2, etc.) — all should collapse into a single tooltip row.
+    const results = bpivRoll([5, 5, 5, 1, 2], 1, emptySc);
+    const hold555 = results.find(r => r.held.join(',') === '5,5,5');
+    const tooltip = selectTop5Outcomes(hold555.rawOutcomes, emptySc);
+    const fhRows = tooltip.filter(r => r.description === 'Full House');
+    expect(fhRows.length).toBeLessThanOrEqual(1);
+  });
+
+  it('does not label non-balut outcomes as "Missed Balut" when positive-score options exist', () => {
+    // Holding 2-2-5-5 and rerolling 1 die: non-full-house outcomes still have
+    // positive scores in other categories (choice, fives, etc.) — none should
+    // be labelled "Missed Balut".
+    const results = bpivRoll([2, 2, 5, 5, 1], 1, emptySc);
+    const hold2255 = results.find(r => r.held.join(',') === '2,2,5,5');
+    if (hold2255) {
+      const tooltip = selectTop5Outcomes(hold2255.rawOutcomes, emptySc);
+      const missedBalut = tooltip.filter(r => r.description === 'Missed Balut');
+      expect(missedBalut.length).toBe(0);
+    }
+  });
+
   it('Balut appears as a top outcome when holding four 4s', () => {
     const results = bpivRoll([4, 4, 4, 4, 1], 1, emptySc);
     const hold4444 = results.find(r => r.held.join(',') === '4,4,4,4');
