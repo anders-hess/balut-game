@@ -4,6 +4,8 @@ import StartScreen from './components/StartScreen.jsx';
 import PlayerSetupScreen from './components/PlayerSetupScreen.jsx';
 import GameBoard from './components/GameBoard.jsx';
 import HighscoresScreen from './components/HighscoresScreen.jsx';
+import RulesScreen from './components/RulesScreen.jsx';
+import OracleScreen from './components/OracleScreen.jsx';
 import './styles/theme.css';
 
 export default function App() {
@@ -15,12 +17,14 @@ export default function App() {
 
   const [showHighscores, setShowHighscores] = useState(false);
   const [showSetup,      setShowSetup]      = useState(false);
+  const [showRules,      setShowRules]      = useState(false);
+  const [showOracle,     setShowOracle]     = useState(false);
 
   // Submission tracking — lifted here so they survive GameBoard unmount when viewing leaderboard
-  const [scoreSubmitted,    setScoreSubmitted]    = useState(false);
-  const [mpSubmittedNames,  setMpSubmittedNames]  = useState([]);
+  const [scoreSubmitted,   setScoreSubmitted]   = useState(false);
+  const [mpSubmittedNames, setMpSubmittedNames] = useState([]);
 
-  const { phase, players, currentPlayerIndex } = state;
+  const { phase } = state;
 
   function handleNewGame() {
     startGame();
@@ -39,6 +43,14 @@ export default function App() {
     return <HighscoresScreen onClose={() => setShowHighscores(false)} />;
   }
 
+  if (showRules) {
+    return <RulesScreen onClose={() => setShowRules(false)} />;
+  }
+
+  if (showOracle) {
+    return <OracleScreen onClose={() => setShowOracle(false)} />;
+  }
+
   if (phase === 'start') {
     if (showSetup) {
       return (
@@ -53,6 +65,8 @@ export default function App() {
         onStart={startGame}
         onMultiplayer={() => setShowSetup(true)}
         onHighscores={() => setShowHighscores(true)}
+        onRules={() => setShowRules(true)}
+        onOracle={() => setShowOracle(true)}
       />
     );
   }

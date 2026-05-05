@@ -98,6 +98,12 @@
   transform: translateY(-1px);
 }
 
+.start-divider {
+  height: 1px;
+  background: rgba(180,150,100,0.3);
+  margin: 0.1rem 0;
+}
+
 .coming-soon {
   display: block;
   font-size: 0.68rem;

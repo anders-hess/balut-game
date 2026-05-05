@@ -1,15 +1,13 @@
 import './StartScreen.css';
 
-export default function StartScreen({ onStart, onMultiplayer, onHighscores }) {
+export default function StartScreen({ onStart, onMultiplayer, onHighscores, onRules, onOracle }) {
   return (
     <div className="start-screen">
-      {/* Title lives on the felt — no card width constraint */}
       <div className="start-hero">
         <h1 className="start-title">BALUT</h1>
         <p className="start-subtitle">The Classic Dice Game</p>
       </div>
 
-      {/* Narrow card only holds the mode buttons */}
       <div className="start-card">
         <div className="start-modes">
           <button className="mode-btn mode-btn--primary" onClick={onStart}>
@@ -23,6 +21,16 @@ export default function StartScreen({ onStart, onMultiplayer, onHighscores }) {
           <button className="mode-btn mode-btn--disabled" disabled>
             Online Multiplayer
             <span className="coming-soon">Coming Soon</span>
+          </button>
+
+          <div className="start-divider" />
+
+          <button className="mode-btn mode-btn--secondary" onClick={onOracle}>
+            ✦ Oracle Sandbox
+          </button>
+
+          <button className="mode-btn mode-btn--secondary" onClick={onRules}>
+            📖 Rules
           </button>
 
           <button className="mode-btn mode-btn--secondary" onClick={onHighscores}>
