@@ -33,6 +33,25 @@
   letter-spacing: 0.08em;
 }
 
+/* Mobile-only inline hint showing the top recommended action */
+.oracle__top-hint {
+  display: none;
+  flex: 1;
+  font-size: 0.72rem;
+  color: rgba(201,168,76,0.85);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0 0.4rem;
+}
+
+@media (max-width: 800px) {
+  .oracle__top-hint {
+    display: block;
+  }
+}
+
 .oracle__toggle {
   background: none;
   border: 1px solid rgba(201, 168, 76, 0.35);

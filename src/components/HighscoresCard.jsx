@@ -37,7 +37,7 @@ export default function HighscoresCard({ onViewAll, refreshTrigger }) {
               <li key={i} className={`hs-card__row ${i === 0 ? 'hs-card__row--top' : ''}`}>
                 <span className="hs-card__rank">{i + 1}</span>
                 <span className="hs-card__name">{row.player_name}</span>
-                <span className="hs-card__pts">{row.big_points} bp</span>
+                <span className="hs-card__pts">{row.big_points} points</span>
               </li>
             ))}
           </ol>

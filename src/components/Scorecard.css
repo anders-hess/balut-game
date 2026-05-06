@@ -288,16 +288,29 @@ thead .th-sum {
 
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 480px) {
+  /* Shrink min-width so the full table (incl. BIG column) fits on mobile */
   .scorecard-table {
-    font-size: 0.78rem;
+    min-width: 0;
+    font-size: 0.76rem;
   }
 
+  /* Narrower category column, tighter entry/sum/big columns */
+  .th-category { width: 26%; }
+  .th-entry    { width: 9%;  }
+  .th-sum      { width: 10%; }
+  .th-big      { width: 10%; }
+
   .cat-label, .foot-label {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
   }
 
   .td-category {
     padding-left: 0.5rem !important;
+  }
+
+  .srow td {
+    padding: 0 0.3rem;
+    height: 36px;
   }
 
   .rt-value {

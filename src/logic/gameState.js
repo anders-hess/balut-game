@@ -21,7 +21,7 @@ export function createInitialState() {
     dice: createInitialDice(),
     rollsLeft: MAX_ROLLS,
     turnNumber: 1,
-    oracleEnabled: true,
+    oracleEnabled: window.innerWidth > 800,
     justScoredBalut: false,
   };
 }

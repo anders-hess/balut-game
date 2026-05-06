@@ -116,6 +116,21 @@ export default function GameBoard({
             </div>
           )}
 
+          {/* Oracle — mobile slot: sits between dice and scorecard on small screens */}
+          {!isGameOver && (
+            <div className="oracle-mobile-slot">
+              <TheOracle
+                dice={dice}
+                rollsLeft={rollsLeft}
+                scorecard={currentPlayer.scorecard}
+                isOpen={oracleEnabled}
+                hasRolled={hasRolled && allRolled}
+                isGameOver={isGameOver}
+                onToggle={onToggleOracle}
+              />
+            </div>
+          )}
+
           <Scorecard
             scorecard={players[displayIdx].scorecard}
             dice={dice}
@@ -127,15 +142,17 @@ export default function GameBoard({
 
         {/* ── Right column: Oracle + leaderboard card ── */}
         <div className="board-right">
-          <TheOracle
-            dice={dice}
-            rollsLeft={rollsLeft}
-            scorecard={currentPlayer.scorecard}
-            isOpen={oracleEnabled}
-            hasRolled={hasRolled && allRolled}
-            isGameOver={isGameOver}
-            onToggle={onToggleOracle}
-          />
+          <div className="oracle-desktop-slot">
+            <TheOracle
+              dice={dice}
+              rollsLeft={rollsLeft}
+              scorecard={currentPlayer.scorecard}
+              isOpen={oracleEnabled}
+              hasRolled={hasRolled && allRolled}
+              isGameOver={isGameOver}
+              onToggle={onToggleOracle}
+            />
+          </div>
           <HighscoresCard
             onViewAll={onViewHighscores}
             refreshTrigger={hsRefresh}

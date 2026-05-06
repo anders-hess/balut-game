@@ -188,6 +188,17 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Oracle slot visibility ──────────────────────────── */
+/* On desktop: Oracle lives in the right column (board-right) */
+/* On mobile:  Oracle lives in board-left, between dice and scorecard */
+.oracle-mobile-slot  { display: none; }
+.oracle-desktop-slot { display: block; }
+
+@media (max-width: 800px) {
+  .oracle-mobile-slot  { display: block; }
+  .oracle-desktop-slot { display: none; }
+}
+
 /* ── Inline handoff (replaces dice area between turns) ── */
 .dice-area--handoff {
   justify-content: center;
