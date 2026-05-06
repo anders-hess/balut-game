@@ -13,6 +13,20 @@ import './GameBoard.css';
 
 const TOTAL_TURNS = CATEGORIES.length * NUM_COLUMNS;
 
+// Tracks whether the viewport is in the "narrow" (mobile) layout.
+// Rendering Oracle in two places causes duplicate SVG gradient IDs which
+// corrupts die face colours, so only one instance is mounted at a time.
+function useIsNarrow() {
+  const [isNarrow, setIsNarrow] = useState(() => window.innerWidth <= 800);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 800px)');
+    const handler = () => setIsNarrow(mq.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return isNarrow;
+}
+
 export default function GameBoard({
   state,
   onRoll, onToggleHold, onScore, onToggleOracle,
@@ -27,6 +41,7 @@ export default function GameBoard({
   const allRolled     = dice.every(d => d.value > 0);
 
   const currentPlayer = players[currentPlayerIndex];
+  const isNarrow      = useIsNarrow();
 
   const [viewingIdx, setViewingIdx] = useState(currentPlayerIndex);
   useEffect(() => { setViewingIdx(currentPlayerIndex); }, [currentPlayerIndex]);
@@ -35,6 +50,15 @@ export default function GameBoard({
   const viewingOwnTurn = displayIdx === currentPlayerIndex;
 
   const [hsRefresh, setHsRefresh] = useState(0);
+
+  const oracleProps = {
+    dice, rollsLeft,
+    scorecard:   currentPlayer.scorecard,
+    isOpen:      oracleEnabled,
+    hasRolled:   hasRolled && allRolled,
+    isGameOver,
+    onToggle:    onToggleOracle,
+  };
 
   return (
     <div className="game-board">
@@ -116,20 +140,8 @@ export default function GameBoard({
             </div>
           )}
 
-          {/* Oracle — mobile slot: sits between dice and scorecard on small screens */}
-          {!isGameOver && (
-            <div className="oracle-mobile-slot">
-              <TheOracle
-                dice={dice}
-                rollsLeft={rollsLeft}
-                scorecard={currentPlayer.scorecard}
-                isOpen={oracleEnabled}
-                hasRolled={hasRolled && allRolled}
-                isGameOver={isGameOver}
-                onToggle={onToggleOracle}
-              />
-            </div>
-          )}
+          {/* Oracle — mobile: one instance between dice and scorecard */}
+          {isNarrow && !isGameOver && <TheOracle {...oracleProps} />}
 
           <Scorecard
             scorecard={players[displayIdx].scorecard}
@@ -140,19 +152,10 @@ export default function GameBoard({
           />
         </div>
 
-        {/* ── Right column: Oracle + leaderboard card ── */}
+        {/* ── Right column: Oracle (desktop) + leaderboard card ── */}
         <div className="board-right">
-          <div className="oracle-desktop-slot">
-            <TheOracle
-              dice={dice}
-              rollsLeft={rollsLeft}
-              scorecard={currentPlayer.scorecard}
-              isOpen={oracleEnabled}
-              hasRolled={hasRolled && allRolled}
-              isGameOver={isGameOver}
-              onToggle={onToggleOracle}
-            />
-          </div>
+          {/* Oracle — desktop: one instance in right column */}
+          {!isNarrow && <TheOracle {...oracleProps} />}
           <HighscoresCard
             onViewAll={onViewHighscores}
             refreshTrigger={hsRefresh}
