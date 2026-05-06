@@ -1,12 +1,8 @@
 import { BIG_POINT_RULES } from '../gameConstants.js';
 import { calcBonus } from '../scoring.js';
 import { normalCDF } from './probabilities.js';
-import {
-  EXPECTED_SCORE_PER_COLUMN,
-  VARIANCE_PER_COLUMN,
-  P_COMPLETE_IN_3_ROLLS,
-  BASELINE_DISCOUNT,
-} from './constants.js';
+import { EXPECTED_SCORE_PER_COLUMN, P_COMPLETE_IN_3_ROLLS } from './constants.js';
+import { SUM_CDF } from './distributions.js';
 import { categoryCurrentSum, columnsUnfilled, hasLockedFailure } from './scoring.js';
 
 // ─── P_threshold ──────────────────────────────────────────────────────────────
@@ -16,8 +12,8 @@ import { categoryCurrentSum, columnsUnfilled, hasLockedFailure } from './scoring
 // Pass actionScore = actual dice score    → P for actual outcome
 // Pass actionScore = BASELINE_SCORE      → P for the baseline (avg outcome)
 //
-// For sum types the function is continuous in actionScore.
-// For filled types pass the sentinel BASELINE_SCORE to trigger the E[P] formula.
+// Sum types use discrete convolution CDFs (distributions.js) — exact enumeration.
+// Filled types use the sentinel BASELINE_SCORE to trigger the E[P] formula.
 
 export const BASELINE_SCORE = Symbol('baseline');
 
@@ -40,29 +36,32 @@ export function pThreshold(cat, scorecard, actionScore) {
 }
 
 // ─── Sum types (fours, fives, sixes, choice) ─────────────────────────────────
+// Uses the precomputed SUM_CDF[cat][K] (self-convolution of the per-column PMF)
+// to give exact discrete probabilities instead of a normal approximation.
+//
+// P(threshold met) = P(sum of K future columns ≥ needed)
+//                  = 1 − SUM_CDF[cat][K][needed − 1]
+// where needed = threshold − newSum.
 
 function _pThresholdSum(cat, scorecard, actionScore) {
   const rule = BIG_POINT_RULES[cat];
   const score = actionScore === BASELINE_SCORE
-    ? EXPECTED_SCORE_PER_COLUMN[cat] * BASELINE_DISCOUNT
+    ? EXPECTED_SCORE_PER_COLUMN[cat]
     : actionScore;
 
   const newSum = categoryCurrentSum(scorecard, cat) + score;
-  const colsRemainingAfter = columnsUnfilled(scorecard, cat) - 1;
+  const K = columnsUnfilled(scorecard, cat) - 1; // future columns after this one
 
-  if (colsRemainingAfter === 0) {
-    return newSum >= rule.threshold ? 1.0 : 0.0;
-  }
+  if (K === 0) return newSum >= rule.threshold ? 1.0 : 0.0;
 
-  const futureMean  = EXPECTED_SCORE_PER_COLUMN[cat] * colsRemainingAfter;
-  const futureVar   = VARIANCE_PER_COLUMN[cat] * colsRemainingAfter;
-  const futureStdev = Math.sqrt(futureVar);
+  const needed = rule.threshold - newSum;
+  if (needed <= 0) return 1.0;  // already at or beyond threshold
 
-  if (futureStdev < 1e-10) {
-    return (newSum + futureMean) >= rule.threshold ? 1.0 : 0.0;
-  }
-
-  return 1 - normalCDF((rule.threshold - newSum - futureMean) / futureStdev);
+  // Future column scores are integers, so P(sum ≥ x) = P(sum ≥ ⌈x⌉)
+  const cdf = SUM_CDF[cat][K];
+  const idx = Math.ceil(needed) - 1;
+  if (idx >= cdf.length) return 0.0; // max possible sum still below threshold
+  return 1 - cdf[idx];
 }
 
 // ─── Filled types (straight, fullHouse) ──────────────────────────────────────

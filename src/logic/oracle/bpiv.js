@@ -1,6 +1,6 @@
 import { CATEGORIES, BIG_POINT_RULES } from '../gameConstants.js';
 import { calcTotals } from '../scoring.js';
-import { EXPECTED_SCORE_PER_COLUMN, VARIANCE_PER_COLUMN, BASELINE_DISCOUNT } from './constants.js';
+import { EXPECTED_SCORE_PER_COLUMN, VARIANCE_PER_COLUMN } from './constants.js';
 import { scoreCell, columnsUnfilled, nextColumn } from './scoring.js';
 import { pThreshold, expectedBonus, BASELINE_SCORE } from './thresholds.js';
 
@@ -67,11 +67,7 @@ function computeBonusBigDelta(cat, actual, scorecard) {
   }
   const futureStdev = Math.sqrt(futureVar);
 
-  // For sum-type categories apply the same discount used in pThreshold,
-  // so the bonus baseline is consistent with the category-delta baseline.
-  const baselineContrib = BIG_POINT_RULES[cat].type === 'sum'
-    ? EXPECTED_SCORE_PER_COLUMN[cat] * BASELINE_DISCOUNT
-    : EXPECTED_SCORE_PER_COLUMN[cat];
+  const baselineContrib = EXPECTED_SCORE_PER_COLUMN[cat];
 
   const eBonusActual   = expectedBonus(currentTotal + actual + futureMean, futureStdev);
   const eBonusBaseline = expectedBonus(currentTotal + baselineContrib + futureMean, futureStdev);

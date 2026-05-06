@@ -1,51 +1,39 @@
-// ─── Baseline discount ────────────────────────────────────────────────────────
-// Applied to EXPECTED_SCORE_PER_COLUMN when computing the SCORE_NOW baseline for
-// sum-type categories (Fours, Fives, Sixes, Choice).
-//
-// Rationale: unconditional column means average over both optimal-attempt turns
-// and late-game forced-fill turns.  When the player is deciding whether to score
-// now, the relevant alternative is the realistic next score — which is biased
-// downward by those forced fills.  The discount makes "above-average" outcomes
-// register as positive BPIV and matches player intuition about progress toward
-// big-point thresholds.
-//
-// TODO: calibrate empirically via Monte Carlo simulation of optimal play.
-export const BASELINE_DISCOUNT = 0.85;
-
 // ─── Expected small-point score per column ────────────────────────────────────
-// Values measured via Monte Carlo simulation of optimal play (fours/fives/sixes/
-// choice) or estimated analytically (straight/fullHouse/balut).
+// Values from Oracle-directed Monte Carlo, iteration 2 (10 000 games).
+// Hold decisions guided by fast Oracle (rollsRemaining=0); scoring by BPIV.
+// These are Definition-B values — per-column mean under realistic Oracle play
+// including selective fills and late-game forced fills.
 //
-// TODO: confirm via Monte Carlo Phase 2 simulator.
+// Used as the BASELINE for BPIV: a column score at this value is average play.
 export const EXPECTED_SCORE_PER_COLUMN = {
-  fours:      8.5,   // TODO: Monte Carlo — optimal-play empirical mean (~8.5)
-  fives:     10.5,   // TODO: Monte Carlo
-  sixes:     12.5,   // TODO: Monte Carlo
-  straight:   9.0,   // P_complete × expected score when pattern completes
-  fullHouse: 10.0,   // P_complete × expected score when pattern completes
-  choice:    21.0,   // TODO: Monte Carlo — optimal-play empirical mean (~21)
-  balut:      1.7,   // P_complete(0.046) × avg balut small pts (~37.5)
+  fours:      10.50,
+  fives:      13.01,
+  sixes:      14.21,
+  straight:    7.17,
+  fullHouse:  14.70,
+  choice:     25.06,
+  balut:       6.30,
 };
 
 // ─── Variance per column ──────────────────────────────────────────────────────
-// Used by the normal-distribution approximation for expected bonus calculation.
-// Sum-type categories have heavy left tails from forced fills, giving much higher
-// variance than naive estimates based on 3-roll optimal distributions.
-//
-// TODO: confirm via Monte Carlo Phase 2 simulator.
+// Used by expectedBonus (normal-distribution approximation for bonus CDF).
+// From the same Oracle-directed Monte Carlo run (iteration 2).
+// Balut is heavily bimodal (0 or ~37 pts), driving the large variance.
 export const VARIANCE_PER_COLUMN = {
-  fours:     28,   // TODO: Monte Carlo — heavy left tail from forced fills
-  fives:     32,   // TODO: Monte Carlo
-  sixes:     38,   // TODO: Monte Carlo
-  straight:  80,
-  fullHouse: 90,
-  choice:    25,   // TODO: Monte Carlo
-  balut:     20,   // TODO: refine
+  fours:      11.79,
+  fives:      19.11,
+  sixes:      30.96,
+  straight:   71.34,
+  fullHouse:  83.49,
+  choice:      4.12,
+  balut:     232.63,
 };
 
-// Probability of completing a valid pattern (>0 score) in 3 rolls with optimal play
+// Probability of completing a valid pattern (>0 score) in 3 rolls with optimal play.
+// straight/fullHouse from isolated greedy-strategy simulation (100 000 trials).
+// balut confirmed analytically.
 export const P_COMPLETE_IN_3_ROLLS = {
-  straight:  0.50,
-  fullHouse: 0.40,
+  straight:  0.25,
+  fullHouse: 0.35,
   balut:     0.046,
 };

@@ -26,17 +26,17 @@ describe('bpivScoreNow – basic behaviour', () => {
     expect(r.smallPoints).toBe(24); // 4+4+5+5+6
   });
 
-  it('BPIV > 0 when actual exceeds the discounted baseline', () => {
-    // Choice discounted baseline ≈ 21 × 0.85 = 17.85; dice score 23 — well above
-    const r = bpivScoreNow('choice', [5, 5, 5, 4, 4], emptySc); // sum=23
+  it('BPIV > 0 when actual exceeds the Oracle-average baseline', () => {
+    // Choice Oracle average ≈ 23.63; dice score 26 — well above
+    const r = bpivScoreNow('choice', [6, 5, 5, 5, 5], emptySc); // sum=26
     expect(r.bpiv).toBeGreaterThan(0);
   });
 });
 
 describe('bpivScoreNow – category big delta', () => {
   it('crossing threshold produces positive categoryBigDelta', () => {
-    // Fours: 3/4 filled, currentSum=36 (below threshold-expected=39.5), scoring 16 → 52.
-    // Baseline would score 12.5 → only 48.5, missing threshold.
+    // Fours: 3/4 filled, currentSum=36. Scoring 16 → 52 (meets threshold).
+    // Baseline scores 10.54 → only 46.54, missing threshold.
     // Actual crosses; baseline does not → positive delta.
     const sc = { ...emptySc, fours: [12, 12, 12, null] }; // sum=36
     const r = bpivScoreNow('fours', [4, 4, 4, 4, 1], sc); // score 16
@@ -96,24 +96,25 @@ describe('SPEC TEST 2 partial – scoring 0 in Full House is strongly negative',
   });
 });
 
-// ─── SPEC TEST 3: Adjusted Baseline — Fours Near Baseline vs. Choice Below ────
+// ─── SPEC TEST 3: Adjusted Baseline Ordering ─────────────────────────────────
+// Definition-B baselines: fours expected ≈ 10.54, choice expected ≈ 23.63.
+// Dice [4,4,1,1,1]: Fours=8 (below Oracle avg 10.54 — a bad fours turn),
+//                   Choice=11 (far below Oracle avg 23.63 — a terrible choice turn).
+// Both are below baseline, but choice is much further below, so fours BPIV > choice BPIV.
 describe('SPEC TEST 3 – Adjusted Baseline Ordering', () => {
-  // With calibrated baselines: fours expected ≈ 8.5 × 0.85 = 7.225 effective.
-  // Dice: [4,4,1,1,1] → Fours=8 (just above discounted baseline),
-  //                      Choice=11 (well below choice discounted baseline ≈ 17.85).
-  it('BPIV(Score in Fours) > BPIV(Score in Choice) when fours is above baseline but choice is below', () => {
+  it('BPIV(Score in Fours) > BPIV(Score in Choice) even when both are below baseline', () => {
     const dice = [4, 4, 1, 1, 1];
     const fours  = bpivScoreNow('fours',  dice, emptySc).bpiv;
     const choice = bpivScoreNow('choice', dice, emptySc).bpiv;
     expect(fours).toBeGreaterThan(choice);
   });
 
-  it('BPIV(fours=8) is positive (just above discounted baseline)', () => {
+  it('BPIV(fours=8) is negative (below Oracle average of ~10.54)', () => {
     const r = bpivScoreNow('fours', [4, 4, 1, 1, 1], emptySc);
-    expect(r.bpiv).toBeGreaterThan(0);
+    expect(r.bpiv).toBeLessThan(0);
   });
 
-  it('BPIV(choice=11) is negative (well below discounted baseline)', () => {
+  it('BPIV(choice=11) is negative (well below Oracle average of ~23.63)', () => {
     const r = bpivScoreNow('choice', [4, 4, 1, 1, 1], emptySc);
     expect(r.bpiv).toBeLessThan(0);
   });

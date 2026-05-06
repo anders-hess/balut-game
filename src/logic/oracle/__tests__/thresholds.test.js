@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { pThreshold, expectedBonus, BASELINE_SCORE } from '../thresholds.js';
+import { EXPECTED_SCORE_PER_COLUMN } from '../constants.js';
 
 const emptySc = {
   fours:     [null, null, null, null],
@@ -32,19 +33,16 @@ describe('pThreshold – sum types', () => {
     expect(p).toBeLessThan(1);
   });
 
-  it('BASELINE_SCORE maps to the discounted expected score (expected × 0.85)', () => {
-    // EXPECTED_SCORE_PER_COLUMN.fours = 8.5, BASELINE_DISCOUNT = 0.85 → 7.225
-    const discountedBaseline = 8.5 * 0.85;
-    const pActual   = pThreshold('fours', emptySc, discountedBaseline);
-    const pBaseline = pThreshold('fours', emptySc, BASELINE_SCORE);
-    expect(pActual).toBeCloseTo(pBaseline, 6);
+  it('BASELINE_SCORE maps to the expected score per column (no discount)', () => {
+    const pAtExpected = pThreshold('fours', emptySc, EXPECTED_SCORE_PER_COLUMN.fours);
+    const pBaseline   = pThreshold('fours', emptySc, BASELINE_SCORE);
+    expect(pBaseline).toBeCloseTo(pAtExpected, 6);
   });
 
-  it('BASELINE_SCORE is lower than the raw expected score (discount applied)', () => {
-    const pRaw      = pThreshold('fours', emptySc, 8.5);
+  it('BASELINE_SCORE equals pThreshold at the expected score (Definition B — no discount)', () => {
     const pBaseline = pThreshold('fours', emptySc, BASELINE_SCORE);
-    // Discounted baseline (7.225) < raw expected (8.5) → lower P
-    expect(pBaseline).toBeLessThan(pRaw);
+    const pExpected = pThreshold('fours', emptySc, EXPECTED_SCORE_PER_COLUMN.fours);
+    expect(pBaseline).toBeCloseTo(pExpected, 6);
   });
 
   it('higher score increases P', () => {
@@ -75,13 +73,13 @@ describe('pThreshold – filled types (straight, fullHouse)', () => {
   });
 
   it('baseline returns p^(colsRemaining+1)', () => {
-    // 0/4 filled, colsRemainingAfter=3, fullHouse P_complete=0.40
-    const p = 0.40;
+    // 0/4 filled, colsRemainingAfter=3, fullHouse P_complete=0.35
+    const p = 0.35;
     expect(pThreshold('fullHouse', emptySc, BASELINE_SCORE)).toBeCloseTo(p ** 4, 10);
   });
 
   it('scoring > 0 on first column: P = p^3', () => {
-    const p = 0.40;
+    const p = 0.35;
     expect(pThreshold('fullHouse', emptySc, 28)).toBeCloseTo(p ** 3, 10);
   });
 });
