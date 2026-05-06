@@ -120,6 +120,11 @@ export default function OracleScreen({ onClose }) {
               </div>
             </div>
 
+          </div>
+
+          {/* ── Right: scorecard placeholder + Oracle output ── */}
+          <div className="oracle-screen__output" ref={panelRef}>
+
             {/* Scorecard (placeholder) */}
             <div className="oracle-screen__card oracle-screen__card--placeholder">
               <h2 className="oracle-screen__card-title">Scorecard</h2>
@@ -137,10 +142,6 @@ export default function OracleScreen({ onClose }) {
               </div>
             </div>
 
-          </div>
-
-          {/* ── Right: Oracle output ── */}
-          <div className="oracle-screen__output" ref={panelRef}>
             <div className="oracle-screen__card oracle-screen__card--output">
               <h2 className="oracle-screen__card-title">
                 <span className="oracle-screen__star oracle-screen__star--sm">✦</span>

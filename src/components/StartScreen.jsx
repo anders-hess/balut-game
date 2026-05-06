@@ -26,7 +26,7 @@ export default function StartScreen({ onStart, onMultiplayer, onHighscores, onRu
           <div className="start-divider" />
 
           <button className="mode-btn mode-btn--secondary" onClick={onOracle}>
-            ✦ Oracle Sandbox
+            ✦ The Oracle
           </button>
 
           <button className="mode-btn mode-btn--secondary" onClick={onRules}>

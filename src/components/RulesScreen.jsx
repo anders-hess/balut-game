@@ -57,17 +57,17 @@ export default function RulesScreen({ onClose }) {
                 <tbody>
                   <tr>
                     <td className="rules-cat">Fours</td>
-                    <td>Any dice</td>
+                    <td>Only fours</td>
                     <td>Sum of all 4-face dice</td>
                   </tr>
                   <tr>
                     <td className="rules-cat">Fives</td>
-                    <td>Any dice</td>
+                    <td>Only fives</td>
                     <td>Sum of all 5-face dice</td>
                   </tr>
                   <tr>
                     <td className="rules-cat">Sixes</td>
-                    <td>Any dice</td>
+                    <td>Only sixes</td>
                     <td>Sum of all 6-face dice</td>
                   </tr>
                   <tr>
@@ -228,29 +228,6 @@ export default function RulesScreen({ onClose }) {
                   <li>Everything else</li>
                   <li>Full House, Choice, Balut always left</li>
                 </ul>
-              </div>
-            </div>
-          </section>
-
-          {/* Tips */}
-          <section className="rules-section">
-            <h2 className="rules-section-title">Strategy Tips</h2>
-            <div className="rules-tips">
-              <div className="rules-tip">
-                <span className="rules-tip-icon">🎯</span>
-                <p><strong>Protect Straight &amp; Full House.</strong> A forced zero in either category costs you all its big points — plan early to avoid it.</p>
-              </div>
-              <div className="rules-tip">
-                <span className="rules-tip-icon">🎲</span>
-                <p><strong>Balut is king.</strong> Every Balut scored is +2 big points regardless of threshold. Chase it whenever the dice align.</p>
-              </div>
-              <div className="rules-tip">
-                <span className="rules-tip-icon">📊</span>
-                <p><strong>Watch your small points total.</strong> Getting above 400 earns a big point bonus; falling below 300 costs you two.</p>
-              </div>
-              <div className="rules-tip">
-                <span className="rules-tip-icon">✦</span>
-                <p><strong>Use The Oracle.</strong> The Oracle calculates the statistically optimal move each turn based on your exact dice and scorecard state.</p>
               </div>
             </div>
           </section>
