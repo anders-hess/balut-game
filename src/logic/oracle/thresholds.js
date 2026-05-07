@@ -2,7 +2,7 @@ import { BIG_POINT_RULES } from '../gameConstants.js';
 import { calcBonus } from '../scoring.js';
 import { normalCDF, binomialCDF } from './probabilities.js';
 import { EXPECTED_SCORE_PER_COLUMN, P_COMPLETE_IN_3_ROLLS, ATTEMPT_FRACTION } from './constants.js';
-import { SUM_CDF } from './distributions.js';
+import { SUM_CDF, CHOICE_MIXED_CDF } from './distributions.js';
 import { categoryCurrentSum, columnsUnfilled, hasLockedFailure, computeTurnsRemaining } from './scoring.js';
 
 // ─── P_threshold ──────────────────────────────────────────────────────────────
@@ -46,7 +46,7 @@ function _pThresholdSum(cat, scorecard, actionScore) {
   const needed = rule.threshold - newSum;
   if (needed <= 0) return 1.0;
 
-  const cdf = SUM_CDF[cat][K];
+  const cdf = cat === 'choice' ? CHOICE_MIXED_CDF[K] : SUM_CDF[cat][K];
   const idx = Math.ceil(needed) - 1;
   if (idx >= cdf.length) return 0.0;
   return 1 - cdf[idx];

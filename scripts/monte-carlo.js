@@ -227,3 +227,31 @@ console.log('};\n');
 
 console.log('⚠  Review before updating constants.js — run npm.cmd run test first.');
 console.log('   SPEC TEST 3 in integration.test.js is sensitive to fours/choice ordering.\n');
+
+// ─── Forced-choice PMF (isolated: keep ≥4, 3 rolls, always score) ─────────────
+// Models "must-score" choice: optimal hold strategy but no Oracle timing.
+// Used as PMF_LOW in the two-regime mixture model in distributions.js.
+
+console.log('Running isolated forced-choice simulation (keep ≥4, 3 rolls)...');
+(function simulateForcedChoicePMF() {
+  const N = 100_000;
+  const freq = {};
+  for (let t = 0; t < N; t++) {
+    let dice = rollN(5);
+    for (let r = 0; r < 2; r++) {
+      const held = dice.filter(d => d >= 4);
+      dice = applyHold(dice, held);
+    }
+    const score = calculateScore('choice', dice); // always valid
+    freq[score] = (freq[score] || 0) + 1;
+  }
+  const mean = Object.entries(freq).reduce((s, [v, c]) => s + Number(v) * c, 0) / N;
+  const pmf  = Object.fromEntries(
+    Object.entries(freq).sort((a, b) => Number(a[0]) - Number(b[0]))
+      .map(([v, c]) => [v, c / N])
+  );
+  const entries = Object.entries(pmf).map(([v, p]) => `${v}: ${p.toFixed(6)}`).join(', ');
+  console.log(`  mean: ${mean.toFixed(2)}`);
+  console.log('\n// ─── Paste into distributions.js as FORCED_CHOICE_PMF ────────────────────');
+  console.log(`const FORCED_CHOICE_PMF = { ${entries} };`);
+})();

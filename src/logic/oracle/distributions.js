@@ -63,3 +63,68 @@ for (const cat of Object.keys(RAW_PMF)) {
     SUM_CDF[cat][K] = toCDF(pmfK);
   }
 }
+
+// ─── Two-regime mixture model for Choice ─────────────────────────────────────
+// Each future choice column is modelled as one of two regimes:
+//   HIGH (prob q):    Oracle-timed fill, score ≥ 25 (drawn from Oracle PMF ≥25)
+//   LOW  (prob 1−q):  Forced fill, score < 25 likely (isolated keep-≥4 simulation)
+//
+// This distinction matters because the Oracle PMF bundles selective and forced
+// fills into one distribution, overstating P(threshold) when forced fills
+// are inevitable.
+//
+// CHOICE_MIXED_CDF[K] = CDF of the sum of K mixture columns.
+// For each K: sum over all splits (j high + K-j low) weighted by binomial(K,j,q).
+
+// Forced-choice PMF: isolated keep-≥4, 3 rolls, must score (100 000 trials, mean 23.13).
+const FORCED_CHOICE_PMF = {
+  7: 0.000020, 8: 0.000010, 9: 0.000030, 10: 0.000070, 11: 0.000150, 12: 0.000580,
+  13: 0.001350, 14: 0.002570, 15: 0.004900, 16: 0.009740, 17: 0.017780, 18: 0.028800,
+  19: 0.045760, 20: 0.066000, 21: 0.089970, 22: 0.114240, 23: 0.132500, 24: 0.141750,
+  25: 0.130280, 26: 0.103420, 27: 0.065300, 28: 0.031980, 29: 0.010520, 30: 0.002280,
+};
+
+// q = P(Oracle-directed choice score ≥ 25)
+const _q = Object.entries(RAW_PMF.choice)
+  .filter(([v]) => Number(v) >= 25)
+  .reduce((s, [, p]) => s + p, 0);
+
+// PMF_HIGH = Oracle-directed choice restricted to scores ≥ 25, renormalised.
+const _pmfHighRaw = Object.fromEntries(
+  Object.entries(RAW_PMF.choice)
+    .filter(([v]) => Number(v) >= 25)
+    .map(([v, p]) => [v, p / _q]),
+);
+
+// Integer binomial coefficient C(n, k) for small n.
+function _binomCoeff(n, k) {
+  if (k === 0 || k === n) return 1;
+  let c = 1;
+  for (let i = 0; i < k; i++) c = c * (n - i) / (i + 1);
+  return c;
+}
+
+// Precompute PMF^0 .. PMF^maxK (PMF^0 = delta at 0, PMF^k = k-fold convolution).
+function _pmfPowers(pmfDense, maxK) {
+  const powers = [[1]]; // PMF^0: delta at 0
+  for (let k = 1; k <= maxK; k++) powers.push(convolve(powers[k - 1], pmfDense));
+  return powers;
+}
+
+const _pmfHighDense = toDense(_pmfHighRaw);
+const _pmfLowDense  = toDense(FORCED_CHOICE_PMF);
+const _highPow = _pmfPowers(_pmfHighDense, 4);
+const _lowPow  = _pmfPowers(_pmfLowDense,  4);
+
+export const CHOICE_MIXED_CDF = {};
+for (let K = 1; K <= 4; K++) {
+  let mixedPMF = [];
+  for (let j = 0; j <= K; j++) {
+    const weight = _binomCoeff(K, j) * _q ** j * (1 - _q) ** (K - j);
+    if (weight < 1e-15) continue;
+    const pmfJKj = convolve(_highPow[j], _lowPow[K - j]);
+    while (mixedPMF.length < pmfJKj.length) mixedPMF.push(0);
+    for (let x = 0; x < pmfJKj.length; x++) mixedPMF[x] += weight * pmfJKj[x];
+  }
+  CHOICE_MIXED_CDF[K] = toCDF(mixedPMF);
+}

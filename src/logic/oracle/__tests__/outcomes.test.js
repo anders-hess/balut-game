@@ -28,12 +28,32 @@ describe('describeResult', () => {
     expect(describeResult('straight', 20)).toBe('High Straight');
   });
 
-  it('names fullHouse, choice, and balut', () => {
+  it('names fullHouse and balut', () => {
     expect(describeResult('fullHouse', 28)).toBe('Full House');
-    expect(describeResult('choice', 27)).toBe('Choice');
     expect(describeResult('balut', 40)).toBe('Balut (4s)');   // 5×4+20=40
     expect(describeResult('balut', 50)).toBe('Balut (6s)');   // 5×6+20=50
     expect(describeResult('balut', 0)).toBe('Missed Balut');
+  });
+
+  it('splits choice at 25 when no scorecard provided', () => {
+    expect(describeResult('choice', 27)).toBe('Choice ≥ 25');
+    expect(describeResult('choice', 25)).toBe('Choice ≥ 25');
+    expect(describeResult('choice', 24)).toBe('Choice < 25');
+    expect(describeResult('choice', 15)).toBe('Choice < 25');
+  });
+
+  it('uses dynamic threshold for choice on last column (K=1)', () => {
+    // currentSum = 23+24+25 = 72; needed = 100-72 = 28
+    const sc = {
+      fours: [null,null,null,null], fives: [null,null,null,null],
+      sixes: [null,null,null,null], straight: [null,null,null,null],
+      fullHouse: [null,null,null,null], choice: [23, 24, 25, null],
+      balut: [null,null,null,null],
+    };
+    expect(describeResult('choice', 28, sc)).toBe('Choice ≥ 28 (threshold!)');
+    expect(describeResult('choice', 29, sc)).toBe('Choice ≥ 28 (threshold!)');
+    expect(describeResult('choice', 27, sc)).toBe('Choice < 28');
+    expect(describeResult('choice', 10, sc)).toBe('Choice < 28');
   });
 });
 
