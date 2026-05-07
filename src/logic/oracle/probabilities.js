@@ -37,6 +37,36 @@ function buildDist(k) {
 // Pre-computed distributions for 0–5 dice (indexed by number of dice to roll).
 export const DIST = Array.from({ length: 6 }, (_, k) => buildDist(k));
 
+// ─── Binomial CDF ────────────────────────────────────────────────────────────
+// P(X ≤ k) where X ~ Bin(n, p).
+// Accepts non-integer n via linear interpolation between floor(n) and ceil(n),
+// which is needed when n = turnsRemaining × attempt_fraction is fractional.
+
+function _binomCDFInt(k, n, p) {
+  if (k >= n) return 1;
+  if (k < 0)  return 0;
+  // Iterative: start at P(X=0) = (1-p)^n, multiply up to P(X=k)
+  const q = 1 - p;
+  let term = Math.pow(q, n);
+  let cdf  = 0;
+  for (let i = 0; i <= k; i++) {
+    cdf += term;
+    if (i < n) term *= (p / q) * ((n - i) / (i + 1));
+  }
+  return Math.min(cdf, 1);
+}
+
+export function binomialCDF(k, n, p) {
+  if (k < 0)  return 0;
+  if (n <= 0) return 1;   // no trials → X=0 → P(X ≤ k) = 1 for k ≥ 0
+  if (p <= 0) return 1;   // X always 0
+  if (p >= 1) return k >= Math.ceil(n) ? 1 : 0;  // X always n
+  const lo = Math.floor(n), hi = Math.ceil(n);
+  if (lo === hi) return _binomCDFInt(k, lo, p);
+  const frac = n - lo;
+  return (1 - frac) * _binomCDFInt(k, lo, p) + frac * _binomCDFInt(k, hi, p);
+}
+
 // ─── Hold-subset enumeration ─────────────────────────────────────────────────
 // Returns all distinct sorted subsets of `dice` (including empty set, excluding
 // holding all 5 dice since that is equivalent to scoring now).

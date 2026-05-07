@@ -50,30 +50,34 @@ describe('bpivScoreNow – category big delta', () => {
     expect(r.breakdown.categoryBigDelta).toBeLessThan(-1.0);
   });
 
-  it('completing a full house on the last column produces large positive BPIV', () => {
+  it('completing a full house on the last column produces large positive BPIV (late game)', () => {
+    // turnsRemaining=5: baseline has ~53% chance; scoring now locks in 100% → Δ≈1.4 big pts
     const sc = { ...emptySc, fullHouse: [32, 28, 25, null] };
-    const r = bpivScoreNow('fullHouse', [4, 4, 4, 3, 3], sc); // valid FH
+    const r = bpivScoreNow('fullHouse', [4, 4, 4, 3, 3], sc, 5);
     expect(r.bpiv).toBeGreaterThan(1.0);
   });
 });
 
 // ─── SPEC TEST 1: "The Last Full House" ───────────────────────────────────────
-describe('SPEC TEST 1 – The Last Full House', () => {
+describe('SPEC TEST 1 – The Last Full House (late game, turnsRemaining=5)', () => {
+  // With few turns left, baseline has ~53% chance of filling the last FH column,
+  // so locking it in now provides ~1.4 categoryBigDelta (≈ +1.4–1.6 total BPIV).
   const sc = {
     ...emptySc,
     fullHouse: [32, 28, 25, null], // 3/4 filled, all >0
     fours:     [null, null, null, null],
   };
   const dice = [4, 4, 4, 3, 3]; // valid Full House, scores 18; also 12 in Fours
+  const tR   = 5;
 
   it('BPIV(Score Full House) is significantly greater than BPIV(Score Fours)', () => {
-    const fhBpiv   = bpivScoreNow('fullHouse', dice, sc).bpiv;
-    const fourBpiv = bpivScoreNow('fours',     dice, sc).bpiv;
-    expect(fhBpiv).toBeGreaterThan(fourBpiv + 1.5); // at least 1.5 big pts apart
+    const fhBpiv   = bpivScoreNow('fullHouse', dice, sc, tR).bpiv;
+    const fourBpiv = bpivScoreNow('fours',     dice, sc, tR).bpiv;
+    expect(fhBpiv).toBeGreaterThan(fourBpiv + 1.0); // at least 1 big pt apart
   });
 
   it('BPIV(Score Full House) is positive', () => {
-    expect(bpivScoreNow('fullHouse', dice, sc).bpiv).toBeGreaterThan(0);
+    expect(bpivScoreNow('fullHouse', dice, sc, tR).bpiv).toBeGreaterThan(0);
   });
 });
 

@@ -37,3 +37,19 @@ export const P_COMPLETE_IN_3_ROLLS = {
   fullHouse: 0.35,
   balut:     0.046,
 };
+
+// Fraction of remaining turns expected to be dedicated to each filled category.
+// Used in the binomial time-pressure model: available_attempts = turnsRemaining × af.
+// TODO: calibrate empirically via Oracle-directed Monte Carlo (Phase 3).
+export const ATTEMPT_FRACTION = {
+  straight:  0.25,
+  fullHouse: 0.35,
+  balut:     0.30,
+};
+
+// NOTE — Task 3 (turn-aware sum baselines) is deferred to Phase 3.
+// EXPECTED_SCORE_PER_COLUMN is currently a single Oracle-play mean per category.
+// Future: EXPECTED_SCORE_PER_COLUMN_AT_TURN[cat][turnsRemaining] lookup table
+// (Monte Carlo measurement of per-column score conditional on when it is filled).
+// Approximation when implemented: expected_at_turn(cat, t) =
+//   EXPECTED_SCORE_PER_COLUMN[cat] × (0.6 + 0.4 × t / 28)

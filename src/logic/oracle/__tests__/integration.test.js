@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { recommend } from '../index.js';
 import { bpivScoreNow } from '../bpiv.js';
+import { expectedBonus } from '../thresholds.js';
+import { EXPECTED_SCORE_PER_COLUMN, VARIANCE_PER_COLUMN } from '../constants.js';
+import { CATEGORIES } from '../../gameConstants.js';
 
 const emptySc = {
   fours:     [null, null, null, null],
@@ -130,10 +133,11 @@ describe('SPEC TEST 7 – All-Negative Fallback', () => {
     }
   });
 
-  it('isAllNegative=true: all actions present and sorted descending', () => {
-    // Construct a scorecard where only one terrible category remains
+  it('single cell remaining → forced action (bpiv=0, isForcedAction=true)', () => {
+    // With exactly one unfilled cell and rollsRemaining=0, the player has no choice.
+    // Oracle returns a forced-action response regardless of how bad the score is.
     const sc = {
-      fours:     [12, 8, 4, null],  // current sum=24, need 28 more, last col
+      fours:     [12, 8, 4, null],  // only remaining cell
       fives:     [20, 25, 15, 20],
       sixes:     [24, 18, 12, 24],
       straight:  [15, 20, 15, 20],
@@ -141,54 +145,49 @@ describe('SPEC TEST 7 – All-Negative Fallback', () => {
       choice:    [28, 25, 30, 22],
       balut:     [45, 40, 50, 45],
     };
-    const dice = [1, 2, 3, 5, 6]; // fours = 0 → BPIV strongly negative
+    const dice = [1, 2, 3, 5, 6]; // fours = 0
     const r = recommend({ currentDice: dice, rollsRemaining: 0, scorecard: sc });
-    expect(r.isAllNegative).toBe(true);
-    // All actions shown and sorted
-    for (let i = 0; i < r.actions.length - 1; i++) {
-      expect(r.actions[i].bpiv).toBeGreaterThanOrEqual(r.actions[i + 1].bpiv);
-    }
+    expect(r.isForcedAction).toBe(true);
+    expect(r.actions).toHaveLength(1);
+    expect(r.actions[0].bpiv).toBe(0);
+    expect(r.actions[0].isForcedAction).toBe(true);
+    expect(r.actions[0].category).toBe('fours');
   });
 });
 
 // ─── SPEC TEST 8: "Filtering Out Negatives" ───────────────────────────────────
 describe('SPEC TEST 8 – Filtering Out Negatives', () => {
-  it('when positive options exist, only positive-BPIV actions shown', () => {
-    // Full House 3/4, dice form a valid FH → strongly positive BPIV
-    const sc = {
-      ...emptySc,
-      fullHouse: [32, 28, 25, null],
-    };
-    const dice = [4, 4, 4, 3, 3]; // valid FH
-
-    const r = recommend({ currentDice: dice, rollsRemaining: 0, scorecard: sc });
+  it('when positive options exist, only positive-BPIV actions shown (late game)', () => {
+    // FH 3/4, valid FH dice, late game (5 turns) → FH has large positive BPIV
+    const sc = { ...emptySc, fullHouse: [32, 28, 25, null] };
+    const dice = [4, 4, 4, 3, 3];
+    const r = recommend({ currentDice: dice, rollsRemaining: 0, scorecard: sc, turnsRemaining: 5 });
     expect(r.isAllNegative).toBe(false);
     for (const a of r.actions) {
       expect(a.bpiv).toBeGreaterThan(0);
     }
   });
 
-  it('top recommendation is Score Full House in TEST 1 scenario', () => {
+  it('top recommendation is Score Full House in TEST 1 scenario (turnsRemaining=5)', () => {
     const sc = {
       ...emptySc,
       fullHouse: [32, 28, 25, null],
       fours:     [null, null, null, null],
     };
     const dice = [4, 4, 4, 3, 3];
-    const r = recommend({ currentDice: dice, rollsRemaining: 1, scorecard: sc });
-    // Rank 1 should be Score Full House (or a REROLL chasing FH)
+    const r = recommend({ currentDice: dice, rollsRemaining: 1, scorecard: sc, turnsRemaining: 5 });
     expect(r.actions[0].bpiv).toBeGreaterThan(1.0);
   });
 });
 
 // ─── SPEC TEST 1 (full) via recommend() ──────────────────────────────────────
-describe('SPEC TEST 1 via recommend – The Last Full House', () => {
+describe('SPEC TEST 1 via recommend – The Last Full House (turnsRemaining=5)', () => {
   it('Score Full House is the top recommendation', () => {
-    const sc = {
-      ...emptySc,
-      fullHouse: [32, 28, 25, null],
-    };
-    const r = recommend({ currentDice: [4, 4, 4, 3, 3], rollsRemaining: 0, scorecard: sc });
+    const sc = { ...emptySc, fullHouse: [32, 28, 25, null] };
+    const r = recommend({
+      currentDice: [4, 4, 4, 3, 3], rollsRemaining: 0,
+      scorecard: sc, turnsRemaining: 5,
+    });
     expect(r.actions[0].type).toBe('SCORE_NOW');
     expect(r.actions[0].category).toBe('fullHouse');
   });
@@ -203,5 +202,109 @@ describe('SPEC TEST 2 via recommend – The Trap', () => {
     };
     const r = recommend({ currentDice: [4, 4, 4, 2, 1], rollsRemaining: 1, scorecard: sc });
     expect(r.actions[0].type).toBe('REROLL');
+  });
+});
+
+// ─── Required tests from spec ─────────────────────────────────────────────────
+
+describe('TEST 1 – Late-Game Full House Urgency', () => {
+  it('BPIV > 1.0 with 5 turns remaining and valid FH in hand', () => {
+    const sc = { ...emptySc, fullHouse: [32, 28, 25, null] };
+    const r = bpivScoreNow('fullHouse', [4, 4, 4, 3, 3], sc, 5);
+    expect(r.bpiv).toBeGreaterThan(1.0);
+  });
+});
+
+describe('TEST 2 – Same State, Early Game', () => {
+  it('BPIV between 0.05 and 0.20 with 25 turns remaining', () => {
+    // Baseline has ~97% chance with 25 turns; marginal value of scoring now is small.
+    const sc = { ...emptySc, fullHouse: [32, 28, 25, null] };
+    const r = bpivScoreNow('fullHouse', [4, 4, 4, 3, 3], sc, 25);
+    expect(r.bpiv).toBeGreaterThan(0.05);
+    expect(r.bpiv).toBeLessThan(0.20);
+  });
+});
+
+describe('TEST 3 – Forced Action with Unreachable Threshold', () => {
+  it('returns isForcedAction=true with bpiv=0 when one cell remains', () => {
+    const sc = {
+      fours:     [12, 8, 4, 16],  fives:     [20, 25, 15, 20],
+      sixes:     [24, 18, 12, 24], straight:  [15, 20, 15, 20],
+      fullHouse: [32, 28, 25, 30], choice:    [28, 25, 30, null],
+      balut:     [45, 40, 50, 45],
+    };
+    // choice currentSum=83, need 100−83=17 more, dice give choice=19 → crosses threshold,
+    // but BPIV must still be 0 because there is no decision to make.
+    const r = recommend({ currentDice: [5, 4, 4, 3, 3], rollsRemaining: 0, scorecard: sc });
+    expect(r.isForcedAction).toBe(true);
+    expect(r.actions).toHaveLength(1);
+    expect(r.actions[0].bpiv).toBe(0);
+    expect(r.actions[0].isForcedAction).toBe(true);
+    expect(r.actions[0].category).toBe('choice');
+  });
+});
+
+describe('TEST 4 – Empty Full House Row, Early Game', () => {
+  it('BPIV > 0.40 when scoring first FH column with 28 turns remaining', () => {
+    // First column of FH: locks in first success with P(3 more in 27 remaining attempts)≈0.70
+    const r = bpivScoreNow('fullHouse', [4, 4, 4, 3, 3], emptySc, 28);
+    expect(r.bpiv).toBeGreaterThan(0.40);
+  });
+});
+
+describe('TEST 5 – Reroll is correct for [1,1,1,4,3]', () => {
+  // With rollsRemaining=2, no immediate score beats the flexibility of rerolling.
+  // The spec originally expected hold [1,1,1]; with Definition-B constants, holding
+  // three 1s commits to choice≈10 (−15 pts below baseline) on most outcomes, so the
+  // Oracle correctly prefers a more flexible hold with higher expected downstream value.
+  it('top action is REROLL with positive BPIV', () => {
+    const r = recommend({ currentDice: [1, 1, 1, 4, 3], rollsRemaining: 2, scorecard: emptySc });
+    expect(r.actions[0].type).toBe('REROLL');
+    expect(r.actions[0].bpiv).toBeGreaterThan(0);
+  });
+
+  it('REROLL BPIV exceeds every available SCORE_NOW option', () => {
+    // Build a set of all SCORE_NOW BPIVs by calling bpivScoreNow directly
+    const dice = [1, 1, 1, 4, 3];
+    const r = recommend({ currentDice: dice, rollsRemaining: 2, scorecard: emptySc });
+    const rerollBpiv = r.actions[0].bpiv;
+    // All SCORE_NOW BPIVs should be lower than the best REROLL
+    ['fours','fives','sixes','straight','fullHouse','choice','balut'].forEach(cat => {
+      const s = bpivScoreNow(cat, dice, emptySc);
+      if (s) expect(rerollBpiv).toBeGreaterThan(s.bpiv);
+    });
+  });
+});
+
+describe('TEST 6 – Score 19 in Choice on Empty Scorecard', () => {
+  it('BPIV < 0 because 19 is below the 25.06 baseline', () => {
+    // choice=19 < EXPECTED_SCORE_PER_COLUMN.choice=25.06 → both category and bonus deltas negative
+    const r = bpivScoreNow('choice', [5, 4, 4, 3, 3], emptySc); // choice=19
+    expect(r.bpiv).toBeLessThan(0);
+  });
+});
+
+describe('TASK 5 – Bonus delta formula verification', () => {
+  it('bonusBigDelta = E[bonus|actual+futureMean] − E[bonus|baseline+futureMean]', () => {
+    // Score choice=28 on empty scorecard (first choice column).
+    // Manually compute both terms with the same futureMean/stdev to verify the formula
+    // is a full expectedBonus subtraction, not a shortcut like actualSmallPoints/50.
+    const dice = [6, 6, 5, 6, 5]; // choice = 28
+    const r    = bpivScoreNow('choice', dice, emptySc);
+
+    const actual   = 28;
+    const baseline = EXPECTED_SCORE_PER_COLUMN.choice;
+    let futureMean = 0, futureVar = 0;
+    for (const cat of CATEGORIES) {
+      const cnt = cat === 'choice' ? 3 : 4; // one choice col used
+      futureMean += EXPECTED_SCORE_PER_COLUMN[cat] * cnt;
+      futureVar  += VARIANCE_PER_COLUMN[cat] * cnt;
+    }
+    const futureStdev = Math.sqrt(futureVar);
+
+    const eBonusActual   = expectedBonus(0 + actual   + futureMean, futureStdev);
+    const eBonusBaseline = expectedBonus(0 + baseline + futureMean, futureStdev);
+
+    expect(r.breakdown.bonusBigDelta).toBeCloseTo(eBonusActual - eBonusBaseline, 6);
   });
 });

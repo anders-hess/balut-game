@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { pThreshold, expectedBonus, BASELINE_SCORE } from '../thresholds.js';
-import { EXPECTED_SCORE_PER_COLUMN } from '../constants.js';
+import { EXPECTED_SCORE_PER_COLUMN, P_COMPLETE_IN_3_ROLLS, ATTEMPT_FRACTION } from '../constants.js';
+import { binomialCDF } from '../probabilities.js';
 
 const emptySc = {
   fours:     [null, null, null, null],
@@ -72,34 +73,58 @@ describe('pThreshold – filled types (straight, fullHouse)', () => {
     expect(pThreshold('fullHouse', sc, 22)).toBeCloseTo(1.0, 10);
   });
 
-  it('baseline returns p^(colsRemaining+1)', () => {
-    // 0/4 filled, colsRemainingAfter=3, fullHouse P_complete=0.35
-    const p = 0.35;
-    expect(pThreshold('fullHouse', emptySc, BASELINE_SCORE)).toBeCloseTo(p ** 4, 10);
+  it('baseline: binomial model P(≥4 successes in turnsRemaining×af attempts)', () => {
+    // 0/4 filled → K=4 needed, n=28×0.35=9.8, p=0.35
+    const p  = P_COMPLETE_IN_3_ROLLS.fullHouse;
+    const af = ATTEMPT_FRACTION.fullHouse;
+    const n  = 28 * af; // default turnsRemaining=28 from emptySc
+    const expected = 1 - binomialCDF(3, n, p);
+    expect(pThreshold('fullHouse', emptySc, BASELINE_SCORE)).toBeCloseTo(expected, 6);
   });
 
-  it('scoring > 0 on first column: P = p^3', () => {
-    const p = 0.35;
-    expect(pThreshold('fullHouse', emptySc, 28)).toBeCloseTo(p ** 3, 10);
+  it('scoring > 0 on first column: P(≥3 successes in 27×af future attempts)', () => {
+    // actual>0 on first col → K=3 remaining, n=(28-1)×0.35=9.45
+    const p  = P_COMPLETE_IN_3_ROLLS.fullHouse;
+    const af = ATTEMPT_FRACTION.fullHouse;
+    const n  = (28 - 1) * af;
+    const expected = 1 - binomialCDF(2, n, p);
+    expect(pThreshold('fullHouse', emptySc, 28)).toBeCloseTo(expected, 6);
+  });
+
+  it('more turns remaining → baseline probability is higher', () => {
+    // With more time, an average attempt is more likely to eventually produce all fills
+    const sc = { ...emptySc, fullHouse: [32, 28, 25, null] };
+    const pLate  = pThreshold('fullHouse', sc, BASELINE_SCORE, 3);
+    const pEarly = pThreshold('fullHouse', sc, BASELINE_SCORE, 25);
+    expect(pEarly).toBeGreaterThan(pLate);
   });
 });
 
 // ─── pThreshold – balut (per-column, returns expected big points) ─────────────
 
 describe('pThreshold – balut', () => {
-  it('all unfilled, baseline: 2 × 4 × p_balut', () => {
-    const p = 0.046;
-    expect(pThreshold('balut', emptySc, BASELINE_SCORE)).toBeCloseTo(2 * 4 * p, 6);
+  // tR=28 from emptySc; af=0.30; p=0.046
+  const p  = P_COMPLETE_IN_3_ROLLS.balut;
+  const af = ATTEMPT_FRACTION.balut;
+  const tR = 28;
+
+  it('all unfilled, baseline: 2 × min(4, tR×af×p)', () => {
+    const futurePositive = Math.min(4, tR * af * p);
+    expect(pThreshold('balut', emptySc, BASELINE_SCORE)).toBeCloseTo(2 * futurePositive, 6);
   });
 
-  it('all unfilled, score > 0 in first column: 2 × (1 + 3 × p_balut)', () => {
-    const p = 0.046;
-    expect(pThreshold('balut', emptySc, 45)).toBeCloseTo(2 * (1 + 3 * p), 6);
+  it('all unfilled, score > 0 in first column: 2 × (1 + min(3, (tR-1)×af×p))', () => {
+    const futurePositive = Math.min(3, (tR - 1) * af * p);
+    expect(pThreshold('balut', emptySc, 45)).toBeCloseTo(2 * (1 + futurePositive), 6);
   });
 
-  it('scoring 0 in first column: 2 × (0 + 3 × p_balut)', () => {
-    const p = 0.046;
-    expect(pThreshold('balut', emptySc, 0)).toBeCloseTo(2 * 3 * p, 6);
+  it('scoring 0 in first column: 2 × (0 + min(3, (tR-1)×af×p))', () => {
+    const futurePositive = Math.min(3, (tR - 1) * af * p);
+    expect(pThreshold('balut', emptySc, 0)).toBeCloseTo(2 * futurePositive, 6);
+  });
+
+  it('score > 0 returns more expected big points than score = 0', () => {
+    expect(pThreshold('balut', emptySc, 45)).toBeGreaterThan(pThreshold('balut', emptySc, 0));
   });
 });
 

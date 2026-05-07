@@ -1,6 +1,7 @@
 import { CATEGORIES, NUM_DICE } from '../gameConstants.js';
 import { DIST, uniqueSubsets } from './probabilities.js';
 import { bpivScoreNow } from './bpiv.js';
+import { computeTurnsRemaining } from './scoring.js';
 
 // ─── Human-readable hold label ────────────────────────────────────────────────
 
@@ -28,35 +29,32 @@ export function holdLabel(held) {
 }
 
 // ─── Memoized max-BPIV function ───────────────────────────────────────────────
-// Returns a function maxBpiv(dice, rollsRemaining) that finds the highest
-// achievable BPIV from the given dice state.
+// Returns maxBpiv(dice, rollsRemaining) — the highest achievable BPIV from the
+// given dice state.
 //
-// The scorecard is captured as a closure — it does NOT change within a single
-// turn evaluation, so the memo key only needs (sorted dice, rollsRemaining).
+// scorecard and turnsRemaining are captured in the closure: both are constant
+// within a single turn's evaluation so the memo key is (sorted dice, rollsLeft).
 //
-// CRITICAL: At each node the algorithm considers ALL unfilled categories, not
-// just the one implied by the hold pattern. This correctly values outcomes like
-// holding 4-4-4 and rolling 4-4 as a Balut, not just as Fours.
+// turnsRemaining defaults to 28 − filled cells if omitted.
 
-export function createMaxBpiv(scorecard) {
+export function createMaxBpiv(scorecard, turnsRemaining) {
+  const tR   = turnsRemaining ?? computeTurnsRemaining(scorecard);
   const memo = new Map();
 
   function maxBpiv(dice, rollsRemaining) {
     const key = [...dice].sort((a, b) => a - b).join(',') + '|' + rollsRemaining;
     if (memo.has(key)) return memo.get(key);
 
-    // Consider all SCORE_NOW options across ALL categories
     let best = -Infinity;
     for (const cat of CATEGORIES) {
-      const r = bpivScoreNow(cat, dice, scorecard);
+      const r = bpivScoreNow(cat, dice, scorecard, tR);
       if (r !== null && r.bpiv > best) best = r.bpiv;
     }
-    if (best === -Infinity) best = 0; // all 28 cells filled (end of game)
+    if (best === -Infinity) best = 0;
 
-    // Consider all REROLL options (hold a subset, reroll the rest)
     if (rollsRemaining > 0) {
       for (const held of uniqueSubsets(dice)) {
-        if (held.length === NUM_DICE) continue; // holding all = score now, skip
+        if (held.length === NUM_DICE) continue;
         const numReroll = NUM_DICE - held.length;
         let rerollBpiv = 0;
         for (const { values: rolled, prob } of DIST[numReroll]) {
@@ -77,25 +75,23 @@ export function createMaxBpiv(scorecard) {
 export { uniqueSubsets };
 
 // ─── REROLL: all hold patterns ────────────────────────────────────────────────
-// Returns an array of { held, bpiv, rawOutcomes } for every non-trivial hold
-// subset of dice.  bpiv is the probability-weighted average of maxDownstreamBpiv
-// across reroll outcomes — the honest mean, not the best-case.
 
-export function bpivRerollAllHolds(dice, rollsRemaining, scorecard) {
+export function bpivRerollAllHolds(dice, rollsRemaining, scorecard, turnsRemaining) {
   if (rollsRemaining <= 0) return [];
 
-  const maxBpiv = createMaxBpiv(scorecard);
+  const tR     = turnsRemaining ?? computeTurnsRemaining(scorecard);
+  const maxBpiv = createMaxBpiv(scorecard, tR);
   const results = [];
 
   for (const held of uniqueSubsets(dice)) {
-    if (held.length === NUM_DICE) continue; // holding all = score now
+    if (held.length === NUM_DICE) continue;
     const numReroll = NUM_DICE - held.length;
 
     let bpiv = 0;
     const rawOutcomes = [];
 
     for (const { values: rolled, prob } of DIST[numReroll]) {
-      const newDice = [...held, ...rolled].sort((a, b) => a - b);
+      const newDice    = [...held, ...rolled].sort((a, b) => a - b);
       const downstream = maxBpiv(newDice, rollsRemaining - 1);
       bpiv += prob * downstream;
       rawOutcomes.push({ held, rolled, prob, newDice, downstreamBpiv: downstream });

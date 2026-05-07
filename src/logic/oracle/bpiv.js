@@ -1,48 +1,50 @@
 import { CATEGORIES, BIG_POINT_RULES } from '../gameConstants.js';
 import { calcTotals } from '../scoring.js';
 import { EXPECTED_SCORE_PER_COLUMN, VARIANCE_PER_COLUMN } from './constants.js';
-import { scoreCell, columnsUnfilled, nextColumn } from './scoring.js';
+import { scoreCell, columnsUnfilled, nextColumn, computeTurnsRemaining } from './scoring.js';
 import { pThreshold, expectedBonus, BASELINE_SCORE } from './thresholds.js';
 
 // ─── SCORE_NOW BPIV ──────────────────────────────────────────────────────────
 // Returns { bpiv, breakdown: {categoryBigDelta, bonusBigDelta}, smallPoints }
 // or null if the category has no unfilled column.
+//
+// turnsRemaining: optional; defaults to 28 − filled cells if omitted.
 
-export function bpivScoreNow(cat, dice, scorecard) {
+export function bpivScoreNow(cat, dice, scorecard, turnsRemaining) {
   if (nextColumn(scorecard, cat) === -1) return null;
 
+  const tR     = turnsRemaining ?? computeTurnsRemaining(scorecard);
   const actual = scoreCell(cat, dice);
-  const categoryBigDelta = computeCategoryBigDelta(cat, actual, scorecard);
+  const categoryBigDelta = computeCategoryBigDelta(cat, actual, scorecard, tR);
   const bonusBigDelta    = computeBonusBigDelta(cat, actual, scorecard);
 
   return {
-    bpiv: categoryBigDelta + bonusBigDelta,
-    breakdown: { categoryBigDelta, bonusBigDelta },
+    bpiv:       categoryBigDelta + bonusBigDelta,
+    breakdown:  { categoryBigDelta, bonusBigDelta },
     smallPoints: actual,
   };
 }
 
 // ─── Category big-point delta ────────────────────────────────────────────────
 
-function computeCategoryBigDelta(cat, actual, scorecard) {
+function computeCategoryBigDelta(cat, actual, scorecard, turnsRemaining) {
   const rule = BIG_POINT_RULES[cat];
 
   if (rule.type === 'sum') {
-    const pActual   = pThreshold(cat, scorecard, actual);
-    const pBaseline = pThreshold(cat, scorecard, BASELINE_SCORE);
+    const pActual   = pThreshold(cat, scorecard, actual,         turnsRemaining);
+    const pBaseline = pThreshold(cat, scorecard, BASELINE_SCORE, turnsRemaining);
     return (pActual - pBaseline) * rule.points;
   }
 
   if (rule.type === 'filled') {
-    const pActual   = pThreshold(cat, scorecard, actual);
-    const pBaseline = pThreshold(cat, scorecard, BASELINE_SCORE);
+    const pActual   = pThreshold(cat, scorecard, actual,         turnsRemaining);
+    const pBaseline = pThreshold(cat, scorecard, BASELINE_SCORE, turnsRemaining);
     return (pActual - pBaseline) * rule.points;
   }
 
   if (rule.type === 'perBalut') {
-    // pThreshold for balut returns E[big pts], not a probability, so no stake multiplier
-    const eActual   = pThreshold(cat, scorecard, actual);
-    const eBaseline = pThreshold(cat, scorecard, BASELINE_SCORE);
+    const eActual   = pThreshold(cat, scorecard, actual,         turnsRemaining);
+    const eBaseline = pThreshold(cat, scorecard, BASELINE_SCORE, turnsRemaining);
     return eActual - eBaseline;
   }
 
@@ -50,11 +52,13 @@ function computeCategoryBigDelta(cat, actual, scorecard) {
 }
 
 // ─── Bonus big-point delta ────────────────────────────────────────────────────
+// NOTE: Task 3 (turn-aware futureMean) is deferred. This uses the flat
+// EXPECTED_SCORE_PER_COLUMN for all future cells regardless of when they
+// will be filled. See constants.js for the planned improvement.
 
 function computeBonusBigDelta(cat, actual, scorecard) {
   const currentTotal = calcTotals(scorecard).totalSmall;
 
-  // Sum expected scores for all remaining unfilled cells, excluding the one being filled
   let futureMean = 0;
   let futureVar  = 0;
   for (const c of CATEGORIES) {
@@ -69,7 +73,7 @@ function computeBonusBigDelta(cat, actual, scorecard) {
 
   const baselineContrib = EXPECTED_SCORE_PER_COLUMN[cat];
 
-  const eBonusActual   = expectedBonus(currentTotal + actual + futureMean, futureStdev);
+  const eBonusActual   = expectedBonus(currentTotal + actual        + futureMean, futureStdev);
   const eBonusBaseline = expectedBonus(currentTotal + baselineContrib + futureMean, futureStdev);
   return eBonusActual - eBonusBaseline;
 }

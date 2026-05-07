@@ -1,9 +1,9 @@
 import { BIG_POINT_RULES } from '../gameConstants.js';
 import { calcBonus } from '../scoring.js';
-import { normalCDF } from './probabilities.js';
-import { EXPECTED_SCORE_PER_COLUMN, P_COMPLETE_IN_3_ROLLS } from './constants.js';
+import { normalCDF, binomialCDF } from './probabilities.js';
+import { EXPECTED_SCORE_PER_COLUMN, P_COMPLETE_IN_3_ROLLS, ATTEMPT_FRACTION } from './constants.js';
 import { SUM_CDF } from './distributions.js';
-import { categoryCurrentSum, columnsUnfilled, hasLockedFailure } from './scoring.js';
+import { categoryCurrentSum, columnsUnfilled, hasLockedFailure, computeTurnsRemaining } from './scoring.js';
 
 // ─── P_threshold ──────────────────────────────────────────────────────────────
 // Returns the probability that the big-point condition for `cat` will be met by
@@ -12,36 +12,25 @@ import { categoryCurrentSum, columnsUnfilled, hasLockedFailure } from './scoring
 // Pass actionScore = actual dice score    → P for actual outcome
 // Pass actionScore = BASELINE_SCORE      → P for the baseline (avg outcome)
 //
-// Sum types use discrete convolution CDFs (distributions.js) — exact enumeration.
-// Filled types use the sentinel BASELINE_SCORE to trigger the E[P] formula.
+// Sum types:   discrete convolution CDFs (distributions.js) — exact enumeration.
+// Filled types: binomial time-pressure model using turnsRemaining + ATTEMPT_FRACTION.
+// turnsRemaining defaults to 28 − filled cells if not provided.
 
 export const BASELINE_SCORE = Symbol('baseline');
 
-export function pThreshold(cat, scorecard, actionScore) {
+export function pThreshold(cat, scorecard, actionScore, turnsRemaining) {
+  const tR = turnsRemaining ?? computeTurnsRemaining(scorecard);
   const rule = BIG_POINT_RULES[cat];
 
-  if (rule.type === 'sum') {
-    return _pThresholdSum(cat, scorecard, actionScore);
-  }
-
-  if (rule.type === 'filled') {
-    return _pThresholdFilled(cat, scorecard, actionScore);
-  }
-
-  if (rule.type === 'perBalut') {
-    return _expectedBalutBigPoints(cat, scorecard, actionScore);
-  }
+  if (rule.type === 'sum')      return _pThresholdSum(cat, scorecard, actionScore);
+  if (rule.type === 'filled')   return _pThresholdFilled(cat, scorecard, actionScore, tR);
+  if (rule.type === 'perBalut') return _expectedBalutBigPoints(cat, scorecard, actionScore, tR);
 
   return 0;
 }
 
 // ─── Sum types (fours, fives, sixes, choice) ─────────────────────────────────
-// Uses the precomputed SUM_CDF[cat][K] (self-convolution of the per-column PMF)
-// to give exact discrete probabilities instead of a normal approximation.
-//
-// P(threshold met) = P(sum of K future columns ≥ needed)
-//                  = 1 − SUM_CDF[cat][K][needed − 1]
-// where needed = threshold − newSum.
+// Exact discrete CDF lookup — turnsRemaining not needed here.
 
 function _pThresholdSum(cat, scorecard, actionScore) {
   const rule = BIG_POINT_RULES[cat];
@@ -50,66 +39,88 @@ function _pThresholdSum(cat, scorecard, actionScore) {
     : actionScore;
 
   const newSum = categoryCurrentSum(scorecard, cat) + score;
-  const K = columnsUnfilled(scorecard, cat) - 1; // future columns after this one
+  const K = columnsUnfilled(scorecard, cat) - 1;
 
   if (K === 0) return newSum >= rule.threshold ? 1.0 : 0.0;
 
   const needed = rule.threshold - newSum;
-  if (needed <= 0) return 1.0;  // already at or beyond threshold
+  if (needed <= 0) return 1.0;
 
-  // Future column scores are integers, so P(sum ≥ x) = P(sum ≥ ⌈x⌉)
   const cdf = SUM_CDF[cat][K];
   const idx = Math.ceil(needed) - 1;
-  if (idx >= cdf.length) return 0.0; // max possible sum still below threshold
+  if (idx >= cdf.length) return 0.0;
   return 1 - cdf[idx];
 }
 
 // ─── Filled types (straight, fullHouse) ──────────────────────────────────────
+// Binomial time-pressure model:
+//   available_attempts = turnsRemaining × ATTEMPT_FRACTION[cat]
+//   P(all K columns filled) = P(Bin(available_attempts, p) ≥ K)
+//                           = 1 − BinomialCDF(K − 1, available_attempts, p)
+//
+// For BASELINE_SCORE: K = colsRemainingAfter + 1 (includes this turn's attempt).
+// For actual > 0:     K = colsRemainingAfter     (this column already secured).
+// For actual = 0:     return 0                   (locks failure).
+//
+// A locked failure (any prior column = 0) always returns 0.
 
-function _pThresholdFilled(cat, scorecard, actionScore) {
-  // Already locked out by a prior zero-scored column
+function _pThresholdFilled(cat, scorecard, actionScore, turnsRemaining) {
   if (hasLockedFailure(scorecard, cat)) return 0;
 
-  const p = P_COMPLETE_IN_3_ROLLS[cat];
+  const p  = P_COMPLETE_IN_3_ROLLS[cat];
+  const af = ATTEMPT_FRACTION[cat];
   const colsRemainingAfter = columnsUnfilled(scorecard, cat) - 1;
 
   if (actionScore === BASELINE_SCORE) {
-    // E[P | average attempt] = p × p^colsRemainingAfter + (1-p) × 0
-    return p ** (colsRemainingAfter + 1);
+    // This turn is an average attempt: need colsRemainingAfter + 1 successes
+    // out of turnsRemaining × af total attempts.
+    const n = turnsRemaining * af;
+    const K = colsRemainingAfter + 1;
+    return K <= 0 ? 1 : 1 - binomialCDF(K - 1, n, p);
   }
 
   if (actionScore === 0) return 0; // this column locks failure
-  return p ** colsRemainingAfter;  // this column succeeded; remaining must too
+
+  // actual > 0: this column succeeded; K more needed in remaining turns.
+  const K = colsRemainingAfter;
+  if (K <= 0) return 1;
+  const n = (turnsRemaining - 1) * af;
+  return 1 - binomialCDF(K - 1, n, p);
 }
 
 // ─── Balut (per-column) ───────────────────────────────────────────────────────
-// Returns E[Balut big points] rather than P(threshold), because Balut awards
-// big points linearly per column rather than as a single threshold.
+// Returns E[Balut big points] (not a probability — Balut awards 2 big pts per
+// filled positive column, linearly, rather than as a single threshold).
+//
+// expected_positive_future = min(colsRemaining, futureAttempts × p_balut)
+// where futureAttempts = (turnsRemaining − 1) × ATTEMPT_FRACTION.balut.
 
-function _expectedBalutBigPoints(cat, scorecard, actionScore) {
+function _expectedBalutBigPoints(cat, scorecard, actionScore, turnsRemaining) {
   const p = P_COMPLETE_IN_3_ROLLS.balut;
   const filledPositive = scorecard[cat].filter(v => v !== null && v > 0).length;
   const colsRemainingAfter = columnsUnfilled(scorecard, cat) - 1;
 
   if (actionScore === BASELINE_SCORE) {
-    // Baseline: this column is an average attempt (p chance of >0)
-    return 2 * (filledPositive + (colsRemainingAfter + 1) * p);
+    // This turn included: turnsRemaining attempts available for colsRemainingAfter+1 cols.
+    const futurePositive = Math.min(
+      colsRemainingAfter + 1,
+      turnsRemaining * ATTEMPT_FRACTION.balut * p,
+    );
+    return 2 * (filledPositive + futurePositive);
   }
 
-  const thisColPositive = actionScore > 0 ? 1 : 0;
-  return 2 * (filledPositive + thisColPositive + colsRemainingAfter * p);
+  const thisColPositive   = actionScore > 0 ? 1 : 0;
+  const futureAttempts    = (turnsRemaining - 1) * ATTEMPT_FRACTION.balut;
+  const futurePositive    = Math.min(colsRemainingAfter, futureAttempts * p);
+  return 2 * (filledPositive + thisColPositive + futurePositive);
 }
 
-// ─── Expected bonus ────────────────────────────────────────────────────────────
+// ─── Expected bonus ───────────────────────────────────────────────────────────
 // E[bonus big points] when finalSmallPoints ~ Normal(mean, stdev).
-//
-// Uses the survival-function identity:
-//   E[bonus] = -2 + Σ_{k≥0} P(X ≥ 300 + k×50)
-//
-// Each step from the -2 floor adds 1 big point per 50-point tier crossed.
+// Uses the survival-function identity: E[bonus] = −2 + Σ_{k≥0} P(X ≥ 300 + k×50).
 
 export function expectedBonus(mean, stdev) {
-  if (stdev < 1e-6) return calcBonus(Math.round(mean)); // degenerate / deterministic
+  if (stdev < 1e-6) return calcBonus(Math.round(mean));
   let result = -2;
   for (let k = 0; k <= 200; k++) {
     const boundary = 300 + k * 50;
