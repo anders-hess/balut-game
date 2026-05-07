@@ -44,14 +44,15 @@ src/
                           # nextColumn, getTargetColumn (high-score right-fill)
     oracle/               # BPIV engine (see Oracle section below)
       index.js            # recommend() — public entry point
-      bpiv.js             # bpivScoreNow(), bpivRerollAllHolds()
-      recursion.js        # createMaxBpiv() memoized recursion, holdLabel()
+      bpiv.js             # bpivScoreNow()
+      recursion.js        # createMaxBpiv() memoized recursion, bpivRerollAllHolds(), holdLabel()
       thresholds.js       # pThreshold(), expectedBonus(), BASELINE_SCORE sentinel
-      probabilities.js    # normalCDF, DIST combinatorics, uniqueSubsets()
-      scoring.js          # scoreCell(), categoryCurrentSum(), etc.
+      probabilities.js    # normalCDF, binomialCDF, DIST combinatorics, uniqueSubsets()
+      scoring.js          # scoreCell(), categoryCurrentSum(), computeTurnsRemaining(), etc.
       outcomes.js         # selectTop5Outcomes(), describeResult()
-      constants.js        # Definition-B Monte Carlo statistics
-      __tests__/          # 101 Vitest unit tests
+      constants.js        # Definition-B Monte Carlo statistics + ATTEMPT_FRACTION
+      distributions.js    # Discrete score PMFs, SUM_CDF, CHOICE_MIXED_CDF
+      __tests__/          # 113 Vitest unit tests
   services/           # External service integrations
     supabase.js           # Supabase client singleton (null when .env.local absent)
     highscores.js         # fetchLeaderboard(), checkQualifies(), submitScore()
@@ -158,9 +159,20 @@ The Oracle is a statistically rigorous advisor in `src/logic/oracle/`. It ranks 
 
 ### Public API
 ```js
-recommend({ currentDice, rollsRemaining, scorecard })
-// Returns: { actions: [...], isAllNegative: bool, recommendedRank: 1 }
+recommend({ currentDice, rollsRemaining, scorecard, turnsRemaining? })
+// turnsRemaining defaults to 28 − filled cells if omitted.
+// Returns:
+// {
+//   actions: [{ rank, type, category?, held?, description, bpiv,
+//               breakdown: {categoryBigDelta, bonusBigDelta},
+//               tooltipOutcomes, isForcedAction? }],
+//   isAllNegative:  bool,
+//   isForcedAction?: bool,   // true when only one cell remains and rollsRemaining=0
+//   recommendedRank: 1,
+// }
 ```
+
+**Forced-action shortcut**: when `rollsRemaining === 0` and exactly one cell is unfilled, `recommend()` returns `{ isForcedAction: true, actions: [{ bpiv: 0 }] }` immediately — the player has no decision to make.
 
 ### How BPIV works
 ```
@@ -170,36 +182,82 @@ BPIV(action) = categoryBigDelta + bonusBigDelta
 - **bonusBigDelta**: change in E[end-game bonus], vs. baseline
 - **Baseline**: `EXPECTED_SCORE_PER_COLUMN[category]` (Definition-B, no discount)
 
+### P(threshold) by category type
+
+**Sum types (fours, fives, sixes, choice)** — discrete convolution CDF from `distributions.js`:
+```
+P(threshold met) = 1 − SUM_CDF[cat][K][⌈threshold − newSum⌉ − 1]
+```
+Choice uses `CHOICE_MIXED_CDF[K]` instead — a two-regime mixture model (see below).
+
+**Filled types (straight, fullHouse)** — binomial time-pressure model:
+```
+available_attempts = turnsRemaining × ATTEMPT_FRACTION[cat]
+P(threshold met) = 1 − BinomialCDF(K − 1, available_attempts, P_COMPLETE_IN_3_ROLLS[cat])
+```
+Effect: with few turns left, scoring a valid pattern NOW has high BPIV; early in the game it's lower (you'll probably fill it eventually anyway).
+
+**Balut** — expected big points (linear per filled column):
+```
+E[balutBigPts] = 2 × (filledPositive + thisColPositive + min(remainingCols, futureAttempts × p))
+```
+
 ### Definition-B constants (`constants.js`)
-Values from Oracle-directed Monte Carlo simulation (10 000 games). These replace all hand-tuned estimates from earlier versions.
+Values from Oracle-directed Monte Carlo, iteration 2 (10 000 games).
 
 ```js
 EXPECTED_SCORE_PER_COLUMN = {
-  fours: 10.54, fives: 13.06, sixes: 15.40,
-  straight: 8.05, fullHouse: 17.42, choice: 23.63, balut: 6.72,
+  fours: 10.50, fives: 13.01, sixes: 14.21,
+  straight: 7.17, fullHouse: 14.70, choice: 25.06, balut: 6.30,
 };
 
 VARIANCE_PER_COLUMN = {
-  fours: 13.32, fives: 21.05, sixes: 28.11,
-  straight: 77.92, fullHouse: 66.90, choice: 6.55, balut: 244.42,
+  fours: 11.79, fives: 19.11, sixes: 30.96,
+  straight: 71.34, fullHouse: 83.49, choice: 4.12, balut: 232.63,
 };
 
 P_COMPLETE_IN_3_ROLLS = { straight: 0.25, fullHouse: 0.35, balut: 0.046 };
+
+// Fraction of remaining turns dedicated to each filled category (time-pressure model).
+// TODO Phase 3: calibrate via Monte Carlo.
+ATTEMPT_FRACTION = { straight: 0.25, fullHouse: 0.35, balut: 0.30 };
 ```
 
-**No BASELINE_DISCOUNT** — the baseline is the raw expected score, not discounted. `thresholds.js` passes `EXPECTED_SCORE_PER_COLUMN[cat]` directly when `actionScore === BASELINE_SCORE`.
+**No BASELINE_DISCOUNT** — `thresholds.js` uses `EXPECTED_SCORE_PER_COLUMN[cat]` directly for `BASELINE_SCORE`.
 
-### Tooltip fixes
-- **Full House**: all variants (different sums) collapse into one tooltip row with combined probability
-- **"Missed Balut"**: only appears when *all* categories score 0. When any positive-score option exists, that wins the label instead.
+### Choice: two-regime mixture model (`distributions.js`)
+Choice scores are modelled as a mixture of two regimes rather than a single Oracle-directed PMF:
+- **HIGH** (prob q ≈ 0.636): Oracle-timed fill, score ≥ 25. Uses Oracle-directed ≥25 portion.
+- **LOW** (prob 1−q): forced fill. Uses isolated keep-≥4 simulation (mean 23.13).
+
+`CHOICE_MIXED_CDF[K]` = CDF of the sum of K future columns under this mixture, precomputed at module load via binomial weighting of all (j high, K−j low) splits.
+
+This corrects overconfidence in P(choice threshold) when some forced fills are inevitable.
+
+**Deferred (Phase 3)**: turn-aware baselines — `EXPECTED_SCORE_PER_COLUMN[cat] × (0.6 + 0.4 × t/28)`. Currently a flat per-game mean is used for all categories' baselines regardless of when the column is filled.
+
+### Tooltip outcome grouping (`outcomes.js`)
+- **Choice** splits into two rows based on score vs baseline:
+  - General game: **"Choice ≥ 25"** / **"Choice < 25"**
+  - Last column (K=1): **"Choice ≥ N (threshold!)"** / **"Choice < N"** (N = 100 − currentChoiceSum)
+- **Full House**: collapses all score variants into one row (combined probability)
+- **Balut**: "Missed Balut" only when all categories score 0
+
+### Simulation tooling (`scripts/`)
+```powershell
+npm.cmd run simulate   # Oracle-directed 10 000-game sim + isolated P_complete trials
+                       # Outputs: EXPECTED_SCORE_PER_COLUMN, VARIANCE_PER_COLUMN,
+                       # P_COMPLETE, fixed-point ratios, Oracle PMF, forced-choice PMF
+npm.cmd run validate   # 6 hand-traced BPIV scenarios (spot-check after any Oracle change)
+```
 
 ### Oracle Sandbox page
-`OracleScreen.jsx` — standalone page from landing. User sets 5 dice (click to cycle 1→6) and rolls remaining (0/1/2). Oracle runs live. Scorecard defaults to empty. Shares CSS classes from `TheOracle.css` for the recommendations list.
+`OracleScreen.jsx` — standalone page from landing. User sets 5 dice (click to cycle 1→6) and rolls remaining (0/1/2). Oracle runs live. Scorecard defaults to empty.
 - TODO Phase 2: manual scorecard cell editor
 - TODO Phase 3: OCR scanner to import a physical scorecard via photo
 
 ### Tests
-101 Vitest tests in `__tests__/`. Run with `npm.cmd run test`.
+113 Vitest tests in `__tests__/`. Run with `npm.cmd run test`.
 
 ### SVG gradient ID caution
 `DiceFace` generates SVG gradient IDs as `dg-{dieIndex}-{0|1}`. **Never render two `TheOracle` instances simultaneously** — duplicate IDs corrupt die-face colours. `GameBoard` uses a `useIsNarrow()` hook (≤800px breakpoint) to mount exactly one Oracle instance at a time: in `board-left` on mobile, `board-right` on desktop.

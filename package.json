@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "simulate": "node scripts/monte-carlo.js"
+    "simulate": "node scripts/monte-carlo.js",
+    "validate": "node scripts/validate.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",
