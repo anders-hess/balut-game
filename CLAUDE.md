@@ -40,42 +40,46 @@ src/
   logic/              # Pure game logic — NO React imports
     gameConstants.js      # NUM_DICE, MAX_ROLLS, NUM_COLUMNS, CATEGORIES, scoring rules
     gameState.js          # State factories incl. createInitialPlayer()
-    scoring.js            # calculateScore, calcTotals, calcBonus, isGameOver, etc.
+    scoring.js            # calculateScore, calcTotals, calcBonus, isGameOver,
+                          # nextColumn, getTargetColumn (high-score right-fill)
     oracle/               # BPIV engine (see Oracle section below)
       index.js            # recommend() — public entry point
       bpiv.js             # bpivScoreNow(), bpivRerollAllHolds()
       recursion.js        # createMaxBpiv() memoized recursion, holdLabel()
-      thresholds.js       # pThreshold(), expectedBonus()
+      thresholds.js       # pThreshold(), expectedBonus(), BASELINE_SCORE sentinel
       probabilities.js    # normalCDF, DIST combinatorics, uniqueSubsets()
       scoring.js          # scoreCell(), categoryCurrentSum(), etc.
       outcomes.js         # selectTop5Outcomes(), describeResult()
-      constants.js        # Per-category statistics (Monte Carlo TODO)
-      __tests__/          # 92 Vitest unit tests
+      constants.js        # Definition-B Monte Carlo statistics
+      __tests__/          # 101 Vitest unit tests
   services/           # External service integrations
     supabase.js           # Supabase client singleton (null when .env.local absent)
     highscores.js         # fetchLeaderboard(), checkQualifies(), submitScore()
   hooks/
     useGameState.js       # useReducer — all game actions including multiplayer
   components/
-    App.jsx               # Routing: showHighscores + showSetup booleans + phase
-    StartScreen           # Landing page — Single Player, Local Multiplayer, Leaderboard
+    App.jsx               # Routing: showHighscores + showSetup + showRules + showOracle
+    StartScreen           # Landing page — game modes + Oracle + Rules + Leaderboard buttons
     PlayerSetupScreen     # Multiplayer setup — player count (2–4) + name inputs
-    HandoffOverlay        # Full-screen "pass the device" overlay between turns
-    GameBoard             # Two-column layout; reads from players[currentPlayerIndex]
-    MultiplayerStandings  # Header badge strip showing all players' live big-point totals
+    RulesScreen           # Standalone rules explanation page
+    OracleScreen          # Standalone Oracle sandbox (set dice, get advice)
+    GameBoard             # Two-column layout; useIsNarrow() hook for responsive Oracle
+    MultiplayerStandings  # Header badge strip (names + active indicator, no scores)
     MultiplayerGameOverScreen  # Ranked results table + per-player leaderboard submit
     DiceArea              # 5-die tray + Roll button + pip counter
     Dice                  # Single die button
     DiceFace              # SVG pip renderer (pure, no state)
     Scorecard             # 7×4 scoring table + footer totals bar
-    TheOracle             # Sidebar advisor — BPIV recommendations + tooltips
+    TheOracle             # Sidebar/inline advisor — BPIV recommendations + tooltips
     GameOverScreen        # Single-player game over + leaderboard submit
-    HighscoresScreen      # Full leaderboard (Daily / Monthly / Yearly tabs)
-    HighscoresCard        # Compact "Today's Top 3" widget in GameBoard right column
+    HighscoresScreen      # Full leaderboard (This Week / Monthly / Yearly tabs)
+    HighscoresCard        # Compact "This Week's Top 3" widget in GameBoard right column
     BalutToast            # Fixed-position celebration toast (2.8 s)
   styles/
     theme.css             # All CSS custom properties (colors, fonts, radii, shadows)
 ```
+
+**Note:** `HandoffOverlay.jsx/.css` still exist in the file system but are no longer imported or used — the handoff is now integrated inline into the dice area section of `GameBoard.jsx`. Safe to delete.
 
 ---
 
@@ -97,12 +101,12 @@ src/
   dice:               [{ value: 0–6, held: bool }, ×5],
   rollsLeft:          0–3,
   turnNumber:         number,
-  oracleEnabled:      bool,
+  oracleEnabled:      bool,     // initialised to window.innerWidth > 800 (open on desktop, closed on mobile)
   justScoredBalut:    bool,
 }
 ```
 
-Single player uses `players.length === 1` — no separate code path. `players[0].scorecard` is always the canonical scorecard for single player.
+Single player uses `players.length === 1` — no separate code path.
 
 ### Actions in `useGameState.js`
 | Action | Effect |
@@ -117,11 +121,21 @@ Single player uses `players.length === 1` — no separate code path. `players[0]
 | `TOGGLE_ORACLE` | Toggles Oracle panel |
 
 ### App routing
-`App.jsx` uses two local booleans (`showHighscores`, `showSetup`) alongside the reducer phase. `showSetup` controls the multiplayer `PlayerSetupScreen` — it's not a reducer phase, just a UI layer.
+`App.jsx` uses four local booleans (`showHighscores`, `showSetup`, `showRules`, `showOracle`) alongside the reducer phase. Each triggers a full-screen replacement component. Submission tracking state (`scoreSubmitted`, `mpSubmittedNames`) is also lifted here so it survives navigating to the leaderboard and back.
 
-### Scoring categories (fill order — always left to right)
-`fours | fives | sixes | straight | fullHouse | choice | balut`
-Each has 4 columns. `nextColumn(scorecard, category)` returns the next fillable index.
+### Scoring categories
+`fours | fives | sixes | straight | fullHouse | choice | balut`  
+Each has 4 columns. **Column fill direction depends on score value:**
+
+| Category | "High" threshold | Fill direction |
+|---|---|---|
+| Fours | ≥ 16 | rightmost empty column |
+| Fives | ≥ 20 | rightmost empty column |
+| Sixes | ≥ 24 | rightmost empty column |
+| Straight | 20 (high straight) | rightmost empty column |
+| Full House / Choice / Balut | — | always leftmost |
+
+Use `getTargetColumn(scorecard, category, score)` (exported from `scoring.js`) to get the target column index. `nextColumn` is still exported for the "is row full?" check.
 
 ---
 
@@ -129,17 +143,18 @@ Each has 4 columns. `nextColumn(scorecard, category)` returns the next fillable 
 
 - 2–4 players on a shared device; free choice of category each turn
 - **Setup**: "Local Multiplayer" → `PlayerSetupScreen` (player count + names) → `SETUP_MULTIPLAYER`
-- **Turn flow**: roll → score → `HandoffOverlay` ("🎲 [Name]'s turn — tap to start") → next player
-- **Scorecard toggle**: player tabs above the scorecard let any player peek at others' scorecards (read-only); tab resets to current player on each turn change via `useEffect`
-- **Standings**: `MultiplayerStandings` shows live big-point totals for all players in the header
-- **Game over**: `MultiplayerGameOverScreen` shows ranked table; each qualifying score gets its own leaderboard submit prompt (same `checkQualifies`/`submitScore` as single player)
-- `GameBoard` reads `players[currentPlayerIndex]` for dice/Oracle; `players[displayIdx]` for the Scorecard tab being viewed
+- **Turn flow**: roll → score → inline handoff prompt replaces dice area → next player dismisses it → their turn begins. (No full-screen overlay — `HandoffOverlay` component is unused.)
+- **Scorecard header** shows the current player's name: "Scorecard – Anders"
+- **Player tabs**: active player gets dice emoji (🎲) only — no background highlight. Tab for the currently *viewed* scorecard gets yellow background.
+- **Top bar** (`MultiplayerStandings`): shows player names + active indicator only. No live score numbers in the header.
+- **Scorecard toggle**: player tabs above the scorecard let any player peek at others' scorecards (read-only); resets to current player on each turn change
+- **Game over**: `MultiplayerGameOverScreen` shows ranked table; each qualifying score gets its own leaderboard submit prompt
 
 ---
 
 ## The Oracle
 
-The Oracle is a statistically rigorous advisor in `src/logic/oracle/`. It ranks every possible action by **BPIV (Big Point Incremental Value)** — the expected big-point gain of an action relative to a baseline of scoring the expected average in that cell.
+The Oracle is a statistically rigorous advisor in `src/logic/oracle/`. It ranks every possible action by **BPIV (Big Point Incremental Value)** — the expected big-point gain vs. a baseline of scoring the Definition-B expected average in that cell.
 
 ### Public API
 ```js
@@ -153,15 +168,41 @@ BPIV(action) = categoryBigDelta + bonusBigDelta
 ```
 - **categoryBigDelta**: change in P(threshold met) × big points at stake, vs. baseline
 - **bonusBigDelta**: change in E[end-game bonus], vs. baseline
-- **Baseline**: `EXPECTED_SCORE_PER_COLUMN[category]` for that cell
+- **Baseline**: `EXPECTED_SCORE_PER_COLUMN[category]` (Definition-B, no discount)
 
-### Constants (important caveat)
-`constants.js` values are **calibrated estimates, not Monte Carlo**:
-- `fours: 12.5` and `choice: 23.0` are kept at these values to preserve SPEC TEST 3 ordering — changing to 12/25 reverses the assertion.
-- `fives: 15.0`, `sixes: 18.0` reflect "three of face value" as discrete baseline.
+### Definition-B constants (`constants.js`)
+Values from Oracle-directed Monte Carlo simulation (10 000 games). These replace all hand-tuned estimates from earlier versions.
+
+```js
+EXPECTED_SCORE_PER_COLUMN = {
+  fours: 10.54, fives: 13.06, sixes: 15.40,
+  straight: 8.05, fullHouse: 17.42, choice: 23.63, balut: 6.72,
+};
+
+VARIANCE_PER_COLUMN = {
+  fours: 13.32, fives: 21.05, sixes: 28.11,
+  straight: 77.92, fullHouse: 66.90, choice: 6.55, balut: 244.42,
+};
+
+P_COMPLETE_IN_3_ROLLS = { straight: 0.25, fullHouse: 0.35, balut: 0.046 };
+```
+
+**No BASELINE_DISCOUNT** — the baseline is the raw expected score, not discounted. `thresholds.js` passes `EXPECTED_SCORE_PER_COLUMN[cat]` directly when `actionScore === BASELINE_SCORE`.
+
+### Tooltip fixes
+- **Full House**: all variants (different sums) collapse into one tooltip row with combined probability
+- **"Missed Balut"**: only appears when *all* categories score 0. When any positive-score option exists, that wins the label instead.
+
+### Oracle Sandbox page
+`OracleScreen.jsx` — standalone page from landing. User sets 5 dice (click to cycle 1→6) and rolls remaining (0/1/2). Oracle runs live. Scorecard defaults to empty. Shares CSS classes from `TheOracle.css` for the recommendations list.
+- TODO Phase 2: manual scorecard cell editor
+- TODO Phase 3: OCR scanner to import a physical scorecard via photo
 
 ### Tests
-92 Vitest tests in `__tests__/`. Run with `npm.cmd run test`.
+101 Vitest tests in `__tests__/`. Run with `npm.cmd run test`.
+
+### SVG gradient ID caution
+`DiceFace` generates SVG gradient IDs as `dg-{dieIndex}-{0|1}`. **Never render two `TheOracle` instances simultaneously** — duplicate IDs corrupt die-face colours. `GameBoard` uses a `useIsNarrow()` hook (≤800px breakpoint) to mount exactly one Oracle instance at a time: in `board-left` on mobile, `board-right` on desktop.
 
 ---
 
@@ -171,7 +212,7 @@ BPIV(action) = categoryBigDelta + bonusBigDelta
 - **Project URL**: `https://ehpguosbtfnrfttghcnz.supabase.co`
 - **Table**: `scores` — `id`, `player_name` (max 20), `big_points`, `small_points`, `balut_count`, `created_at`
 - **Sort**: `big_points DESC, small_points DESC, balut_count DESC`
-- **Time windows**: daily / monthly / yearly filtered at query time — no resets needed
+- **Time windows**: **weekly** (Mon–Sun) / monthly / yearly filtered at query time
 - **RLS**: anonymous SELECT + INSERT; no auth required
 
 ### Credentials
@@ -183,7 +224,9 @@ VITE_SUPABASE_ANON_KEY
 Client returns `null` gracefully when absent — leaderboard degrades silently.
 
 ### Submit flow
-`checkQualifies(bigPts, smallPts, balutCount)` → returns qualifying periods → name input → `submitScore()`. Last-used name persisted in `localStorage` (`balut_player_name`). Works the same for single and multiplayer (each player submits independently).
+`checkQualifies(bigPts, smallPts, balutCount)` → returns qualifying periods → name input → `submitScore()`. Last-used name persisted in `localStorage` (`balut_player_name`).
+
+**Duplicate submission prevention**: `scoreSubmitted` (single player) and `mpSubmittedNames` (multiplayer) are lifted to `App.jsx` state so they survive unmount when navigating to the leaderboard and back.
 
 ---
 
@@ -200,17 +243,25 @@ All tokens in `src/styles/theme.css`:
 | `--font-serif` | Georgia | Titles, labels |
 | `--transition-fast` | `0.12s ease` | Buttons, dice |
 
+### Scorecard cell states
+- **Available cell**: yellow background (standard) or **green** if score meets "great" threshold (Fours ≥ 12, Fives ≥ 15, Sixes ≥ 18, Straight/Full House any > 0, Choice ≥ 25, Balut any > 0)
+- **Zero cell** (invalid pattern, force-score 0): red-tinted background
+- **Filled cell**: no tint — inherits standard row background
+- A left border on the Sum column separates the 4 score columns from the summary columns
+
 ---
 
 ## Known cleanup items
 
-- **`APPLY_HOLD` reducer case** (`useGameState.js`) and `onApplyHold` prop in `GameBoard.jsx` are vestigial — safe to delete.
+- **`HandoffOverlay.jsx/.css`** — no longer imported anywhere; can be deleted
+- **`APPLY_HOLD` reducer case** (`useGameState.js`) and `onApplyHold` prop — vestigial; safe to delete
 
 ---
 
 ## Roadmap
 
 - **Online multiplayer**: the `players[]` state shape is already multi-player aware; the main work is adding a real-time sync layer (WebSockets / Supabase Realtime) and a lobby/room system.
+- **Oracle Sandbox scorecard input**: Phase 2 = manual per-cell editor; Phase 3 = OCR scanner (camera/image → filled scorecard state).
 - **`scores` table**: no `player_count` column — multiplayer scores submit identically to single-player scores (ranking is player-agnostic).
 
 ---
@@ -219,5 +270,5 @@ All tokens in `src/styles/theme.css`:
 
 | Breakpoint | Layout change |
 |---|---|
-| ≤ 800px | Oracle and leaderboard card move below scorecard (single column) |
-| ≤ 480px | Turn counter / standings hidden, font sizes reduce |
+| ≤ 800px | Single-column layout; Oracle moves to between dice and scorecard; `useIsNarrow()` controls which Oracle instance mounts |
+| ≤ 480px | Scorecard column widths tighten (category 26%) so BIG column fits; font sizes reduce |
