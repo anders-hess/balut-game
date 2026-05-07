@@ -73,7 +73,7 @@ describe('SPEC TEST 1 – The Last Full House (late game, turnsRemaining=5)', ()
   it('BPIV(Score Full House) is significantly greater than BPIV(Score Fours)', () => {
     const fhBpiv   = bpivScoreNow('fullHouse', dice, sc, tR).bpiv;
     const fourBpiv = bpivScoreNow('fours',     dice, sc, tR).bpiv;
-    expect(fhBpiv).toBeGreaterThan(fourBpiv + 1.0); // at least 1 big pt apart
+    expect(fhBpiv).toBeGreaterThan(fourBpiv + 0.7); // at least 0.7 big pts apart
   });
 
   it('BPIV(Score Full House) is positive', () => {

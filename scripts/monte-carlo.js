@@ -6,6 +6,7 @@ import {
   EXPECTED_SCORE_PER_COLUMN,
   VARIANCE_PER_COLUMN,
   P_COMPLETE_IN_3_ROLLS,
+  ATTEMPT_FRACTION,
 } from '../src/logic/oracle/constants.js';
 
 // ─── Dice helpers ─────────────────────────────────────────────────────────────
@@ -65,7 +66,7 @@ function bestStraightHold(dice) {
 // target category, then category-specific hold); final score uses the same
 // fast Oracle path. No recursive lookahead anywhere.
 
-function simulateGame() {
+function simulateGame(trackFilledCats) {
   const scorecard = createInitialScorecard();
   const categoryScores = Object.fromEntries(CATEGORIES.map(c => [c, []]));
 
@@ -90,16 +91,24 @@ function simulateGame() {
     categoryScores[top.category].push(score);
   }
 
+  if (trackFilledCats) {
+    // Record whether each filled category completed all 4 columns with >0 scores
+    for (const cat of ['straight', 'fullHouse', 'balut']) {
+      trackFilledCats[cat] += scorecard[cat].every(s => s !== null && s > 0) ? 1 : 0;
+    }
+  }
+
   return categoryScores;
 }
 
 function runGameSimulation(numGames) {
-  const allScores = Object.fromEntries(CATEGORIES.map(c => [c, []]));
-  const interval = Math.max(1, Math.floor(numGames / 10));
+  const allScores  = Object.fromEntries(CATEGORIES.map(c => [c, []]));
+  const filledCats = { straight: 0, fullHouse: 0, balut: 0 };
+  const interval   = Math.max(1, Math.floor(numGames / 10));
 
   for (let g = 0; g < numGames; g++) {
     if ((g + 1) % interval === 0) console.log(`  game ${g + 1}/${numGames}`);
-    const gs = simulateGame();
+    const gs = simulateGame(filledCats);
     for (const cat of CATEGORIES) allScores[cat].push(...gs[cat]);
   }
 
@@ -109,19 +118,21 @@ function runGameSimulation(numGames) {
     const n = scores.length;
     const mean = scores.reduce((a, b) => a + b, 0) / n;
     const variance = scores.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
-
-    // Frequency histogram: count occurrences of each distinct score value
     const freq = {};
     for (const s of scores) freq[s] = (freq[s] || 0) + 1;
-    // Normalise to probabilities
     const pmf = Object.fromEntries(
       Object.entries(freq)
         .map(([v, c]) => [Number(v), c / n])
         .sort((a, b) => a[0] - b[0])
     );
-
     results[cat] = { mean, variance, n, pmf };
   }
+
+  // Empirical completion rates for filled categories
+  results._completionRates = Object.fromEntries(
+    ['straight', 'fullHouse', 'balut'].map(cat => [cat, filledCats[cat] / numGames])
+  );
+
   return results;
 }
 
@@ -213,6 +224,34 @@ const sumTypes = ['fours', 'fives', 'sixes', 'choice'];
 printTable('Oracle mean / EXPECTED_SCORE_PER_COLUMN  (fixed-point check, target ≈ 1.0)', sumTypes.map(cat => ({
   cat, current: 1.0, empirical: gameResults[cat].mean / EXPECTED_SCORE_PER_COLUMN[cat],
 })));
+
+// ─── ATTEMPT_FRACTION calibration ────────────────────────────────────────────
+// Empirical completion rate → back-solve for af in:
+//   P(Bin(28 × af, p) ≥ 4) = empiricalRate
+// Uses binary search on binomialCDF.
+import { binomialCDF } from '../src/logic/oracle/probabilities.js';
+
+function calibrateAF(p, empiricalRate) {
+  let lo = 0.01, hi = 2.0;
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    const cdf = 1 - binomialCDF(3, 28 * mid, p);
+    if (cdf < empiricalRate) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+const rates = gameResults._completionRates;
+console.log('\nATTEMPT_FRACTION calibration:');
+console.log('  ' + 'category'.padEnd(12) + 'completionRate'.padStart(16) + 'current_af'.padStart(12) + 'calibrated_af'.padStart(15));
+console.log('  ' + '─'.repeat(57));
+for (const cat of ['straight', 'fullHouse', 'balut']) {
+  const rate = rates[cat];
+  const p    = P_COMPLETE_IN_3_ROLLS[cat];
+  const afCal = calibrateAF(p, rate);
+  console.log('  ' + cat.padEnd(12) + rate.toFixed(4).padStart(16) + ATTEMPT_FRACTION[cat].toFixed(3).padStart(12) + afCal.toFixed(3).padStart(15));
+}
+console.log('  (paste calibrated values into constants.js ATTEMPT_FRACTION)\n');
 
 // ─── Score PMF output for distributions.js ───────────────────────────────────
 const SUM_CATS = ['fours', 'fives', 'sixes', 'choice'];

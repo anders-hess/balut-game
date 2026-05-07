@@ -15,7 +15,12 @@ export default function TheOracle({
 
   const result = useMemo(() => {
     if (!hasRolled || isGameOver) return null;
-    return recommend({ currentDice: diceValues, rollsRemaining: rollsLeft, scorecard });
+    // Compute turnsRemaining here so Oracle has full game-state context
+    const filledCells = Object.values(scorecard).reduce(
+      (n, cols) => n + cols.filter(s => s !== null).length, 0,
+    );
+    const turnsRemaining = 28 - filledCells;
+    return recommend({ currentDice: diceValues, rollsRemaining: rollsLeft, scorecard, turnsRemaining });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [diceValues.join(','), rollsLeft, scorecard, hasRolled, isGameOver]);
 
@@ -91,6 +96,21 @@ export default function TheOracle({
             </div>
           ) : (
             <>
+              {result?.isForcedAction ? (
+                <div className="oracle__forced">
+                  <span className="oracle__forced-icon">⚠</span>
+                  <p className="oracle__forced-text">
+                    Only one cell remains — you must score here.
+                  </p>
+                  <p className="oracle__forced-action">
+                    Forced: {result.actions[0]?.description}
+                    {result.actions[0]?.smallPoints != null
+                      ? ` (${result.actions[0].smallPoints} pts)`
+                      : ''}
+                  </p>
+                </div>
+              ) : (
+              <>
               {result?.isAllNegative && (
                 <p className="oracle__no-positive-banner">
                   No positive options available. Showing the least costly choices.
@@ -150,6 +170,8 @@ export default function TheOracle({
                   </li>
                 ))}
               </ol>
+              </>
+              )}
             </>
           )}
         </div>

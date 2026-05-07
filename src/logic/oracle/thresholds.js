@@ -1,7 +1,7 @@
 import { BIG_POINT_RULES } from '../gameConstants.js';
 import { calcBonus } from '../scoring.js';
 import { normalCDF, binomialCDF } from './probabilities.js';
-import { EXPECTED_SCORE_PER_COLUMN, P_COMPLETE_IN_3_ROLLS, ATTEMPT_FRACTION } from './constants.js';
+import { EXPECTED_SCORE_PER_COLUMN, P_COMPLETE_IN_3_ROLLS, ATTEMPT_FRACTION, effectiveExpected } from './constants.js';
 import { SUM_CDF, CHOICE_MIXED_CDF } from './distributions.js';
 import { categoryCurrentSum, columnsUnfilled, hasLockedFailure, computeTurnsRemaining } from './scoring.js';
 
@@ -22,7 +22,7 @@ export function pThreshold(cat, scorecard, actionScore, turnsRemaining) {
   const tR = turnsRemaining ?? computeTurnsRemaining(scorecard);
   const rule = BIG_POINT_RULES[cat];
 
-  if (rule.type === 'sum')      return _pThresholdSum(cat, scorecard, actionScore);
+  if (rule.type === 'sum')      return _pThresholdSum(cat, scorecard, actionScore, tR);
   if (rule.type === 'filled')   return _pThresholdFilled(cat, scorecard, actionScore, tR);
   if (rule.type === 'perBalut') return _expectedBalutBigPoints(cat, scorecard, actionScore, tR);
 
@@ -32,10 +32,10 @@ export function pThreshold(cat, scorecard, actionScore, turnsRemaining) {
 // ─── Sum types (fours, fives, sixes, choice) ─────────────────────────────────
 // Exact discrete CDF lookup — turnsRemaining not needed here.
 
-function _pThresholdSum(cat, scorecard, actionScore) {
+function _pThresholdSum(cat, scorecard, actionScore, turnsRemaining) {
   const rule = BIG_POINT_RULES[cat];
   const score = actionScore === BASELINE_SCORE
-    ? EXPECTED_SCORE_PER_COLUMN[cat]
+    ? effectiveExpected(cat, turnsRemaining)
     : actionScore;
 
   const newSum = categoryCurrentSum(scorecard, cat) + score;

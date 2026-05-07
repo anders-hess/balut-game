@@ -40,16 +40,30 @@ export const P_COMPLETE_IN_3_ROLLS = {
 
 // Fraction of remaining turns expected to be dedicated to each filled category.
 // Used in the binomial time-pressure model: available_attempts = turnsRemaining × af.
-// TODO: calibrate empirically via Oracle-directed Monte Carlo (Phase 3).
+// Calibrated by back-solving: P(Bin(28×af, p) ≥ 4) = empirical completion rate.
+//   straight:  5.7% of games complete all 4 → af=0.235
+//   fullHouse: 70.7% of games complete all 4 → af=0.457
+//   balut:     0.07% of games complete all 4 → af=0.351
 export const ATTEMPT_FRACTION = {
-  straight:  0.25,
-  fullHouse: 0.35,
-  balut:     0.30,
+  straight:  0.235,
+  fullHouse: 0.457,
+  balut:     0.351,
 };
 
-// NOTE — Task 3 (turn-aware sum baselines) is deferred to Phase 3.
-// EXPECTED_SCORE_PER_COLUMN is currently a single Oracle-play mean per category.
-// Future: EXPECTED_SCORE_PER_COLUMN_AT_TURN[cat][turnsRemaining] lookup table
-// (Monte Carlo measurement of per-column score conditional on when it is filled).
-// Approximation when implemented: expected_at_turn(cat, t) =
-//   EXPECTED_SCORE_PER_COLUMN[cat] × (0.6 + 0.4 × t / 28)
+// Turn-aware baseline: scales the per-column expectation by how many turns remain.
+// Early game (t≈28): factor≈1.0 — Oracle can wait for good dice, mean stays high.
+// Late game (t≈5):   factor≈0.67 — forced fills drag the effective baseline down.
+// This makes below-average scores acceptable late in the game (when forced fills
+// are inevitable) and correctly raises the bar for above-average scores early.
+//
+// t=28 → 1.00 × mean  (full game, no discount)
+// t=14 → 0.80 × mean  (mid-game)
+// t=5  → 0.67 × mean  (late game)
+// t=1  → 0.61 × mean  (near forced)
+//
+// TODO Phase 4: replace with Monte Carlo lookup table
+//   EXPECTED_SCORE_PER_COLUMN_AT_TURN[cat][t] measured from games conditioned
+//   on when each column was actually filled.
+export function effectiveExpected(cat, turnsRemaining) {
+  return EXPECTED_SCORE_PER_COLUMN[cat] * (0.6 + 0.4 * turnsRemaining / 28);
+}

@@ -218,21 +218,31 @@ VARIANCE_PER_COLUMN = {
 
 P_COMPLETE_IN_3_ROLLS = { straight: 0.25, fullHouse: 0.35, balut: 0.046 };
 
-// Fraction of remaining turns dedicated to each filled category (time-pressure model).
-// TODO Phase 3: calibrate via Monte Carlo.
-ATTEMPT_FRACTION = { straight: 0.25, fullHouse: 0.35, balut: 0.30 };
+// Calibrated from empirical completion rates (10k games):
+//   straight 5.7%,  fullHouse 70.7%,  balut 0.07%
+ATTEMPT_FRACTION = { straight: 0.235, fullHouse: 0.457, balut: 0.351 };
+
+// Turn-aware baseline (new in Phase 3):
+effectiveExpected(cat, turnsRemaining) = EXPECTED[cat] × (0.6 + 0.4 × t/28)
+// Shrinks the baseline late-game when forced fills are inevitable.
+// t=28→1.0×, t=14→0.8×, t=5→0.67×
 ```
 
-**No BASELINE_DISCOUNT** — `thresholds.js` uses `EXPECTED_SCORE_PER_COLUMN[cat]` directly for `BASELINE_SCORE`.
+**No BASELINE_DISCOUNT** — `thresholds.js` uses `effectiveExpected(cat, turnsRemaining)` for `BASELINE_SCORE`, scaling with game stage.
 
-### Choice: two-regime mixture model (`distributions.js`)
-Choice scores are modelled as a mixture of two regimes rather than a single Oracle-directed PMF:
-- **HIGH** (prob q ≈ 0.636): Oracle-timed fill, score ≥ 25. Uses Oracle-directed ≥25 portion.
-- **LOW** (prob 1−q): forced fill. Uses isolated keep-≥4 simulation (mean 23.13).
+### Choice: K−1 oracle + 1 forced column model (`distributions.js`)
+The Oracle scores choice selectively (waits for good dice) for the first K−1 fills, but the final fill is always forced. This models the reality that you can't indefinitely defer the last choice column.
 
-`CHOICE_MIXED_CDF[K]` = CDF of the sum of K future columns under this mixture, precomputed at module load via binomial weighting of all (j high, K−j low) splits.
+- **Columns 1 to K−1**: score drawn from the full Oracle-directed PMF (mean ~25)
+- **Column K** (last): score drawn from isolated keep-≥4 simulation (FORCED_CHOICE_PMF, mean 23.13)
 
-This corrects overconfidence in P(choice threshold) when some forced fills are inevitable.
+`CHOICE_MIXED_CDF[K]` = `toCDF(conv(oraclePMF^(K-1), forcedPMF))`, precomputed at module load.
+- K=1: just forcedPMF (must score regardless)
+- K=2: conv(oracle, forced)
+- K=3: conv(oracle², forced)
+- K=4: conv(oracle³, forced)
+
+This lowers P(choice threshold) compared to treating all columns as Oracle-directed, especially for K=2.
 
 **Deferred (Phase 3)**: turn-aware baselines — `EXPECTED_SCORE_PER_COLUMN[cat] × (0.6 + 0.4 × t/28)`. Currently a flat per-game mean is used for all categories' baselines regardless of when the column is filled.
 
@@ -311,8 +321,7 @@ All tokens in `src/styles/theme.css`:
 
 ## Known cleanup items
 
-- **`HandoffOverlay.jsx/.css`** — no longer imported anywhere; can be deleted
-- **`APPLY_HOLD` reducer case** (`useGameState.js`) and `onApplyHold` prop — vestigial; safe to delete
+*(none — HandoffOverlay.jsx/.css deleted, APPLY_HOLD reducer case removed)*
 
 ---
 

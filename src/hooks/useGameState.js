@@ -106,16 +106,6 @@ function reducer(state, action) {
     case 'TOGGLE_ORACLE':
       return { ...state, oracleEnabled: !state.oracleEnabled };
 
-    case 'APPLY_HOLD': {
-      const remaining = [...action.valuesToHold];
-      const newDice = state.dice.map(die => {
-        const idx = remaining.indexOf(die.value);
-        if (idx !== -1) { remaining.splice(idx, 1); return { ...die, held: true }; }
-        return { ...die, held: false };
-      });
-      return { ...state, dice: newDice };
-    }
-
     default:
       return state;
   }
@@ -134,6 +124,5 @@ export function useGameState() {
     toggleHold:       (index)         => dispatch({ type: 'TOGGLE_HOLD', index }),
     scoreCategory:    (category)      => dispatch({ type: 'SCORE', category }),
     toggleOracle:     ()              => dispatch({ type: 'TOGGLE_ORACLE' }),
-    applyHold:        (valuesToHold)  => dispatch({ type: 'APPLY_HOLD', valuesToHold }),
   };
 }
