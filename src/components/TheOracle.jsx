@@ -96,21 +96,6 @@ export default function TheOracle({
             </div>
           ) : (
             <>
-              {result?.isForcedAction ? (
-                <div className="oracle__forced">
-                  <span className="oracle__forced-icon">⚠</span>
-                  <p className="oracle__forced-text">
-                    Only one cell remains — you must score here.
-                  </p>
-                  <p className="oracle__forced-action">
-                    Forced: {result.actions[0]?.description}
-                    {result.actions[0]?.smallPoints != null
-                      ? ` (${result.actions[0].smallPoints} pts)`
-                      : ''}
-                  </p>
-                </div>
-              ) : (
-              <>
               {result?.isAllNegative && (
                 <p className="oracle__no-positive-banner">
                   No positive options available. Showing the least costly choices.
@@ -170,8 +155,6 @@ export default function TheOracle({
                   </li>
                 ))}
               </ol>
-              </>
-              )}
             </>
           )}
         </div>

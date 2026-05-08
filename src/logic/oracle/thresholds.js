@@ -1,7 +1,7 @@
 import { BIG_POINT_RULES } from '../gameConstants.js';
 import { calcBonus } from '../scoring.js';
 import { normalCDF, binomialCDF } from './probabilities.js';
-import { EXPECTED_SCORE_PER_COLUMN, P_COMPLETE_IN_3_ROLLS, ATTEMPT_FRACTION, effectiveExpected } from './constants.js';
+import { EXPECTED_SCORE_PER_COLUMN, P_COMPLETE_IN_3_ROLLS, ATTEMPT_FRACTION } from './constants.js';
 import { SUM_CDF, CHOICE_MIXED_CDF } from './distributions.js';
 import { categoryCurrentSum, columnsUnfilled, hasLockedFailure, computeTurnsRemaining } from './scoring.js';
 
@@ -22,7 +22,7 @@ export function pThreshold(cat, scorecard, actionScore, turnsRemaining) {
   const tR = turnsRemaining ?? computeTurnsRemaining(scorecard);
   const rule = BIG_POINT_RULES[cat];
 
-  if (rule.type === 'sum')      return _pThresholdSum(cat, scorecard, actionScore, tR);
+  if (rule.type === 'sum')      return _pThresholdSum(cat, scorecard, actionScore);
   if (rule.type === 'filled')   return _pThresholdFilled(cat, scorecard, actionScore, tR);
   if (rule.type === 'perBalut') return _expectedBalutBigPoints(cat, scorecard, actionScore, tR);
 
@@ -30,12 +30,13 @@ export function pThreshold(cat, scorecard, actionScore, turnsRemaining) {
 }
 
 // ─── Sum types (fours, fives, sixes, choice) ─────────────────────────────────
-// Exact discrete CDF lookup — turnsRemaining not needed here.
+// Exact discrete CDF lookup. Baseline uses flat EXPECTED_SCORE_PER_COLUMN —
+// the Oracle-quality average, not a late-game-discounted value.
 
-function _pThresholdSum(cat, scorecard, actionScore, turnsRemaining) {
+function _pThresholdSum(cat, scorecard, actionScore) {
   const rule = BIG_POINT_RULES[cat];
   const score = actionScore === BASELINE_SCORE
-    ? effectiveExpected(cat, turnsRemaining)
+    ? EXPECTED_SCORE_PER_COLUMN[cat]
     : actionScore;
 
   const newSum = categoryCurrentSum(scorecard, cat) + score;
@@ -72,16 +73,13 @@ function _pThresholdFilled(cat, scorecard, actionScore, turnsRemaining) {
   const colsRemainingAfter = columnsUnfilled(scorecard, cat) - 1;
 
   if (actionScore === BASELINE_SCORE) {
-    // This turn is an average attempt: need colsRemainingAfter + 1 successes
-    // out of turnsRemaining × af total attempts.
     const n = turnsRemaining * af;
     const K = colsRemainingAfter + 1;
     return K <= 0 ? 1 : 1 - binomialCDF(K - 1, n, p);
   }
 
-  if (actionScore === 0) return 0; // this column locks failure
+  if (actionScore === 0) return 0;
 
-  // actual > 0: this column succeeded; K more needed in remaining turns.
   const K = colsRemainingAfter;
   if (K <= 0) return 1;
   const n = (turnsRemaining - 1) * af;
@@ -91,9 +89,6 @@ function _pThresholdFilled(cat, scorecard, actionScore, turnsRemaining) {
 // ─── Balut (per-column) ───────────────────────────────────────────────────────
 // Returns E[Balut big points] (not a probability — Balut awards 2 big pts per
 // filled positive column, linearly, rather than as a single threshold).
-//
-// expected_positive_future = min(colsRemaining, futureAttempts × p_balut)
-// where futureAttempts = (turnsRemaining − 1) × ATTEMPT_FRACTION.balut.
 
 function _expectedBalutBigPoints(cat, scorecard, actionScore, turnsRemaining) {
   const p = P_COMPLETE_IN_3_ROLLS.balut;
@@ -101,7 +96,6 @@ function _expectedBalutBigPoints(cat, scorecard, actionScore, turnsRemaining) {
   const colsRemainingAfter = columnsUnfilled(scorecard, cat) - 1;
 
   if (actionScore === BASELINE_SCORE) {
-    // This turn included: turnsRemaining attempts available for colsRemainingAfter+1 cols.
     const futurePositive = Math.min(
       colsRemainingAfter + 1,
       turnsRemaining * ATTEMPT_FRACTION.balut * p,
@@ -109,9 +103,9 @@ function _expectedBalutBigPoints(cat, scorecard, actionScore, turnsRemaining) {
     return 2 * (filledPositive + futurePositive);
   }
 
-  const thisColPositive   = actionScore > 0 ? 1 : 0;
-  const futureAttempts    = (turnsRemaining - 1) * ATTEMPT_FRACTION.balut;
-  const futurePositive    = Math.min(colsRemainingAfter, futureAttempts * p);
+  const thisColPositive = actionScore > 0 ? 1 : 0;
+  const futureAttempts  = (turnsRemaining - 1) * ATTEMPT_FRACTION.balut;
+  const futurePositive  = Math.min(colsRemainingAfter, futureAttempts * p);
   return 2 * (filledPositive + thisColPositive + futurePositive);
 }
 

@@ -1,6 +1,6 @@
 import { CATEGORIES, BIG_POINT_RULES } from '../gameConstants.js';
 import { calcTotals } from '../scoring.js';
-import { EXPECTED_SCORE_PER_COLUMN, VARIANCE_PER_COLUMN, effectiveExpected } from './constants.js';
+import { EXPECTED_SCORE_PER_COLUMN, VARIANCE_PER_COLUMN } from './constants.js';
 import { scoreCell, columnsUnfilled, nextColumn, computeTurnsRemaining } from './scoring.js';
 import { pThreshold, expectedBonus, BASELINE_SCORE } from './thresholds.js';
 
@@ -16,7 +16,7 @@ export function bpivScoreNow(cat, dice, scorecard, turnsRemaining) {
   const tR     = turnsRemaining ?? computeTurnsRemaining(scorecard);
   const actual = scoreCell(cat, dice);
   const categoryBigDelta = computeCategoryBigDelta(cat, actual, scorecard, tR);
-  const bonusBigDelta    = computeBonusBigDelta(cat, actual, scorecard, tR);
+  const bonusBigDelta    = computeBonusBigDelta(cat, actual, scorecard);
 
   return {
     bpiv:       categoryBigDelta + bonusBigDelta,
@@ -52,7 +52,10 @@ function computeCategoryBigDelta(cat, actual, scorecard, turnsRemaining) {
 }
 
 // ─── Bonus big-point delta ────────────────────────────────────────────────────
-function computeBonusBigDelta(cat, actual, scorecard, turnsRemaining) {
+// Uses flat EXPECTED_SCORE_PER_COLUMN for both the baseline contribution and
+// futureMean — Oracle-quality average, independent of game stage.
+
+function computeBonusBigDelta(cat, actual, scorecard) {
   const currentTotal = calcTotals(scorecard).totalSmall;
 
   let futureMean = 0;
@@ -61,13 +64,13 @@ function computeBonusBigDelta(cat, actual, scorecard, turnsRemaining) {
     let unfilledCount = columnsUnfilled(scorecard, c);
     if (c === cat) unfilledCount -= 1;
     if (unfilledCount > 0) {
-      futureMean += effectiveExpected(c, turnsRemaining) * unfilledCount;
+      futureMean += EXPECTED_SCORE_PER_COLUMN[c] * unfilledCount;
       futureVar  += VARIANCE_PER_COLUMN[c] * unfilledCount;
     }
   }
   const futureStdev = Math.sqrt(futureVar);
 
-  const baselineContrib = effectiveExpected(cat, turnsRemaining);
+  const baselineContrib = EXPECTED_SCORE_PER_COLUMN[cat];
 
   const eBonusActual   = expectedBonus(currentTotal + actual        + futureMean, futureStdev);
   const eBonusBaseline = expectedBonus(currentTotal + baselineContrib + futureMean, futureStdev);

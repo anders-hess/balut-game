@@ -64,39 +64,61 @@ for (const cat of Object.keys(RAW_PMF)) {
   }
 }
 
-// ─── Two-regime choice model: K−1 Oracle-directed + 1 forced column ──────────
-// The Oracle scores choice selectively: the first K−1 fills happen on good turns
-// (score drawn from the full Oracle-directed PMF), but the final fill is forced
-// (must score regardless of dice quality → isolated keep-≥4 simulation).
+// ─── Two-regime mixture model for Choice ─────────────────────────────────────
+// Each future choice column is modelled as one of two regimes:
+//   HIGH (prob q):    Oracle-timed fill, score ≥ 25 (Oracle-directed PMF ≥25)
+//   LOW  (prob 1−q):  Forced fill, isolated keep-≥4 simulation (mean 23.13)
 //
-// This directly corrects the previous pure-mixture model where every column was
-// treated as an i.i.d. blend — the final column always incurs a forced-fill penalty.
-//
-// CHOICE_MIXED_CDF[K] = CDF of sum of (K−1 oracle + 1 forced) future columns.
-//   K=1: just the forced PMF         (one column, must score)
-//   K=2: conv(oracle, forced)
-//   K=3: conv(oracle², forced)
-//   K=4: conv(oracle³, forced)
+// CHOICE_MIXED_CDF[K] = CDF of the sum of K mixture columns,
+// computed as a binomial-weighted sum over all (j high, K−j low) splits.
 
 // Forced-choice PMF: isolated keep-≥4, 3 rolls, must score (100 000 trials, mean 23.13).
 const FORCED_CHOICE_PMF = {
-  8: 0.000010, 9: 0.000030, 10: 0.000060, 11: 0.000210, 12: 0.000720,
-  13: 0.001100, 14: 0.002390, 15: 0.005070, 16: 0.009700, 17: 0.016820,
-  18: 0.028730, 19: 0.044940, 20: 0.066180, 21: 0.091720, 22: 0.115960,
-  23: 0.131690, 24: 0.140760, 25: 0.131020, 26: 0.103190, 27: 0.065190,
-  28: 0.031440, 29: 0.010760, 30: 0.002310,
+  7: 0.000020, 8: 0.000010, 9: 0.000030, 10: 0.000070, 11: 0.000150, 12: 0.000580,
+  13: 0.001350, 14: 0.002570, 15: 0.004900, 16: 0.009740, 17: 0.017780, 18: 0.028800,
+  19: 0.045760, 20: 0.066000, 21: 0.089970, 22: 0.114240, 23: 0.132500, 24: 0.141750,
+  25: 0.130280, 26: 0.103420, 27: 0.065300, 28: 0.031980, 29: 0.010520, 30: 0.002280,
 };
 
-const _oracleDense = toDense(RAW_PMF.choice);
-const _forcedDense = toDense(FORCED_CHOICE_PMF);
+// q = P(Oracle-directed choice score ≥ 25)
+const _q = Object.entries(RAW_PMF.choice)
+  .filter(([v]) => Number(v) >= 25)
+  .reduce((s, [, p]) => s + p, 0);
 
-// Precompute oracle^0 .. oracle^3
-const _oraclePow = [[1]]; // oracle^0: delta at 0
-for (let k = 1; k <= 3; k++) _oraclePow.push(convolve(_oraclePow[k - 1], _oracleDense));
+// PMF_HIGH = Oracle-directed choice restricted to scores ≥ 25, renormalised.
+const _pmfHighRaw = Object.fromEntries(
+  Object.entries(RAW_PMF.choice)
+    .filter(([v]) => Number(v) >= 25)
+    .map(([v, p]) => [v, p / _q]),
+);
+
+function _binomCoeff(n, k) {
+  if (k === 0 || k === n) return 1;
+  let c = 1;
+  for (let i = 0; i < k; i++) c = c * (n - i) / (i + 1);
+  return c;
+}
+
+function _pmfPowers(pmfDense, maxK) {
+  const powers = [[1]];
+  for (let k = 1; k <= maxK; k++) powers.push(convolve(powers[k - 1], pmfDense));
+  return powers;
+}
+
+const _pmfHighDense = toDense(_pmfHighRaw);
+const _pmfLowDense  = toDense(FORCED_CHOICE_PMF);
+const _highPow = _pmfPowers(_pmfHighDense, 4);
+const _lowPow  = _pmfPowers(_pmfLowDense,  4);
 
 export const CHOICE_MIXED_CDF = {};
 for (let K = 1; K <= 4; K++) {
-  // K-1 oracle-directed columns + 1 forced column
-  const pmfK = convolve(_oraclePow[K - 1], _forcedDense);
-  CHOICE_MIXED_CDF[K] = toCDF(pmfK);
+  let mixedPMF = [];
+  for (let j = 0; j <= K; j++) {
+    const weight = _binomCoeff(K, j) * _q ** j * (1 - _q) ** (K - j);
+    if (weight < 1e-15) continue;
+    const pmfJKj = convolve(_highPow[j], _lowPow[K - j]);
+    while (mixedPMF.length < pmfJKj.length) mixedPMF.push(0);
+    for (let x = 0; x < pmfJKj.length; x++) mixedPMF[x] += weight * pmfJKj[x];
+  }
+  CHOICE_MIXED_CDF[K] = toCDF(mixedPMF);
 }
