@@ -15,8 +15,19 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
   const effectiveDice = hasPending ? pendingScore.originalDice : diceValues;
   const effectiveRolled = hasPending || (hasRolled && allRolled);
 
-  const { totalSmall, totalBig, bonus, categoryBigPoints, categoryTotals } = calcTotals(scorecard);
-  const balutCount  = countBaluts(scorecard);
+  // For footer totals and big-pt completion badges, use a virtual scorecard
+  // that includes the pending score so they update immediately on placement/move.
+  const displayScorecard = hasPending
+    ? {
+        ...scorecard,
+        [pendingScore.category]: scorecard[pendingScore.category].map(
+          (v, i) => i === pendingScore.column ? pendingScore.score : v
+        ),
+      }
+    : scorecard;
+
+  const { totalSmall, totalBig, bonus, categoryBigPoints, categoryTotals } = calcTotals(displayScorecard);
+  const balutCount  = countBaluts(displayScorecard);
   const catBigTotal = totalBig - bonus;
 
   function getCellState(category) {
@@ -60,7 +71,7 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
               const targetCol = getTargetColumn(scorecard, cat, potential);
               const catTotal  = categoryTotals[cat];
               const bigPts    = categoryBigPoints[cat];
-              const isComplete = scorecard[cat].every(s => s !== null);
+              const isComplete = displayScorecard[cat].every(s => s !== null);
               const isGreat    = cellState === 'valid' && isGreatScore(cat, potential);
 
               return (

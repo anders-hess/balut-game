@@ -1,5 +1,5 @@
 import { useReducer } from 'react';
-import { MAX_ROLLS } from '../logic/gameConstants.js';
+import { MAX_ROLLS, CATEGORIES } from '../logic/gameConstants.js';
 import {
   createInitialState,
   createInitialPlayer,
@@ -152,6 +152,14 @@ function reducer(state, action) {
       const finalScore = rawScore === null ? 0 : rawScore;
       const col        = getTargetColumn(currentPlayer.scorecard, category, finalScore);
       if (col === -1) return state;
+
+      // Last turn: only one unfilled cell exists — lock immediately, no pending state.
+      const unfilledCount = CATEGORIES.reduce(
+        (n, cat) => n + currentPlayer.scorecard[cat].filter(s => s === null).length, 0
+      );
+      if (unfilledCount === 1) {
+        return applyScore(state, category, col, finalScore);
+      }
 
       return {
         ...state,
