@@ -123,9 +123,9 @@ thead .th-sum {
   /* no tint on filled cells — inherit standard row color */
 }
 
-/* Dotted outline marks the tentative (pending) cell without changing its background */
+/* Solid black border marks the tentative (pending) cell without changing its background */
 .td-entry--pending {
-  outline: 1.5px dashed var(--color-gold);
+  outline: 1.5px solid #000;
   outline-offset: -1px;
   border-radius: 3px;
   cursor: pointer;
