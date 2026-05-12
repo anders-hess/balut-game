@@ -115,7 +115,6 @@ export default function GameBoard({
               rollsLeft={rollsLeft}
               onRoll={onRoll}
               onToggleHold={onToggleHold}
-              hasPendingScore={!!pendingScore}
             />
           )}
 

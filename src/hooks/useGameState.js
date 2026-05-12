@@ -9,9 +9,7 @@ import {
 } from '../logic/gameState.js';
 import { calculateScore, isGameOver, getTargetColumn } from '../logic/scoring.js';
 
-// ─── Shared: commit a pending or immediate score to scorecard ─────────────────
-// Returns the full next state after applying the score, including turn rotation.
-// Used by both PENDING_SCORE (immediate) and ROLL (deferred commit).
+// ─── Commit a score to the scorecard and rotate the turn ─────────────────────
 function applyScore(state, category, column, finalScore) {
   const currentPlayer = state.players[state.currentPlayerIndex];
   const isBalut = category === 'balut' && finalScore > 0;
@@ -76,12 +74,23 @@ function reducer(state, action) {
     }
 
     case 'ROLL': {
-      // If a pending score exists: commit it (like the old SCORE action) and start new turn.
+      // Commit a pending score and start the new turn.
       if (state.pendingScore) {
         const { category, column, score } = state.pendingScore;
-        return applyScore(state, category, column, score);
+        const committed = applyScore(state, category, column, score);
+
+        // Gameover or multiplayer handoff — caller handles next step.
+        if (committed.phase === 'gameover' || committed.showHandoff) return committed;
+
+        // Single player: also perform the first roll of the new turn.
+        return {
+          ...committed,
+          dice:      rollDice(committed.dice),
+          rollsLeft: committed.rollsLeft - 1,
+        };
       }
-      // Normal roll
+
+      // Normal roll.
       if (state.rollsLeft === 0) return state;
       return {
         ...state,
@@ -92,35 +101,64 @@ function reducer(state, action) {
     }
 
     case 'TOGGLE_HOLD': {
-      // Holding is meaningless while a pending score is being adjusted.
-      if (state.pendingScore) return state;
+      if (state.pendingScore) return state;   // no holds while score is pending
       if (state.rollsLeft === MAX_ROLLS) return state;
       if (state.rollsLeft === 0) return state;
       return { ...state, dice: toggleHold(state.dice, action.index) };
     }
 
     case 'PENDING_SCORE': {
-      // Player clicked a scorecard cell. If it matches the current pending cell,
-      // cancel it (player changed their mind). Otherwise set/move the pending score.
+      // Player clicked a scorecard cell.
+      //
+      // First click  → dice clear, rollsLeft resets, pendingScore set.
+      // Second click on a *different* cell → pendingScore moves there.
+      // Click on the *same* pending cell → cancel; dice restored to original
+      //   values and rollsLeft returns to 0 so the player can choose again.
       const { category } = action;
       const currentPlayer = state.players[state.currentPlayerIndex];
 
+      if (state.pendingScore) {
+        // Already pending — use the stored originalDice for all computation.
+        const origDice = state.pendingScore.originalDice;
+        const rawScore = calculateScore(category, origDice);
+        const finalScore = rawScore === null ? 0 : rawScore;
+        const col = getTargetColumn(currentPlayer.scorecard, category, finalScore);
+
+        // Cancel: clicked the pending cell again.
+        if (
+          state.pendingScore.category === category &&
+          state.pendingScore.column   === col
+        ) {
+          return {
+            ...state,
+            pendingScore: null,
+            // Restore original dice (unheld) so the player can see & re-choose.
+            dice:      origDice.map(v => ({ value: v, held: false })),
+            rollsLeft: 0,   // all rolls consumed — must score, can't re-roll
+          };
+        }
+
+        // Move: valid cell for the original dice.
+        if (col === -1) return state;
+        return {
+          ...state,
+          pendingScore: { ...state.pendingScore, category, column: col, score: finalScore },
+        };
+      }
+
+      // First click — record original dice, clear them, reset roll counter.
       const diceValues = state.dice.map(d => d.value);
       const rawScore   = calculateScore(category, diceValues);
       const finalScore = rawScore === null ? 0 : rawScore;
       const col        = getTargetColumn(currentPlayer.scorecard, category, finalScore);
       if (col === -1) return state;
 
-      // Toggle off if clicking the already-pending cell
-      if (
-        state.pendingScore &&
-        state.pendingScore.category === category &&
-        state.pendingScore.column   === col
-      ) {
-        return { ...state, pendingScore: null };
-      }
-
-      return { ...state, pendingScore: { category, column: col, score: finalScore } };
+      return {
+        ...state,
+        pendingScore: { category, column: col, score: finalScore, originalDice: diceValues },
+        dice:         resetTurn(state.dice),   // clear: values → 0, all unheld
+        rollsLeft:    MAX_ROLLS,               // "Roll Dice" becomes available
+      };
     }
 
     case 'DISMISS_HANDOFF':

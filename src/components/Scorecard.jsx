@@ -10,24 +10,25 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
   const allRolled  = diceValues.every(v => v > 0);
   const hasPending = !!pendingScore;
 
+  // When a pending score is set, compute potential scores from the stored original
+  // dice (the actual dice have been cleared). Otherwise use current dice.
+  const effectiveDice = hasPending ? pendingScore.originalDice : diceValues;
+  const effectiveRolled = hasPending || (hasRolled && allRolled);
+
   const { totalSmall, totalBig, bonus, categoryBigPoints, categoryTotals } = calcTotals(scorecard);
   const balutCount  = countBaluts(scorecard);
   const catBigTotal = totalBig - bonus;
 
   function getCellState(category) {
-    // When a pending score is active, use dice to determine potential score for
-    // all unfilled cells (so the player can see and select alternative slots).
-    if (hasPending || (hasRolled && allRolled)) {
-      if (nextColumn(scorecard, category) === -1) return 'full';
-      const score = calculateScore(category, diceValues);
-      if (score === null || score === 0) return 'zero';
-      return 'valid';
-    }
-    return 'empty';
+    if (!effectiveRolled) return 'empty';
+    if (nextColumn(scorecard, category) === -1) return 'full';
+    const score = calculateScore(category, effectiveDice);
+    if (score === null || score === 0) return 'zero';
+    return 'valid';
   }
 
   function getPotentialScore(category) {
-    const s = calculateScore(category, diceValues);
+    const s = calculateScore(category, effectiveDice);
     return s ?? 0;
   }
 
@@ -37,11 +38,6 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
         <h2 className="scorecard-title">
           {playerName ? `Scorecard – ${playerName}` : 'Scorecard'}
         </h2>
-        {hasPending && (
-          <span className="scorecard-pending-hint">
-            Tap another slot to move · Roll to confirm
-          </span>
-        )}
       </div>
 
       <div className="scorecard-scroll">
@@ -74,27 +70,26 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
                   </td>
 
                   {scorecard[cat].map((score, colIdx) => {
-                    const isFilled = score !== null;
-                    const isNext   = colIdx === targetCol;
+                    const isFilled  = score !== null;
+                    const isNext    = colIdx === targetCol;
 
-                    // Is this the currently-pending cell?
+                    // The pending cell — visually identical to a filled cell.
                     const isPending = hasPending &&
                       pendingScore.category === cat &&
                       pendingScore.column   === colIdx;
 
-                    // Normal availability: dice rolled, this is the target column, valid/zero score.
+                    // Normal scoring availability (no pending state).
                     const isAvailableNormal = !hasPending && isNext &&
                       (cellState === 'valid' || cellState === 'zero') &&
                       hasRolled && allRolled;
 
-                    // Move-target availability: pending state, this is an unfilled target for
-                    // this category's dice score, and it's not the currently-pending cell.
+                    // Move-target availability (pending state active, different unfilled cell).
                     const isAvailableMove = hasPending && !isPending && !isFilled &&
                       isNext && cellState !== 'full' && cellState !== 'empty';
 
                     const isAvailable = isPending || isAvailableNormal || isAvailableMove;
 
-                    // Score to display: pending score for pending cell, filled score otherwise.
+                    // Display value: pending shows pending score as a plain number.
                     const displayScore = isPending ? pendingScore.score : score;
 
                     return (
@@ -102,26 +97,31 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
                         key={colIdx}
                         className={[
                           'td-entry',
-                          isPending                                            ? 'td-entry--pending'   : '',
-                          isFilled && !isPending                               ? 'td-entry--filled'    : '',
-                          !isFilled && !isPending                              ? 'td-entry--empty'     : '',
-                          isAvailable && isGreat                               ? 'td-entry--great'     : '',
-                          isAvailable && !isGreat && cellState === 'valid'     ? 'td-entry--available' : '',
-                          isAvailable && cellState === 'zero'                  ? 'td-entry--zero'      : '',
+                          // Pending cell: same appearance as filled
+                          (isFilled || isPending)                              ? 'td-entry--filled'    : 'td-entry--empty',
+                          isAvailableMove && isGreat                           ? 'td-entry--great'     : '',
+                          isAvailableMove && !isGreat && cellState === 'valid' ? 'td-entry--available' : '',
+                          isAvailableMove && cellState === 'zero'              ? 'td-entry--zero'      : '',
+                          isAvailableNormal && isGreat                         ? 'td-entry--great'     : '',
+                          isAvailableNormal && !isGreat && cellState === 'valid' ? 'td-entry--available' : '',
+                          isAvailableNormal && cellState === 'zero'            ? 'td-entry--zero'      : '',
                         ].filter(Boolean).join(' ')}
                         onClick={() => isAvailable && onScore?.(cat)}
                         title={
-                          isPending        ? `Score ${pendingScore.score} pts (pending) — tap to cancel` :
-                          isAvailableMove  ? `Move score here: ${potential} pts for ${CATEGORY_LABELS[cat]}` :
-                          isAvailableNormal ? `Score ${potential} pts for ${CATEGORY_LABELS[cat]}` :
-                          undefined
+                          isPending
+                            ? `${pendingScore.score} pts (pending) — tap to cancel, or Roll to confirm`
+                            : isAvailableMove
+                              ? `Move score here: ${potential} pts for ${CATEGORY_LABELS[cat]}`
+                              : isAvailableNormal
+                                ? `Score ${potential} pts for ${CATEGORY_LABELS[cat]}`
+                                : undefined
                         }
                         role={isAvailable ? 'button' : undefined}
                         tabIndex={isAvailable ? 0 : undefined}
                         onKeyDown={e => isAvailable && e.key === 'Enter' && onScore?.(cat)}
                       >
                         {isPending
-                          ? <span className="ghost-score ghost-score--pending">{displayScore}</span>
+                          ? displayScore
                           : isFilled
                             ? score
                             : isAvailable

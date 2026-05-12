@@ -54,14 +54,6 @@
   opacity: 0.55;
 }
 
-/* Confirm-score variant (pending score present) */
-.btn-roll--confirm {
-  background: rgba(201, 168, 76, 0.85);
-  color: #1a1a1a;
-}
-.btn-roll--confirm:hover:not(:disabled) {
-  background: var(--color-gold);
-}
 
 /* Roll pips */
 .rolls-pips {

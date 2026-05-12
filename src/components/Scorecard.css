@@ -21,12 +21,6 @@
   color: var(--color-parchment);
 }
 
-.scorecard-pending-hint {
-  font-size: 0.68rem;
-  color: rgba(201, 168, 76, 0.85);
-  font-style: italic;
-  margin-left: 0.5rem;
-}
 
 /* ── Table scroll wrapper ────────────────────────────── */
 .scorecard-scroll {
@@ -129,22 +123,6 @@ thead .th-sum {
   /* no tint on filled cells — inherit standard row color */
 }
 
-/* Pending (tentative) score — player can still move it before confirming */
-.td-entry--pending {
-  background: rgba(201, 168, 76, 0.12);
-  cursor: pointer;
-  outline: 1.5px dashed var(--color-gold);
-  outline-offset: -1px;
-  border-radius: 3px;
-}
-.td-entry--pending:hover {
-  background: rgba(201, 168, 76, 0.08);
-}
-.ghost-score--pending {
-  color: var(--color-gold);
-  font-style: italic;
-  opacity: 0.85;
-}
 
 .td-entry--available {
   background: rgba(201, 168, 76, 0.2);
