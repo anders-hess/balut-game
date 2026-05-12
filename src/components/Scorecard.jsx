@@ -97,8 +97,8 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
                         key={colIdx}
                         className={[
                           'td-entry',
-                          // Pending cell: same appearance as filled
                           (isFilled || isPending)                              ? 'td-entry--filled'    : 'td-entry--empty',
+                          isPending                                            ? 'td-entry--pending'   : '',
                           isAvailableMove && isGreat                           ? 'td-entry--great'     : '',
                           isAvailableMove && !isGreat && cellState === 'valid' ? 'td-entry--available' : '',
                           isAvailableMove && cellState === 'zero'              ? 'td-entry--zero'      : '',

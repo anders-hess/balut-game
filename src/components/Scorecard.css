@@ -123,6 +123,14 @@ thead .th-sum {
   /* no tint on filled cells — inherit standard row color */
 }
 
+/* Dotted outline marks the tentative (pending) cell without changing its background */
+.td-entry--pending {
+  outline: 1.5px dashed var(--color-gold);
+  outline-offset: -1px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
 
 .td-entry--available {
   background: rgba(201, 168, 76, 0.2);
