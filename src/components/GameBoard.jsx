@@ -34,7 +34,7 @@ export default function GameBoard({
   scoreSubmitted, onScoreSubmitted,
   mpSubmittedNames, onMpPlayerSubmitted,
 }) {
-  const { dice, rollsLeft, oracleEnabled, players, currentPlayerIndex, phase, turnNumber, justScoredBalut, showHandoff } = state;
+  const { dice, rollsLeft, oracleEnabled, players, currentPlayerIndex, phase, turnNumber, justScoredBalut, showHandoff, pendingScore } = state;
   const isMultiplayer = players.length > 1;
   const isGameOver    = phase === 'gameover';
   const hasRolled     = rollsLeft < 3;
@@ -115,6 +115,7 @@ export default function GameBoard({
               rollsLeft={rollsLeft}
               onRoll={onRoll}
               onToggleHold={onToggleHold}
+              hasPendingScore={!!pendingScore}
             />
           )}
 
@@ -149,6 +150,7 @@ export default function GameBoard({
             rollsLeft={rollsLeft}
             onScore={viewingOwnTurn && !isGameOver ? onScore : null}
             playerName={isMultiplayer ? players[displayIdx].name : null}
+            pendingScore={viewingOwnTurn ? pendingScore : null}
           />
         </div>
 

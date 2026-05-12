@@ -4,21 +4,26 @@ import './Scorecard.css';
 
 const MAX_ROLLS_IMPORT = 3;
 
-export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerName }) {
-  const hasRolled = rollsLeft < MAX_ROLLS_IMPORT;
+export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerName, pendingScore }) {
+  const hasRolled  = rollsLeft < MAX_ROLLS_IMPORT;
   const diceValues = dice.map(d => d.value);
   const allRolled  = diceValues.every(v => v > 0);
+  const hasPending = !!pendingScore;
 
   const { totalSmall, totalBig, bonus, categoryBigPoints, categoryTotals } = calcTotals(scorecard);
   const balutCount  = countBaluts(scorecard);
   const catBigTotal = totalBig - bonus;
 
   function getCellState(category) {
-    if (!hasRolled || !allRolled) return 'empty';
-    if (nextColumn(scorecard, category) === -1) return 'full';
-    const score = calculateScore(category, diceValues);
-    if (score === null || score === 0) return 'zero';
-    return 'valid';
+    // When a pending score is active, use dice to determine potential score for
+    // all unfilled cells (so the player can see and select alternative slots).
+    if (hasPending || (hasRolled && allRolled)) {
+      if (nextColumn(scorecard, category) === -1) return 'full';
+      const score = calculateScore(category, diceValues);
+      if (score === null || score === 0) return 'zero';
+      return 'valid';
+    }
+    return 'empty';
   }
 
   function getPotentialScore(category) {
@@ -32,6 +37,11 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
         <h2 className="scorecard-title">
           {playerName ? `Scorecard – ${playerName}` : 'Scorecard'}
         </h2>
+        {hasPending && (
+          <span className="scorecard-pending-hint">
+            Tap another slot to move · Roll to confirm
+          </span>
+        )}
       </div>
 
       <div className="scorecard-scroll">
@@ -49,11 +59,11 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
 
           <tbody>
             {CATEGORIES.map(cat => {
-              const cellState  = getCellState(cat);
-              const potential  = getPotentialScore(cat);
-              const targetCol  = getTargetColumn(scorecard, cat, potential);
-              const catTotal   = categoryTotals[cat];
-              const bigPts     = categoryBigPoints[cat];
+              const cellState = getCellState(cat);
+              const potential = getPotentialScore(cat);
+              const targetCol = getTargetColumn(scorecard, cat, potential);
+              const catTotal  = categoryTotals[cat];
+              const bigPts    = categoryBigPoints[cat];
               const isComplete = scorecard[cat].every(s => s !== null);
               const isGreat    = cellState === 'valid' && isGreatScore(cat, potential);
 
@@ -64,31 +74,59 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
                   </td>
 
                   {scorecard[cat].map((score, colIdx) => {
-                    const isFilled    = score !== null;
-                    const isNext      = colIdx === targetCol;
-                    const isAvailable = isNext && (cellState === 'valid' || cellState === 'zero');
+                    const isFilled = score !== null;
+                    const isNext   = colIdx === targetCol;
+
+                    // Is this the currently-pending cell?
+                    const isPending = hasPending &&
+                      pendingScore.category === cat &&
+                      pendingScore.column   === colIdx;
+
+                    // Normal availability: dice rolled, this is the target column, valid/zero score.
+                    const isAvailableNormal = !hasPending && isNext &&
+                      (cellState === 'valid' || cellState === 'zero') &&
+                      hasRolled && allRolled;
+
+                    // Move-target availability: pending state, this is an unfilled target for
+                    // this category's dice score, and it's not the currently-pending cell.
+                    const isAvailableMove = hasPending && !isPending && !isFilled &&
+                      isNext && cellState !== 'full' && cellState !== 'empty';
+
+                    const isAvailable = isPending || isAvailableNormal || isAvailableMove;
+
+                    // Score to display: pending score for pending cell, filled score otherwise.
+                    const displayScore = isPending ? pendingScore.score : score;
 
                     return (
                       <td
                         key={colIdx}
                         className={[
                           'td-entry',
-                          isFilled ? 'td-entry--filled' : 'td-entry--empty',
-                          isAvailable && isGreat                         ? 'td-entry--great'     : '',
-                          isAvailable && !isGreat && cellState === 'valid' ? 'td-entry--available' : '',
-                          isAvailable && cellState === 'zero'             ? 'td-entry--zero'      : '',
+                          isPending                                            ? 'td-entry--pending'   : '',
+                          isFilled && !isPending                               ? 'td-entry--filled'    : '',
+                          !isFilled && !isPending                              ? 'td-entry--empty'     : '',
+                          isAvailable && isGreat                               ? 'td-entry--great'     : '',
+                          isAvailable && !isGreat && cellState === 'valid'     ? 'td-entry--available' : '',
+                          isAvailable && cellState === 'zero'                  ? 'td-entry--zero'      : '',
                         ].filter(Boolean).join(' ')}
-                        onClick={() => isAvailable && onScore(cat)}
-                        title={isAvailable ? `Score ${potential} pts for ${CATEGORY_LABELS[cat]}` : undefined}
+                        onClick={() => isAvailable && onScore?.(cat)}
+                        title={
+                          isPending        ? `Score ${pendingScore.score} pts (pending) — tap to cancel` :
+                          isAvailableMove  ? `Move score here: ${potential} pts for ${CATEGORY_LABELS[cat]}` :
+                          isAvailableNormal ? `Score ${potential} pts for ${CATEGORY_LABELS[cat]}` :
+                          undefined
+                        }
                         role={isAvailable ? 'button' : undefined}
                         tabIndex={isAvailable ? 0 : undefined}
-                        onKeyDown={e => isAvailable && e.key === 'Enter' && onScore(cat)}
+                        onKeyDown={e => isAvailable && e.key === 'Enter' && onScore?.(cat)}
                       >
-                        {isFilled
-                          ? score
-                          : isAvailable
-                            ? <span className="ghost-score">{potential}</span>
-                            : ''}
+                        {isPending
+                          ? <span className="ghost-score ghost-score--pending">{displayScore}</span>
+                          : isFilled
+                            ? score
+                            : isAvailable
+                              ? <span className="ghost-score">{potential}</span>
+                              : ''}
                       </td>
                     );
                   })}
@@ -111,17 +149,13 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
 
           <tfoot>
             <tr className="srow srow--subtotal">
-              <td className="td-category">
-                <span className="foot-label">Total</span>
-              </td>
+              <td className="td-category"><span className="foot-label">Total</span></td>
               <td colSpan={NUM_COLUMNS} />
               <td className="td-sum td-sum--total">{totalSmall}</td>
               <td className="td-big td-big--total">{catBigTotal > 0 ? catBigTotal : 0}</td>
             </tr>
             <tr className="srow srow--subtotal">
-              <td className="td-category">
-                <span className="foot-label">Bonus</span>
-              </td>
+              <td className="td-category"><span className="foot-label">Bonus</span></td>
               <td colSpan={NUM_COLUMNS} className="td-bonus-hint-cell">
                 <span className="foot-hint">{bonusHint(totalSmall)}</span>
               </td>
@@ -131,9 +165,7 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
               </td>
             </tr>
             <tr className="srow srow--grand-total">
-              <td className="td-category">
-                <span className="foot-label">Grand Total</span>
-              </td>
+              <td className="td-category"><span className="foot-label">Grand Total</span></td>
               <td colSpan={NUM_COLUMNS} />
               <td className="td-sum" />
               <td className="td-big td-big--grand">{totalBig}</td>

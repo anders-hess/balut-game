@@ -23,6 +23,9 @@ export function createInitialState() {
     turnNumber: 1,
     oracleEnabled: window.innerWidth > 800,
     justScoredBalut: false,
+    // Pending score: set when player clicks a cell, committed on next Roll.
+    // null | { category: string, column: number, score: number }
+    pendingScore: null,
   };
 }
 
