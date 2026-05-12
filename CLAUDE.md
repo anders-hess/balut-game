@@ -98,12 +98,13 @@ src/
   phase:              'start' | 'playing' | 'gameover',
   players:            [{ name: string, scorecard: { [cat]: [null|number, ×4] } }, ...],
   currentPlayerIndex: number,   // index into players[]
-  showHandoff:        bool,     // true after SCORE in multiplayer; cleared by DISMISS_HANDOFF
+  showHandoff:        bool,     // true after scoring in multiplayer; cleared by DISMISS_HANDOFF
   dice:               [{ value: 0–6, held: bool }, ×5],
   rollsLeft:          0–3,
   turnNumber:         number,
   oracleEnabled:      bool,     // initialised to window.innerWidth > 800 (open on desktop, closed on mobile)
   justScoredBalut:    bool,
+  pendingScore:       null | { category, column, score, originalDice },
 }
 ```
 
@@ -114,9 +115,9 @@ Single player uses `players.length === 1` — no separate code path.
 |---|---|
 | `START_GAME` | Single-player game; `players: [{ name: 'You', scorecard: empty }]` |
 | `SETUP_MULTIPLAYER({ names })` | Multiplayer; builds `players[]` from names array |
-| `ROLL` | Rerolls unheld dice, decrements rollsLeft |
-| `TOGGLE_HOLD` | Toggles held flag on a die |
-| `SCORE` | Scores for current player; rotates to next unfinished player; sets `showHandoff: true` in multiplayer |
+| `ROLL` | If `pendingScore` set: commits it via `applyScore`, then auto-rolls (single player) or shows handoff (multiplayer). Otherwise: rerolls unheld dice, decrements rollsLeft. |
+| `TOGGLE_HOLD` | Toggles held flag on a die. Blocked while `pendingScore` is set. |
+| `PENDING_SCORE({ category })` | First click: stores `pendingScore`, clears dice (values→0), resets rollsLeft to MAX so player can re-roll or move. Second click on same cell: cancels pending, restores original dice, rollsLeft→0. Click on different valid cell: moves score there. On the **last turn** (only 1 unfilled cell): calls `applyScore` directly — no pending state. |
 | `DISMISS_HANDOFF` | Clears `showHandoff` |
 | `GO_HOME` | Full reset |
 | `TOGGLE_ORACLE` | Toggles Oracle panel |
@@ -218,33 +219,22 @@ VARIANCE_PER_COLUMN = {
 
 P_COMPLETE_IN_3_ROLLS = { straight: 0.25, fullHouse: 0.35, balut: 0.046 };
 
-// Calibrated from empirical completion rates (10k games):
-//   straight 5.7%,  fullHouse 70.7%,  balut 0.07%
-ATTEMPT_FRACTION = { straight: 0.235, fullHouse: 0.457, balut: 0.351 };
-
-// Turn-aware baseline (new in Phase 3):
-effectiveExpected(cat, turnsRemaining) = EXPECTED[cat] × (0.6 + 0.4 × t/28)
-// Shrinks the baseline late-game when forced fills are inevitable.
-// t=28→1.0×, t=14→0.8×, t=5→0.67×
+ATTEMPT_FRACTION = { straight: 0.25, fullHouse: 0.35, balut: 0.30 };
 ```
 
-**No BASELINE_DISCOUNT** — `thresholds.js` uses `effectiveExpected(cat, turnsRemaining)` for `BASELINE_SCORE`, scaling with game stage.
+**No BASELINE_DISCOUNT, no turn-aware scaling** — `thresholds.js` uses flat `EXPECTED_SCORE_PER_COLUMN[cat]` as `BASELINE_SCORE` for all categories regardless of turn.
 
-### Choice: K−1 oracle + 1 forced column model (`distributions.js`)
-The Oracle scores choice selectively (waits for good dice) for the first K−1 fills, but the final fill is always forced. This models the reality that you can't indefinitely defer the last choice column.
+### Choice: two-regime mixture model (`distributions.js`)
+`CHOICE_MIXED_CDF[K]` models K choice columns as a mixture of two score regimes:
 
-- **Columns 1 to K−1**: score drawn from the full Oracle-directed PMF (mean ~25)
-- **Column K** (last): score drawn from isolated keep-≥4 simulation (FORCED_CHOICE_PMF, mean 23.13)
+- **High regime** (Oracle-directed ≥ 25): PMF_HIGH, normalised from Oracle simulation; q ≈ 0.636
+- **Low regime** (forced fill, keep-≥4): FORCED_CHOICE_PMF, mean 23.13; weight (1−q)
 
-`CHOICE_MIXED_CDF[K]` = `toCDF(conv(oraclePMF^(K-1), forcedPMF))`, precomputed at module load.
-- K=1: just forcedPMF (must score regardless)
-- K=2: conv(oracle, forced)
-- K=3: conv(oracle², forced)
-- K=4: conv(oracle³, forced)
-
-This lowers P(choice threshold) compared to treating all columns as Oracle-directed, especially for K=2.
-
-**Deferred (Phase 3)**: turn-aware baselines — `EXPECTED_SCORE_PER_COLUMN[cat] × (0.6 + 0.4 × t/28)`. Currently a flat per-game mean is used for all categories' baselines regardless of when the column is filled.
+For K columns, `CHOICE_MIXED_CDF[K]` is built by binomial-weighting all (j high, K−j low) splits:
+```
+P(sum ≤ x | K cols) = Σ_{j=0}^{K} C(K,j) × q^j × (1-q)^(K-j) × conv(highPMF^j, lowPMF^(K-j))[x]
+```
+Precomputed at module load for K = 1..4. This correctly lowers P(choice threshold) vs treating all columns as Oracle-directed, especially for K=2.
 
 ### Tooltip outcome grouping (`outcomes.js`)
 - **Choice** splits into two rows based on score vs baseline:
@@ -315,7 +305,11 @@ All tokens in `src/styles/theme.css`:
 - **Available cell**: yellow background (standard) or **green** if score meets "great" threshold (Fours ≥ 12, Fives ≥ 15, Sixes ≥ 18, Straight/Full House any > 0, Choice ≥ 25, Balut any > 0)
 - **Zero cell** (invalid pattern, force-score 0): red-tinted background
 - **Filled cell**: no tint — inherits standard row background
+- **Pending cell** (`td-entry--pending`): solid black outline, no background change — score is placed but not yet locked. Player can click a different valid cell to move it, or click the pending cell again to cancel. Clicking Roll locks it.
 - A left border on the Sum column separates the 4 score columns from the summary columns
+
+### Scorecard pending score display
+`Scorecard.jsx` builds a `displayScorecard` that patches the pending score into its cell, then passes it to `calcTotals`, `countBaluts`, and `isComplete`. This means footer totals (Total, Bonus, Grand Total) and big-point badges update live as the score is placed or moved. Cell rendering (filled/pending/available detection) still uses the original `scorecard` prop.
 
 ---
 
