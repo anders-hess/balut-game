@@ -3,7 +3,7 @@ import Dice from './Dice.jsx';
 import './DiceArea.css';
 import { MAX_ROLLS } from '../logic/gameConstants.js';
 
-export default function DiceArea({ dice, rollsLeft, onRoll, onToggleHold }) {
+export default function DiceArea({ dice, rollsLeft, onRoll, onToggleHold, turnNumber, totalTurns }) {
   const [rolling, setRolling] = useState(false);
 
   const hasRolled = rollsLeft < MAX_ROLLS;
@@ -23,8 +23,39 @@ export default function DiceArea({ dice, rollsLeft, onRoll, onToggleHold }) {
       ? 'Roll Again'
       : 'No Rolls Left';
 
+  const heldCount = dice.filter(d => d.held && d.value > 0).length;
+  const turnStatus = !hasRolled
+    ? 'Roll to start your turn.'
+    : heldCount > 0
+      ? `${heldCount === 1 ? 'One die' : `${heldCount} dice`} held.`
+      : rollsLeft < MAX_ROLLS
+        ? 'Pick dice to hold, or score.'
+        : '';
+
   return (
     <section className="dice-area">
+      <div className="dice-area__info">
+        <div className="dice-area__turn">
+          {turnNumber != null && (
+            <div className="dice-area__turn-label">
+              Turn {Math.min(turnNumber, totalTurns || 28)} of {totalTurns || 28}
+            </div>
+          )}
+          <div className="dice-area__turn-status">{turnStatus}</div>
+        </div>
+        <div className="dice-area__rolls-wrap">
+          <div className="dice-area__rolls-label">Rolls left</div>
+          <div className="rolls-pips" aria-label={`${rollsLeft} rolls remaining`}>
+            {Array(MAX_ROLLS).fill(0).map((_, i) => (
+              <span
+                key={i}
+                className={`rolls-pip ${i < rollsLeft ? 'rolls-pip--active' : ''}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="dice-tray" role="group" aria-label="Dice">
         {dice.map((die, i) => (
           <Dice
@@ -47,21 +78,10 @@ export default function DiceArea({ dice, rollsLeft, onRoll, onToggleHold }) {
         >
           {rollLabel}
         </button>
-
-        <div className="rolls-pips" aria-label={`${rollsLeft} rolls remaining`}>
-          {Array(MAX_ROLLS).fill(0).map((_, i) => (
-            <span
-              key={i}
-              className={`rolls-pip ${i < rollsLeft ? 'rolls-pip--active' : ''}`}
-            />
-          ))}
-        </div>
       </div>
 
       {canHold && (
-        <p className="dice-hint">
-          Click a die to hold it between rolls
-        </p>
+        <p className="dice-hint">Tap a die to hold it between rolls</p>
       )}
     </section>
   );

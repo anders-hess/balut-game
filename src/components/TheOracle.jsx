@@ -63,8 +63,7 @@ export default function TheOracle({
   return (
     <aside className="oracle" ref={panelRef}>
       <div className="oracle__header">
-        <span className="oracle__star">✦</span>
-        <h2 className="oracle__title">The Oracle</h2>
+        <h2 className="oracle__title">The Oracle suggests</h2>
         {!isOpen && result?.actions?.length > 0 && (
           <span className="oracle__top-hint" aria-hidden="true">
             {result.actions[0].description}
@@ -76,7 +75,7 @@ export default function TheOracle({
           aria-expanded={isOpen}
           title={isOpen ? 'Hide Oracle' : 'Show Oracle'}
         >
-          {isOpen ? '▲ Hide' : '▼ Show'}
+          {isOpen ? 'Hide' : 'Show'}
         </button>
       </div>
 

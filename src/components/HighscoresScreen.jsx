@@ -3,9 +3,26 @@ import { fetchLeaderboard } from '../services/highscores.js';
 import './HighscoresScreen.css';
 
 const PERIODS = ['weekly', 'monthly', 'yearly'];
-const PERIOD_LABELS = { weekly: 'This Week', monthly: 'This Month', yearly: 'This Year' };
+const PERIOD_LABELS = { weekly: 'Week', monthly: 'Month', yearly: 'Year' };
+const HEADLINE = { weekly: 'This week\'s\nhighest scores.', monthly: 'This month\'s\nhighest scores.', yearly: 'This year\'s\nhighest scores.' };
 
-export default function HighscoresScreen({ onClose }) {
+// Simple logo mark
+function Logo({ size = 36 }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{
+        width: size, height: size, borderRadius: size * 0.27,
+        background: 'var(--color-accent)', color: '#fff',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: 'var(--font-serif)', fontStyle: 'italic',
+        fontWeight: 500, fontSize: size * 0.62,
+      }}>b</div>
+      <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 500, fontSize: size * 0.62, color: 'var(--color-ink)', letterSpacing: '-0.3px' }}>balut</span>
+    </div>
+  );
+}
+
+export default function HighscoresScreen({ onClose, backLabel = '← Back to home' }) {
   const [activePeriod, setActivePeriod] = useState('weekly');
   const [boards, setBoards] = useState({ weekly: null, monthly: null, yearly: null });
   const [loading, setLoading] = useState(true);
@@ -34,25 +51,45 @@ export default function HighscoresScreen({ onClose }) {
 
   return (
     <div className="hs-screen">
+      {/* Marketing header */}
+      <header className="hs-screen__marketing-header">
+        <Logo size={36} />
+        <button className="hs-screen__back" onClick={onClose}>{backLabel}</button>
+      </header>
+
       <div className="hs-screen__inner">
+        {/* Headline + tabs */}
         <div className="hs-screen__header">
-          <button className="hs-screen__back" onClick={onClose}>← Back</button>
-          <h1 className="hs-screen__title">🏆 Leaderboard</h1>
-          <div /> {/* spacer */}
+          <div className="hs-screen__hero">
+            <div className="hs-screen__kicker">Leaderboard</div>
+            <h1 className="hs-screen__title">
+              {HEADLINE[activePeriod].split('\n').map((line, i) => (
+                <span key={i}>{line}{i === 0 && <br />}</span>
+              ))}
+            </h1>
+          </div>
+          <div className="hs-screen__tabs">
+            {PERIODS.map(p => (
+              <button
+                key={p}
+                className={`hs-screen__tab ${activePeriod === p ? 'hs-screen__tab--active' : ''}`}
+                onClick={() => setActivePeriod(p)}
+              >
+                {PERIOD_LABELS[p]}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="hs-screen__tabs">
-          {PERIODS.map(p => (
-            <button
-              key={p}
-              className={`hs-screen__tab ${activePeriod === p ? 'hs-screen__tab--active' : ''}`}
-              onClick={() => setActivePeriod(p)}
-            >
-              {PERIOD_LABELS[p]}
-            </button>
-          ))}
+        {/* Column header */}
+        <div className="hs-screen__col-header">
+          <span>#</span>
+          <span>Player</span>
+          <span>Small</span>
+          <span className="hs-screen__col-big">Big</span>
         </div>
 
+        {/* Body */}
         <div className="hs-screen__body">
           {loading ? (
             <p className="hs-screen__status">Loading…</p>
@@ -63,32 +100,25 @@ export default function HighscoresScreen({ onClose }) {
           ) : rows.length === 0 ? (
             <p className="hs-screen__status">No scores yet — be the first!</p>
           ) : (
-            <table className="hs-table">
-              <thead>
-                <tr>
-                  <th className="hs-table__th hs-table__th--rank">#</th>
-                  <th className="hs-table__th">Name</th>
-                  <th className="hs-table__th hs-table__th--num">Big Pts</th>
-                  <th className="hs-table__th hs-table__th--num">Small Pts</th>
-                  <th className="hs-table__th hs-table__th--num">Baluts</th>
-                  <th className="hs-table__th hs-table__th--date">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row, i) => (
-                  <tr key={i} className={i === 0 ? 'hs-table__row hs-table__row--top' : 'hs-table__row'}>
-                    <td className="hs-table__td hs-table__td--rank">{i + 1}</td>
-                    <td className="hs-table__td hs-table__td--name">{row.player_name}</td>
-                    <td className="hs-table__td hs-table__td--num">{row.big_points}</td>
-                    <td className="hs-table__td hs-table__td--num">{row.small_points}</td>
-                    <td className="hs-table__td hs-table__td--num">{row.balut_count}</td>
-                    <td className="hs-table__td hs-table__td--date">
-                      {new Date(row.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            rows.map((row, i) => {
+              const medalClass = i < 3 ? ` hs-row__rank--${i + 1}` : '';
+              return (
+                <div key={i} className="hs-row">
+                  <span className={`hs-row__rank${medalClass}`}>{i + 1}</span>
+                  <div className="hs-row__name">
+                    {row.player_name}
+                    <span className="hs-row__sub">
+                      {activePeriod === 'weekly'
+                        ? new Date(row.created_at).toLocaleDateString('en', { weekday: 'short' })
+                        : new Date(row.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric' })
+                      } · {row.balut_count} balut{row.balut_count !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                  <span className="hs-row__small">{row.small_points}</span>
+                  <span className="hs-row__big">{row.big_points}</span>
+                </div>
+              );
+            })
           )}
         </div>
       </div>

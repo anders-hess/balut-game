@@ -13,6 +13,11 @@ export default function DiceFace({ value, size = 64, held = false, dieIndex = 0 
   const pips   = PIP_POSITIONS[value] ?? [];
   const gradId = `dg-${dieIndex}-${held ? 1 : 0}`;
 
+  // Scandinavian Warmth: white body / ink dots unheld; terracotta body / white dots held
+  const bodyFill  = held ? '#c97a4a' : '#ffffff';
+  const bodyStroke = held ? 'none' : '#ece3cf';
+  const pipFill   = held ? 'rgba(255,255,255,0.95)' : 'rgba(42,38,32,0.85)';
+
   return (
     <svg
       width={size}
@@ -23,31 +28,24 @@ export default function DiceFace({ value, size = 64, held = false, dieIndex = 0 
       role="img"
     >
       <defs>
-        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor={held ? '#fff8c0' : '#ffffff'} stopOpacity="0.9" />
-          <stop offset="100%" stopColor={held ? '#f0d060' : '#f0ece4'} stopOpacity="0.95" />
-        </linearGradient>
+        <filter id={`shadow-${gradId}`} x="-10%" y="-10%" width="120%" height="130%">
+          <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="rgba(0,0,0,0.08)" />
+        </filter>
       </defs>
 
       {/* Die body */}
       <rect
         x="3" y="3" width="94" height="94"
-        rx="15" ry="15"
-        fill={`url(#${gradId})`}
-        stroke={held ? '#c9a84c' : '#c8b898'}
-        strokeWidth="2.5"
+        rx="22" ry="22"
+        fill={bodyFill}
+        stroke={bodyStroke}
+        strokeWidth="1.5"
+        filter={`url(#shadow-${gradId})`}
       />
-      {/* Inner highlight edge */}
-      <rect
-        x="3" y="3" width="94" height="94"
-        rx="15" ry="15"
-        fill="none"
-        stroke="rgba(255,255,255,0.55)"
-        strokeWidth="1"
-      />
+
       {/* Pips */}
       {pips.map(([cx, cy], i) => (
-        <circle key={i} cx={cx} cy={cy} r={7.5} fill={held ? '#5a3800' : '#1a1008'} />
+        <circle key={i} cx={cx} cy={cy} r={7.5} fill={pipFill} />
       ))}
     </svg>
   );

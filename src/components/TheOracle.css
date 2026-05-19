@@ -1,49 +1,53 @@
 .oracle {
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(201, 168, 76, 0.28);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
 }
 
-/* ── Header row (always visible) ─────────────────────── */
+/* ── Header row ─────────────────────────────────────── */
 .oracle__header {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.7rem 1rem;
-  border-bottom: 1px solid rgba(201, 168, 76, 0.2);
-  background: rgba(0,0,0,0.2);
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 22px 26px 14px;
 }
 
 .oracle__star {
-  font-size: 0.75rem;
-  color: var(--color-gold);
-  opacity: 0.85;
-  flex-shrink: 0;
+  display: none; /* removed in Scandi design */
 }
 
 .oracle__title {
   flex: 1;
   font-family: var(--font-serif);
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--color-gold);
-  letter-spacing: 0.08em;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--color-ink);
+  letter-spacing: -0.2px;
+  margin: 0;
 }
 
-/* Mobile-only inline hint showing the top recommended action */
+.oracle__bpiv-label {
+  font-size: 10px;
+  color: var(--color-ink-mute);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Mobile inline hint */
 .oracle__top-hint {
   display: none;
   flex: 1;
-  font-size: 0.72rem;
-  color: rgba(201,168,76,0.85);
-  font-weight: 600;
+  font-size: 13px;
+  color: var(--color-ink-soft);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin: 0 0.4rem;
+  margin: 0 8px;
 }
 
 @media (max-width: 800px) {
@@ -53,30 +57,28 @@
 }
 
 .oracle__toggle {
-  background: none;
-  border: 1px solid rgba(201, 168, 76, 0.35);
-  color: rgba(201, 168, 76, 0.7);
-  padding: 0.2rem 0.6rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  transition: background 0.15s, color 0.15s;
+  background: transparent;
+  border: none;
+  color: var(--color-ink-mute);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  white-space: nowrap;
+  padding: 0;
+  transition: color var(--transition-fast);
 }
 
 .oracle__toggle:hover {
-  background: rgba(201, 168, 76, 0.15);
-  color: var(--color-gold);
+  color: var(--color-ink);
 }
 
 /* ── Body ────────────────────────────────────────────── */
 .oracle__body {
-  padding: 0.75rem 0.85rem 0.85rem;
+  padding: 0 26px 22px;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 /* ── Placeholder ─────────────────────────────────────── */
@@ -85,34 +87,43 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  padding: 1.5rem 1rem;
+  gap: 6px;
+  padding: 24px 16px;
   text-align: center;
-  color: rgba(255,255,255,0.35);
-  font-size: 0.85rem;
-  letter-spacing: 0.03em;
+  color: var(--color-ink-mute);
+  font-size: 14px;
 }
 
 .oracle__placeholder-icon {
-  font-size: 2rem;
-  opacity: 0.5;
-  margin-bottom: 0.25rem;
+  font-size: 28px;
+  opacity: 0.4;
+  margin-bottom: 4px;
 }
 
 .oracle__placeholder-sub {
-  font-size: 0.72rem;
-  opacity: 0.6;
+  font-size: 12px;
+  color: var(--color-ink-mute);
 }
 
-/* ── Intro line ──────────────────────────────────────── */
+/* ── Intro ───────────────────────────────────────────── */
 .oracle__intro {
-  font-size: 0.68rem;
-  color: rgba(255,255,255,0.35);
-  letter-spacing: 0.04em;
-  text-align: center;
-  padding-bottom: 0.25rem;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  margin-bottom: 0.1rem;
+  font-size: 11px;
+  color: var(--color-ink-mute);
+  line-height: 1.5;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-edge-soft);
+}
+
+/* ── All-negative banner ─────────────────────────────── */
+.oracle__no-positive-banner {
+  font-size: 12px;
+  color: var(--color-accent);
+  font-style: italic;
+  padding: 8px 10px;
+  border: 1px solid var(--color-accent-soft);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  line-height: 1.4;
 }
 
 /* ── List ────────────────────────────────────────────── */
@@ -120,52 +131,41 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
 }
 
 /* ── Item ────────────────────────────────────────────── */
 .oracle__item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.55rem;
-  border-radius: var(--radius-sm);
-  background: rgba(255,255,255,0.04);
-  border: 1px solid transparent;
-  transition: background 0.12s;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-edge-soft);
 }
 
-.oracle__item:hover {
-  background: rgba(255,255,255,0.08);
-}
-
-.oracle__item--top {
-  background: rgba(201, 168, 76, 0.11);
-  border-color: rgba(201, 168, 76, 0.32);
-}
-
-.oracle__item--top:hover {
-  background: rgba(201, 168, 76, 0.17);
+.oracle__item:last-child {
+  border-bottom: none;
 }
 
 /* ── Rank badge ──────────────────────────────────────── */
 .oracle__rank {
   flex-shrink: 0;
-  width: 19px;
-  height: 19px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  font-size: 0.65rem;
-  font-weight: 700;
-  background: rgba(255,255,255,0.09);
-  color: rgba(255,255,255,0.4);
+  font-size: 11px;
+  font-weight: 600;
+  background: transparent;
+  border: 1px solid var(--color-edge);
+  color: var(--color-ink-mute);
 }
 
 .oracle__item--top .oracle__rank {
-  background: var(--color-gold);
-  color: var(--color-ink);
+  background: var(--color-accent);
+  border-color: transparent;
+  color: #fff;
 }
 
 /* ── Content ─────────────────────────────────────────── */
@@ -174,250 +174,173 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
 }
 
 .oracle__label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: rgba(255,255,255,0.85);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.oracle__item--top .oracle__label {
-  color: var(--color-gold-light);
 }
 
 .oracle__detail {
-  font-size: 0.7rem;
-  color: rgba(255,255,255,0.42);
+  font-size: 11px;
+  color: var(--color-ink-mute);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.oracle__ev {
-  font-size: 0.65rem;
-  color: rgba(255,255,255,0.25);
+/* ── BPIV value ──────────────────────────────────────── */
+.oracle__bpiv {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-mute);
+  min-width: 44px;
+  text-align: right;
 }
 
-/* ── Info tooltip ────────────────────────────────────── */
+.oracle__bpiv--positive {
+  color: var(--color-accent);
+}
+
+.oracle__bpiv--negative {
+  color: var(--color-danger);
+}
+
+/* ── Info button ─────────────────────────────────────── */
 .oracle__tip-wrap {
   position: relative;
   flex-shrink: 0;
 }
 
 .oracle__info-btn {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.22);
-  background: rgba(255,255,255,0.07);
-  color: rgba(255,255,255,0.45);
-  font-size: 0.65rem;
-  font-weight: 700;
+  border: 1px solid var(--color-edge);
+  background: transparent;
+  color: var(--color-ink-mute);
+  font-size: 11px;
+  font-weight: 600;
   font-style: italic;
-  font-family: Georgia, serif;
+  font-family: var(--font-serif);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
-  line-height: 1;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .oracle__info-btn:hover,
 .oracle__info-btn--active {
-  background: rgba(201,168,76,0.2);
-  border-color: rgba(201,168,76,0.55);
-  color: var(--color-gold-light);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
-/* position:fixed lets the tooltip escape overflow:hidden on .oracle */
+/* ── Tooltip ─────────────────────────────────────────── */
 .oracle__tooltip {
   position: fixed;
   width: 240px;
-  background: rgba(20,15,8,0.97);
-  border: 1px solid rgba(201,168,76,0.35);
+  background: var(--color-ink);
   border-radius: var(--radius-md);
-  padding: 0.65rem 0.75rem;
+  padding: 12px 14px;
   box-shadow: var(--shadow-lg);
   z-index: 200;
+  color: rgba(251,247,239,0.85);
 }
 
-/* Arrow */
 .oracle__tooltip::before {
   content: '';
   position: absolute;
   top: -5px;
-  right: 5px;
+  right: 6px;
   width: 8px;
   height: 8px;
-  background: rgba(20,15,8,0.97);
-  border-left: 1px solid rgba(201,168,76,0.35);
-  border-top: 1px solid rgba(201,168,76,0.35);
+  background: var(--color-ink);
   transform: rotate(45deg);
 }
 
-.oracle__tooltip-placeholder {
-  font-size: 0.73rem;
-  color: rgba(255,255,255,0.45);
-  font-style: italic;
-  line-height: 1.45;
-}
-
-/* ── BPIV value ──────────────────────────────────────── */
-.oracle__bpiv {
-  flex-shrink: 0;
-  font-size: 0.78rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255,255,255,0.45);
-  min-width: 3.2rem;
-  text-align: right;
-}
-
-.oracle__bpiv--positive {
-  color: #4caf50;
-}
-
-.oracle__bpiv--negative {
-  color: #e53935;
-}
-
-/* ── All-negative banner ─────────────────────────────── */
-.oracle__no-positive-banner {
-  font-size: 0.7rem;
-  color: rgba(201,168,76,0.8);
-  font-style: italic;
-  padding: 0.4rem 0.5rem;
-  border: 1px solid rgba(201,168,76,0.25);
-  border-radius: var(--radius-sm);
-  background: rgba(201,168,76,0.06);
-  line-height: 1.4;
-}
-
-/* ── Tooltip: score breakdown ────────────────────────── */
 .oracle__tooltip-score {
-  font-size: 0.73rem;
-  color: rgba(255,255,255,0.75);
+  font-size: 12px;
   line-height: 1.6;
 }
 
-.oracle__tooltip-score p {
-  margin: 0;
-}
+.oracle__tooltip-score p { margin: 0; }
 
-/* ── Tooltip: reroll outcomes table ─────────────────── */
 .oracle__tooltip-reroll {
-  font-size: 0.7rem;
-  color: rgba(255,255,255,0.7);
+  font-size: 12px;
   line-height: 1.5;
 }
 
 .oracle__tooltip-header {
   font-weight: 600;
-  color: rgba(255,255,255,0.85);
-  margin: 0 0 0.4rem;
+  margin: 0 0 6px;
+  color: rgba(251,247,239,0.95);
 }
 
 .oracle__tooltip-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 0.5rem;
 }
 
-.oracle__tooltip-table td {
-  padding: 0.1rem 0.2rem;
-  vertical-align: top;
-}
-
-.oracle__tooltip-desc {
-  color: rgba(255,255,255,0.65);
-  font-size: 0.65rem;
-  max-width: 110px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.oracle__tooltip-prob {
-  color: rgba(201,168,76,0.8);
-  white-space: nowrap;
-  text-align: center;
-  font-size: 0.73rem;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ── Held dice icons (replaces "Reroll X dice" detail) ──── */
-.oracle__held-dice {
-  display: flex;
-  gap: 3px;
-  align-items: center;
-  margin-top: 2px;
-}
-
-/* ── Tooltip table columns ───────────────────────────────── */
 .oracle__tooltip-table th,
 .oracle__tooltip-table td {
-  padding: 0.12rem 0.25rem;
+  padding: 2px 4px;
   vertical-align: middle;
 }
 
 .oracle__tooltip-th {
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: #1a1008;
-  background: rgba(201,168,76,0.75);
-  letter-spacing: 0.05em;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-ink-mute);
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  border-bottom: 1px solid rgba(201,168,76,0.5);
-  padding-bottom: 0.2rem;
   text-align: left;
+  padding-bottom: 4px;
 }
 
-.oracle__tooltip-th--num {
-  text-align: center;
-}
+.oracle__tooltip-th--num { text-align: center; }
 
 .oracle__tooltip-result {
-  color: rgba(255,255,255,0.85);
-  font-size: 0.73rem;
-  font-weight: 500;
+  font-size: 12px;
+  color: rgba(251,247,239,0.85);
+  font-weight: 400;
   white-space: nowrap;
+}
+
+.oracle__tooltip-prob {
+  color: var(--color-accent-2);
+  font-size: 12px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .oracle__tooltip-bpiv--pos {
-  color: #4caf50;
-  font-weight: 700;
-  font-size: 0.73rem;
+  color: var(--color-accent);
+  font-weight: 600;
+  font-size: 12px;
   text-align: center;
-  white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
 .oracle__tooltip-bpiv--neg {
-  color: #e53935;
-  font-weight: 700;
-  font-size: 0.73rem;
+  color: var(--color-danger);
+  font-weight: 600;
+  font-size: 12px;
   text-align: center;
-  white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
-/* ── Mobile: full-width, not sticky ─────────────────── */
-@media (max-width: 800px) {
-  .oracle__list {
-    gap: 0.25rem;
-  }
-
-  .oracle__item {
-    padding: 0.35rem 0.45rem;
-  }
-
-  .oracle__label {
-    font-size: 0.75rem;
-  }
+/* ── Held dice ───────────────────────────────────────── */
+.oracle__held-dice {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 2px;
 }

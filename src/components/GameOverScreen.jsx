@@ -7,7 +7,7 @@ const PERIOD_LABELS = { weekly: 'This Week', monthly: 'This Month', yearly: 'Thi
 const NAME_KEY = 'balut_player_name';
 
 export default function GameOverScreen({ scorecard, onPlayAgain, onViewHighscores, onScoreSubmitted, scoreSubmitted }) {
-  const { totalSmall, totalBig } = calcTotals(scorecard);
+  const { totalSmall, totalBig, bonus } = calcTotals(scorecard);
   const balutCount = countBaluts(scorecard);
 
   const [qualifyingPeriods, setQualifyingPeriods] = useState(null);
@@ -40,33 +40,40 @@ export default function GameOverScreen({ scorecard, onPlayAgain, onViewHighscore
 
   return (
     <div className="gameover">
-      <div className="gameover__top">
-        <p className="gameover__label">Game Over</p>
-        <div className="gameover__grand">
-          <span className="gameover__grand-value">{totalBig}</span>
-          <span className="gameover__grand-unit">big points</span>
-        </div>
+      <div>
+        <p className="gameover__label">Game complete</p>
+        <h1 className="gameover__headline">
+          What a quiet,<br />brilliant game.
+        </h1>
       </div>
 
       <div className="gameover__stats">
         <div className="gameover__stat">
-          <span className="gameover__stat-label">Small Points</span>
-          <span className="gameover__stat-value">{totalSmall}</span>
+          <span className="gameover__stat-label">Grand total</span>
+          <span className="gameover__stat-value gameover__stat-value--big">{totalBig}</span>
+          <span className="gameover__stat-hint">from {totalSmall} small points</span>
         </div>
         <div className="gameover__stat">
-          <span className="gameover__stat-label">Balut</span>
+          <span className="gameover__stat-label">Bonus</span>
+          <span className="gameover__stat-value" style={{ color: bonus >= 0 ? 'var(--color-accent)' : 'var(--color-danger)' }}>
+            {bonus >= 0 ? `+${bonus}` : bonus}
+          </span>
+        </div>
+        <div className="gameover__stat">
+          <span className="gameover__stat-label">Baluts</span>
           <span className="gameover__stat-value">{balutCount}</span>
+          <span className="gameover__stat-hint">× 2 big pts</span>
         </div>
       </div>
 
       <div className="gameover__leaderboard">
         {alreadyDone ? (
-          <p className="gameover__hs-done">✓ Score submitted!</p>
+          <p className="gameover__hs-done">Score submitted!</p>
         ) : qualifyingPeriods === null ? (
           <p className="gameover__hs-checking">Checking leaderboard…</p>
         ) : qualifies ? (
           <div className="gameover__hs-qualify">
-            <p className="gameover__hs-title">🏆 You made the top 10!</p>
+            <p className="gameover__hs-title">You qualify for —</p>
             <div className="gameover__hs-badges">
               {qualifyingPeriods.map(p => (
                 <span key={p} className="gameover__hs-badge">{PERIOD_LABELS[p]}</span>
@@ -88,7 +95,7 @@ export default function GameOverScreen({ scorecard, onPlayAgain, onViewHighscore
                 type="submit"
                 disabled={!playerName.trim() || submitState === 'submitting'}
               >
-                {submitState === 'submitting' ? 'Submitting…' : 'Submit Score'}
+                {submitState === 'submitting' ? 'Submitting…' : 'Submit score'}
               </button>
             </form>
             {submitState === 'error' && (
@@ -96,15 +103,16 @@ export default function GameOverScreen({ scorecard, onPlayAgain, onViewHighscore
             )}
           </div>
         ) : null}
-
-        <button className="gameover__hs-view" onClick={onViewHighscores}>
-          View Leaderboard →
-        </button>
       </div>
 
-      <button className="gameover__play-again" onClick={onPlayAgain}>
-        Play Again
-      </button>
+      <div className="gameover__actions">
+        <button className="gameover__play-again" onClick={onPlayAgain}>
+          Play again
+        </button>
+        <button className="gameover__hs-view" onClick={onViewHighscores}>
+          View leaderboard →
+        </button>
+      </div>
     </div>
   );
 }

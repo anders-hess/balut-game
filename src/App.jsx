@@ -16,6 +16,7 @@ export default function App() {
   } = useGameState();
 
   const [showHighscores, setShowHighscores] = useState(false);
+  const [hsContext,      setHsContext]      = useState('home'); // 'home' | 'game'
   const [showSetup,      setShowSetup]      = useState(false);
   const [showRules,      setShowRules]      = useState(false);
   const [showOracle,     setShowOracle]     = useState(false);
@@ -40,7 +41,12 @@ export default function App() {
   }
 
   if (showHighscores) {
-    return <HighscoresScreen onClose={() => setShowHighscores(false)} />;
+    return (
+      <HighscoresScreen
+        onClose={() => setShowHighscores(false)}
+        backLabel={hsContext === 'game' ? '← Back to game' : '← Back to home'}
+      />
+    );
   }
 
   if (showRules) {
@@ -64,7 +70,7 @@ export default function App() {
       <StartScreen
         onStart={startGame}
         onMultiplayer={() => setShowSetup(true)}
-        onHighscores={() => setShowHighscores(true)}
+        onHighscores={() => { setHsContext('home'); setShowHighscores(true); }}
         onRules={() => setShowRules(true)}
         onOracle={() => setShowOracle(true)}
       />
@@ -80,7 +86,7 @@ export default function App() {
       onToggleOracle={toggleOracle}
       onGoHome={() => { goHome(); setShowSetup(false); setScoreSubmitted(false); setMpSubmittedNames([]); }}
       onNewGame={handleNewGame}
-      onViewHighscores={() => setShowHighscores(true)}
+      onViewHighscores={() => { setHsContext('game'); setShowHighscores(true); }}
       onDismissHandoff={dismissHandoff}
       scoreSubmitted={scoreSubmitted}
       onScoreSubmitted={() => setScoreSubmitted(true)}

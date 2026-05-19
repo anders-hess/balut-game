@@ -1,28 +1,22 @@
 .die {
   position: relative;
-  width: 76px;
-  height: 76px;
-  padding: 3px;
   background: none;
-  border: 3px solid transparent;
-  border-radius: 20px;
+  border: none;
+  padding: 0;
+  border-radius: calc(var(--die-size, 70px) * 0.28);
   cursor: pointer;
-  transition: transform var(--transition-fast), border-color var(--transition-fast), filter var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   flex-shrink: 0;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.45));
 }
 
-/* Holdable hover */
+/* Holdable hover — lift slightly */
 .die--holdable:hover {
   transform: translateY(-4px);
-  filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5)) brightness(1.04);
 }
 
-/* Held state */
+/* Held state — terracotta glow (handled in DiceFace), lifted */
 .die--held {
   transform: translateY(-8px);
-  border-color: var(--color-gold);
-  filter: drop-shadow(0 10px 16px rgba(0,0,0,0.5)) drop-shadow(0 0 8px rgba(201,168,76,0.4));
 }
 
 .die--held:hover {
@@ -31,12 +25,12 @@
 
 /* Rolling animation */
 @keyframes dieRoll {
-  0%   { transform: translateY(0)     rotate(0deg)   scale(1);    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.45)); }
-  20%  { transform: translateY(-10px) rotate(-18deg) scale(1.06); filter: drop-shadow(0 12px 14px rgba(0,0,0,0.4)); }
-  45%  { transform: translateY(-4px)  rotate(12deg)  scale(0.96); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.45)); }
-  65%  { transform: translateY(-12px) rotate(-8deg)  scale(1.04); filter: drop-shadow(0 14px 16px rgba(0,0,0,0.38)); }
-  85%  { transform: translateY(-2px)  rotate(4deg)   scale(0.99); filter: drop-shadow(0 5px 9px rgba(0,0,0,0.42)); }
-  100% { transform: translateY(0)     rotate(0deg)   scale(1);    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.45)); }
+  0%   { transform: translateY(0)     rotate(0deg)   scale(1); }
+  20%  { transform: translateY(-10px) rotate(-18deg) scale(1.06); }
+  45%  { transform: translateY(-4px)  rotate(12deg)  scale(0.96); }
+  65%  { transform: translateY(-12px) rotate(-8deg)  scale(1.04); }
+  85%  { transform: translateY(-2px)  rotate(4deg)   scale(0.99); }
+  100% { transform: translateY(0)     rotate(0deg)   scale(1); }
 }
 
 .die--rolling {
@@ -46,35 +40,37 @@
 
 /* Unrolled */
 .die--unrolled {
-  opacity: 0.38;
+  opacity: 0.3;
   cursor: default;
-  filter: none;
 }
 
 .die__blank {
   display: block;
-  width: 68px;
-  height: 68px;
-  background: linear-gradient(160deg, #f0ece4, #e8e0d0);
-  border-radius: 14px;
+  width: var(--die-size, 70px);
+  height: var(--die-size, 70px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-edge-soft);
+  border-radius: calc(var(--die-size, 70px) * 0.28);
 }
 
-/* HELD label */
+/* HOLD pill label — below the die */
 .die__held-label {
   position: absolute;
-  bottom: -20px;
+  bottom: -22px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  color: var(--color-gold);
-  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 3px 7px;
+  border-radius: 999px;
   white-space: nowrap;
   pointer-events: none;
 }
 
 .die:focus-visible {
-  outline: 2px solid var(--color-gold);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }

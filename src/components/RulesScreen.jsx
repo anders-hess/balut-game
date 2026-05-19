@@ -1,14 +1,34 @@
 import './RulesScreen.css';
 
+function Logo({ size = 36 }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{
+        width: size, height: size, borderRadius: size * 0.27,
+        background: 'var(--color-accent)', color: '#fff',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: 'var(--font-serif)', fontStyle: 'italic',
+        fontWeight: 500, fontSize: size * 0.62,
+      }}>b</div>
+      <span style={{
+        fontFamily: 'var(--font-sans)', fontWeight: 500,
+        fontSize: size * 0.62, color: 'var(--color-ink)', letterSpacing: '-0.3px',
+      }}>balut</span>
+    </div>
+  );
+}
+
 export default function RulesScreen({ onClose }) {
   return (
     <div className="rules-screen">
+      {/* Marketing header — matches HighscoresScreen style */}
+      <header className="rules-marketing-header">
+        <Logo size={36} />
+        <button className="rules-back" onClick={onClose}>← Back to home</button>
+      </header>
+
       <div className="rules-inner">
-        <div className="rules-header">
-          <button className="rules-back" onClick={onClose}>← Back</button>
-          <h1 className="rules-title">How to Play Balut</h1>
-          <div />
-        </div>
+        <h1 className="rules-page-title">How to play Balut</h1>
 
         <div className="rules-body">
 

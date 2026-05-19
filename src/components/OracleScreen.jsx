@@ -4,6 +4,24 @@ import { CATEGORIES, CATEGORY_LABELS } from '../logic/gameConstants.js';
 import DiceFace from './DiceFace.jsx';
 import './OracleScreen.css';
 
+function Logo({ size = 36 }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{
+        width: size, height: size, borderRadius: size * 0.27,
+        background: 'var(--color-accent)', color: '#fff',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: 'var(--font-serif)', fontStyle: 'italic',
+        fontWeight: 500, fontSize: size * 0.62,
+      }}>b</div>
+      <span style={{
+        fontFamily: 'var(--font-sans)', fontWeight: 500,
+        fontSize: size * 0.62, color: 'var(--color-ink)', letterSpacing: '-0.3px',
+      }}>balut</span>
+    </div>
+  );
+}
+
 // Empty scorecard — used as default when no scorecard is configured.
 const EMPTY_SCORECARD = Object.fromEntries(
   CATEGORIES.map(cat => [cat, [null, null, null, null]])
@@ -63,16 +81,13 @@ export default function OracleScreen({ onClose }) {
 
   return (
     <div className="oracle-screen">
-      <div className="oracle-screen__inner">
+      <header className="oracle-screen__marketing-header">
+        <Logo size={36} />
+        <button className="oracle-screen__back" onClick={onClose}>← Back to home</button>
+      </header>
 
-        <div className="oracle-screen__header">
-          <button className="oracle-screen__back" onClick={onClose}>← Back</button>
-          <div className="oracle-screen__title-wrap">
-            <span className="oracle-screen__star">✦</span>
-            <h1 className="oracle-screen__title">The Oracle</h1>
-          </div>
-          <div />
-        </div>
+      <div className="oracle-screen__inner">
+        <h1 className="oracle-screen__page-title">The Oracle</h1>
 
         <p className="oracle-screen__desc">
           Set up your dice and remaining rolls, then see what The Oracle recommends.

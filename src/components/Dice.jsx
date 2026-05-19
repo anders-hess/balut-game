@@ -22,7 +22,7 @@ export default function Dice({ die, index, canHold, onToggleHold, isRolling }) {
       onClick={() => canHold && !unrolled && onToggleHold(index)}
       aria-pressed={held}
       aria-label={unrolled ? 'Unrolled die' : `Die ${index + 1}: ${value}${held ? ', held' : ''}`}
-      disabled={!canHold || unrolled}
+      disabled={unrolled}
     >
       {unrolled ? (
         <span className="die__blank" aria-hidden="true" />

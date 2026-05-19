@@ -1,5 +1,5 @@
 import { CATEGORIES, CATEGORY_LABELS, BIG_POINT_RULES, NUM_COLUMNS } from '../logic/gameConstants.js';
-import { calculateScore, calcTotals, countBaluts, nextColumn, getTargetColumn } from '../logic/scoring.js';
+import { calculateScore, calcTotals, nextColumn, getTargetColumn } from '../logic/scoring.js';
 import './Scorecard.css';
 
 const MAX_ROLLS_IMPORT = 3;
@@ -27,9 +27,6 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
     : scorecard;
 
   const { totalSmall, totalBig, bonus, categoryBigPoints, categoryTotals } = calcTotals(displayScorecard);
-  const balutCount  = countBaluts(displayScorecard);
-  const catBigTotal = totalBig - bonus;
-
   function getCellState(category) {
     if (!effectiveRolled) return 'empty';
     if (nextColumn(scorecard, category) === -1) return 'full';
@@ -46,9 +43,10 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
   return (
     <div className="scorecard">
       <div className="scorecard-header">
-        <h2 className="scorecard-title">
-          {playerName ? `Scorecard – ${playerName}` : 'Scorecard'}
-        </h2>
+        <h2 className="scorecard-title">Scorecard</h2>
+        {playerName && (
+          <span className="scorecard-player-label">{playerName}</span>
+        )}
       </div>
 
       <div className="scorecard-scroll">
@@ -131,13 +129,15 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
                         tabIndex={isAvailable ? 0 : undefined}
                         onKeyDown={e => isAvailable && e.key === 'Enter' && onScore?.(cat)}
                       >
-                        {isPending
-                          ? displayScore
-                          : isFilled
-                            ? score
-                            : isAvailable
-                              ? <span className="ghost-score">{potential}</span>
-                              : ''}
+                        {isPending ? (
+                          <span className="entry-chip">{displayScore}</span>
+                        ) : isFilled ? (
+                          score
+                        ) : isAvailable ? (
+                          <span className="entry-chip">
+                            <span className="ghost-score">{potential}</span>
+                          </span>
+                        ) : ''}
                       </td>
                     );
                   })}
@@ -158,45 +158,24 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
             })}
           </tbody>
 
-          <tfoot>
-            <tr className="srow srow--subtotal">
-              <td className="td-category"><span className="foot-label">Total</span></td>
-              <td colSpan={NUM_COLUMNS} />
-              <td className="td-sum td-sum--total">{totalSmall}</td>
-              <td className="td-big td-big--total">{catBigTotal > 0 ? catBigTotal : 0}</td>
-            </tr>
-            <tr className="srow srow--subtotal">
-              <td className="td-category"><span className="foot-label">Bonus</span></td>
-              <td colSpan={NUM_COLUMNS} className="td-bonus-hint-cell">
-                <span className="foot-hint">{bonusHint(totalSmall)}</span>
-              </td>
-              <td className="td-sum" />
-              <td className="td-big td-big--bonus">
-                {bonus >= 0 ? `+${bonus}` : bonus}
-              </td>
-            </tr>
-            <tr className="srow srow--grand-total">
-              <td className="td-category"><span className="foot-label">Grand Total</span></td>
-              <td colSpan={NUM_COLUMNS} />
-              <td className="td-sum" />
-              <td className="td-big td-big--grand">{totalBig}</td>
-            </tr>
-          </tfoot>
         </table>
       </div>
 
       <div className="scorecard-footer">
-        <div className="running-total running-total--big">
-          <span className="rt-label">Big Points</span>
-          <span className="rt-value">{totalBig}</span>
+        <div className="running-total running-total--small">
+          <span className="rt-label">Small</span>
+          <span className="rt-value">{totalSmall}</span>
+          <span className="rt-hint">{bonusHint(totalSmall)}</span>
         </div>
         <div className="running-total running-total--small">
-          <span className="rt-label">Small Points</span>
-          <span className="rt-value">{totalSmall}</span>
+          <span className="rt-label">Bonus</span>
+          <span className="rt-value" style={{ color: bonus >= 0 ? 'var(--color-accent)' : 'var(--color-danger)' }}>
+            {bonus >= 0 ? `+${bonus}` : bonus}
+          </span>
         </div>
-        <div className="running-total running-total--balut">
-          <span className="rt-label">Baluts</span>
-          <span className="rt-value">{balutCount}</span>
+        <div className="running-total running-total--big">
+          <span className="rt-label">Grand Total (Big)</span>
+          <span className="rt-value">{totalBig}</span>
         </div>
       </div>
     </div>

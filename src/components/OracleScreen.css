@@ -3,71 +3,62 @@
 
 .oracle-screen {
   min-height: 100vh;
-  padding: 0 1rem 4rem;
+  background: var(--color-bg);
+  padding: 0 2rem 4rem;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+}
+
+/* ── Marketing header ────────────────────────────────── */
+.oracle-screen__marketing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 0 16px;
+  border-bottom: 1px solid var(--color-edge);
+}
+
+/* ── Page title ──────────────────────────────────────── */
+.oracle-screen__page-title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--color-ink);
+  letter-spacing: -1px;
+  margin: 24px 0 0;
+  line-height: 1;
 }
 
 .oracle-screen__inner {
-  max-width: 900px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-/* ── Header ──────────────────────────────────────────── */
-.oracle-screen__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 0;
-  border-bottom: 2px solid var(--color-gold);
-}
-
+/* ── Back button (in marketing header) ──────────────── */
 .oracle-screen__back {
-  background: none;
-  border: 1px solid rgba(201,168,76,0.4);
-  color: rgba(255,255,255,0.65);
-  padding: 0.4rem 0.9rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-  font-weight: 600;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-decoration-color: var(--color-edge);
+  text-underline-offset: 4px;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
 }
 
-.oracle-screen__back:hover {
-  color: var(--color-gold);
-  border-color: var(--color-gold);
-}
-
-.oracle-screen__title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.oracle-screen__star {
-  color: var(--color-gold);
-  font-size: 1rem;
-}
-
-.oracle-screen__star--sm {
-  font-size: 0.75rem;
-}
-
-.oracle-screen__title {
-  font-family: var(--font-serif);
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-gold);
-  letter-spacing: 0.12em;
-}
+.oracle-screen__back:hover { color: var(--color-ink); }
 
 .oracle-screen__desc {
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.5);
-  text-align: center;
-  letter-spacing: 0.04em;
+  font-size: 13px;
+  color: var(--color-ink-mute);
+  letter-spacing: 0.3px;
 }
 
 /* ── Two-column layout ───────────────────────────────── */
@@ -94,78 +85,66 @@
 
 /* ── Cards ───────────────────────────────────────────── */
 .oracle-screen__card {
-  background: rgba(0, 0, 0, 0.28);
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(201, 168, 76, 0.28);
-  padding: 1.1rem 1.25rem;
+  padding: 22px 24px;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-}
-
-.oracle-screen__card--output {
-  gap: 0.75rem;
+  gap: 12px;
 }
 
 .oracle-screen__card--placeholder {
-  border-style: dashed;
-  border-color: rgba(201,168,76,0.2);
-  background: rgba(0,0,0,0.15);
+  border: 1px dashed var(--color-edge);
+  background: var(--color-surface-2);
 }
 
 .oracle-screen__card-title {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
   font-family: var(--font-serif);
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--color-gold);
-  letter-spacing: 0.06em;
-  border-bottom: 1px solid rgba(201,168,76,0.18);
-  padding-bottom: 0.4rem;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--color-ink);
+  letter-spacing: -0.2px;
+  border-bottom: 1px solid var(--color-edge-soft);
+  padding-bottom: 10px;
 }
 
 .oracle-screen__hint {
-  font-size: 0.72rem;
-  color: rgba(255,255,255,0.35);
-  letter-spacing: 0.04em;
+  font-size: 12px;
+  color: var(--color-ink-mute);
+  letter-spacing: 0.3px;
 }
 
 /* ── Dice tray ───────────────────────────────────────── */
 .oracle-screen__dice-tray {
   display: flex;
-  gap: 0.6rem;
+  gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
-  padding: 0.5rem 0;
+  padding: 8px 0;
 }
 
 .oracle-screen__die-btn {
   background: none;
-  border: 2px solid transparent;
+  border: 1.5px solid var(--color-edge);
   border-radius: var(--radius-md);
-  padding: 0.25rem;
+  padding: 4px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
-  transition: border-color 0.15s, transform 0.1s;
+  gap: 4px;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .oracle-screen__die-btn:hover {
-  border-color: rgba(201,168,76,0.5);
+  border-color: var(--color-accent);
   transform: translateY(-2px);
 }
 
-.oracle-screen__die-btn:active {
-  transform: translateY(0);
-}
-
 .oracle-screen__die-val {
-  font-size: 0.68rem;
-  color: rgba(255,255,255,0.35);
+  font-size: 11px;
+  color: var(--color-ink-mute);
   font-variant-numeric: tabular-nums;
 }
 
@@ -173,72 +152,70 @@
 .oracle-screen__rolls-group {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 6px;
 }
 
 .oracle-screen__rolls-btn {
-  padding: 0.55rem 1rem;
+  padding: 10px 16px;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(201,168,76,0.25);
-  background: rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.55);
-  font-size: 0.82rem;
-  font-weight: 600;
+  border: 1px solid var(--color-edge);
+  background: transparent;
+  color: var(--color-ink-soft);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   text-align: left;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .oracle-screen__rolls-btn:hover {
-  background: rgba(201,168,76,0.1);
-  border-color: rgba(201,168,76,0.45);
-  color: rgba(255,255,255,0.8);
+  background: var(--color-surface-2);
+  border-color: var(--color-edge);
 }
 
 .oracle-screen__rolls-btn--active {
-  background: rgba(201,168,76,0.2) !important;
-  border-color: var(--color-gold) !important;
-  color: var(--color-gold) !important;
+  background: var(--color-ink) !important;
+  border-color: var(--color-ink) !important;
+  color: var(--color-surface) !important;
 }
 
-/* ── Scorecard placeholder ───────────────────────────── */
+/* ── Placeholder ─────────────────────────────────────── */
 .oracle-screen__placeholder-body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.75rem 0;
+  gap: 6px;
+  padding: 12px 0;
   text-align: center;
 }
 
 .oracle-screen__placeholder-icon {
-  font-size: 1.8rem;
+  font-size: 28px;
   opacity: 0.4;
 }
 
 .oracle-screen__placeholder-text {
-  font-size: 0.78rem;
-  color: rgba(255,255,255,0.3);
+  font-size: 13px;
+  color: var(--color-ink-mute);
   font-style: italic;
 }
 
-/* ── Oracle output body ──────────────────────────────── */
+/* ── Output ──────────────────────────────────────────── */
 .oracle-screen__no-positive {
-  font-size: 0.75rem;
-  color: rgba(201,168,76,0.8);
+  font-size: 13px;
+  color: var(--color-accent);
   font-style: italic;
-  padding: 0.4rem 0.6rem;
-  border: 1px solid rgba(201,168,76,0.25);
+  padding: 8px 12px;
+  border: 1px solid var(--color-accent-soft);
   border-radius: var(--radius-sm);
-  background: rgba(201,168,76,0.06);
-  line-height: 1.4;
+  background: var(--color-accent-soft);
 }
 
 .oracle-screen__oracle-intro {
-  font-size: 0.68rem;
-  color: rgba(255,255,255,0.3);
+  font-size: 11px;
+  color: var(--color-ink-mute);
   line-height: 1.5;
-  letter-spacing: 0.03em;
 }
 
 /* ── Responsive ──────────────────────────────────────── */
@@ -251,7 +228,5 @@
     position: static;
   }
 
-  .oracle-screen__title {
-    font-size: 1.1rem;
-  }
+  .oracle-screen__title { font-size: 22px; }
 }

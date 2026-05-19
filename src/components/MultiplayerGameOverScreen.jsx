@@ -17,9 +17,12 @@ export default function MultiplayerGameOverScreen({ players, onPlayAgain, onView
 
   return (
     <div className="mp-gameover">
-      <div className="mp-gameover__top">
-        <p className="mp-gameover__label">Final Results</p>
-        <p className="mp-gameover__winner">🏆 {ranked[0].name} wins!</p>
+      <div>
+        <p className="mp-gameover__label">Game complete</p>
+        <h1 className="mp-gameover__winner">
+          And the winner is —{' '}
+          <span className="mp-gameover__winner-accent">{ranked[0].name}.</span>
+        </h1>
       </div>
 
       <div className="mp-gameover__table-wrap">
@@ -28,8 +31,8 @@ export default function MultiplayerGameOverScreen({ players, onPlayAgain, onView
             <tr>
               <th>#</th>
               <th>Player</th>
-              <th>Big Pts</th>
-              <th>Small Pts</th>
+              <th>Big</th>
+              <th>Small</th>
               <th>Baluts</th>
             </tr>
           </thead>
@@ -60,11 +63,11 @@ export default function MultiplayerGameOverScreen({ players, onPlayAgain, onView
       </div>
 
       <div className="mp-gameover__actions">
-        <button className="mp-gameover__hs-btn" onClick={onViewHighscores}>
-          View Leaderboard →
-        </button>
         <button className="mp-gameover__play-again" onClick={onPlayAgain}>
-          Play Again
+          Play again
+        </button>
+        <button className="mp-gameover__hs-btn" onClick={onViewHighscores}>
+          View leaderboard →
         </button>
       </div>
     </div>
@@ -117,7 +120,7 @@ function PlayerSubmit({ player, alreadySubmitted, onPlayerSubmitted, onScoreSubm
       ) : (
         <>
           <p className="mp-gameover__qualify-title">
-            🏆 {player.name} made the top 10!
+            {player.name} qualifies for —
           </p>
           <div className="mp-gameover__badges">
             {qualifyingPeriods.map(p => (

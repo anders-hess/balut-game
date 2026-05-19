@@ -1,26 +1,37 @@
 .scorecard {
-  background: var(--color-parchment);
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md), 0 0 0 2px var(--color-gold);
-  overflow: hidden;
+  padding: 28px 32px;
   display: flex;
   flex-direction: column;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
 }
 
 /* ── Header ─────────────────────────────────────────── */
 .scorecard-header {
-  padding: 0.65rem 1.25rem;
-  background: var(--color-accent);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 22px;
 }
 
 .scorecard-title {
   font-family: var(--font-serif);
-  font-size: 1.1rem;
-  letter-spacing: 0.1em;
-  font-weight: 700;
-  color: var(--color-parchment);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 24px;
+  color: var(--color-ink);
+  letter-spacing: -0.2px;
 }
 
+.scorecard-player-label {
+  font-size: 12px;
+  color: var(--color-ink-mute);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
 
 /* ── Table scroll wrapper ────────────────────────────── */
 .scorecard-scroll {
@@ -31,299 +42,253 @@
 /* ── Table ───────────────────────────────────────────── */
 .scorecard-table {
   width: 100%;
-  min-width: 420px;
-  border-collapse: collapse;
-  font-size: 0.88rem;
-  font-family: var(--font-sans);
+  min-width: 380px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
 }
 
 .th-category { width: 36%; }
-.th-entry    { width: 8%;  }
+.th-entry    { width: 9%;  }
 .th-sum      { width: 10%; }
 .th-big      { width: 10%; }
 
-/* ── Header row ─────────────────────────────────────── */
+/* ── Header row (no bottom border) ─────────────────── */
 thead th {
-  background: var(--color-parchment-dark);
-  color: var(--color-ink-light);
-  font-weight: 700;
-  font-size: 0.72rem;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  padding: 0.4rem 0.5rem;
-  border-bottom: 2px solid var(--color-gold);
+  padding: 0 0 10px;
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--color-ink-mute);
+  letter-spacing: 0.5px;
   text-align: center;
 }
 
 thead .th-category {
   text-align: left;
-  padding-left: 1rem;
+  padding-right: 8px;
 }
 
-thead .th-sum {
-  border-left: 2px solid rgba(180, 150, 100, 0.45);
+thead .th-big {
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
 }
 
-/* ── Body rows ──────────────────────────────────────── */
+/* ── Body rows (no borders) ─────────────────────────── */
 .srow td {
   height: 40px;
-  padding: 0 0.5rem;
-  border-bottom: 1px solid rgba(180, 150, 100, 0.25);
+  padding: 0 4px;
   text-align: center;
   vertical-align: middle;
-}
-
-.srow:nth-child(even) {
-  background: rgba(0, 0, 0, 0.03);
 }
 
 /* ── Category cell ──────────────────────────────────── */
 .td-category {
   text-align: left !important;
-  padding-left: 1rem !important;
+  padding-right: 8px !important;
 }
 
 .cat-label {
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
   color: var(--color-ink);
-  font-family: var(--font-serif);
-  font-size: 0.9rem;
-}
-
-/* Footer labels — same serif font as category names */
-.foot-label {
-  display: block;
-  font-family: var(--font-serif);
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-ink);
-}
-
-.foot-hint {
-  font-size: 0.65rem;
-  color: var(--color-ink-light);
-  opacity: 0.7;
-}
-
-.td-bonus-hint-cell {
-  text-align: left;
-  padding-left: 0.5rem;
-  vertical-align: middle;
 }
 
 /* ── Entry cells ────────────────────────────────────── */
 .td-entry {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-ink);
-  min-width: 34px;
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
   transition: background 0.12s;
 }
 
-.td-entry--filled {
-  /* no tint on filled cells — inherit standard row color */
-}
-
-/* Solid black border marks the tentative (pending) cell without changing its background */
+/* All clickable cells get pointer */
+.td-entry--available,
+.td-entry--great,
+.td-entry--zero,
 .td-entry--pending {
-  outline: 1.5px solid #000;
+  cursor: pointer;
+}
+
+/* Standard available (valid, not great) */
+.td-entry--available .entry-chip {
+  background: var(--color-cell-ok);
+  color: var(--color-ink-soft);
+}
+
+/* Great score — green */
+.td-entry--great .entry-chip {
+  background: #d4ecd4;
+  border: 1px solid rgba(58,122,58,0.2);
+  color: #3a7a3a;
+}
+
+/* Zero (forced fail) — red-tinted */
+.td-entry--zero .entry-chip {
+  background: var(--color-cell-zero);
+  color: var(--color-danger);
+}
+
+/* Pending — outlined */
+.td-entry--pending .entry-chip {
+  outline: 1.5px solid var(--color-ink);
   outline-offset: -1px;
-  border-radius: 3px;
-  cursor: pointer;
 }
 
-
-.td-entry--available {
-  background: rgba(201, 168, 76, 0.2);
-  cursor: pointer;
-  outline: 1.5px solid var(--color-gold);
-  outline-offset: -2px;
-  border-radius: 3px;
-}
-
-.td-entry--available:hover {
-  background: rgba(201, 168, 76, 0.4);
-}
-
-.td-entry--zero {
-  background: rgba(139, 26, 26, 0.05);
-  cursor: pointer;
-  outline: 1.5px dashed rgba(139, 26, 26, 0.4);
-  outline-offset: -2px;
-  border-radius: 3px;
-}
-
-.td-entry--zero:hover {
-  background: rgba(139, 26, 26, 0.1);
-}
-
-.td-entry--great {
-  background: rgba(39, 79, 34, 0.22);
-  cursor: pointer;
-  outline: 1.5px solid rgba(39, 79, 34, 0.55);
-  outline-offset: -2px;
-  border-radius: 3px;
-}
-
-.td-entry--great:hover {
-  background: rgba(39, 79, 34, 0.38);
+/* Chip — rounded inner box for available/great/zero/pending cells */
+.entry-chip {
+  margin: 0 auto;
+  width: 36px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: inherit;
 }
 
 .ghost-score {
-  color: var(--color-ink);
-  font-weight: 700;
-}
-
-.td-entry--zero .ghost-score {
-  color: var(--color-ink);
-  opacity: 0.6;
-  font-size: 0.82rem;
+  font-weight: 500;
 }
 
 /* ── Sum column ─────────────────────────────────────── */
 .td-sum {
-  font-weight: 600;
-  color: var(--color-ink-light);
-  font-size: 0.85rem;
-  border-left: 2px solid rgba(180, 150, 100, 0.45);
-}
-
-.td-sum--total {
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-ink);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Big Points column ──────────────────────────────── */
 .td-big {
-  font-size: 0.82rem;
+  font-size: 13px;
+  color: var(--color-ink-mute);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
 .big-pts-earned {
-  display: inline-block;
-  background: var(--color-felt);
-  color: var(--color-gold-light);
-  font-weight: 700;
-  font-size: 0.78rem;
-  padding: 1px 6px;
-  border-radius: 3px;
+  color: var(--color-accent);
+  font-weight: 500;
+  font-size: 13px;
 }
 
-/* Red badge — completed category, no big points earned */
 .big-pts-zero {
-  display: inline-block;
-  background: var(--color-accent);
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.78rem;
-  padding: 1px 6px;
-  border-radius: 3px;
+  color: var(--color-ink-mute);
+  font-size: 13px;
 }
 
 .big-pts-target {
-  color: var(--color-ink-light);
-  opacity: 0.38;
-  font-size: 0.72rem;
+  color: var(--color-ink-mute);
+  font-size: 12px;
+  opacity: 0.7;
 }
 
-/* Footer big point cells */
-.td-big--total {
-  font-weight: 700;
-  color: var(--color-ink);
-  font-size: 0.95rem;
-}
-
-.td-big--bonus {
-  font-weight: 700;
-  color: var(--color-ink);
-  font-size: 0.95rem;
-}
-
-.td-big--grand {
-  font-weight: 700;
-  color: var(--color-ink);
-  font-size: 1.05rem;
-}
-
-/* ── Footer rows ─────────────────────────────────────── */
-.srow--subtotal td {
-  border-top: 2px solid var(--color-gold);
-  background: var(--color-parchment-dark) !important;
-  height: 40px;
-}
-
-.srow--grand-total td {
-  border-top: 2px solid var(--color-gold);
-  border-bottom: 2px solid var(--color-accent);
-  background: var(--color-parchment-dark) !important;
-  height: 44px;
-}
-
-/* ── Bottom running-total bar ───────────────────────── */
+/* ── Bottom totals strip ────────────────────────────── */
 .scorecard-footer {
-  display: flex;
-  background: var(--color-parchment-dark);
+  margin-top: 24px;
+  padding: 18px 22px;
+  background: var(--color-surface-2);
+  border-radius: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
 }
 
 .running-total {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 0.55rem 0.5rem;
-  gap: 2px;
-}
-
-.running-total + .running-total {
-  border-left: 1px solid rgba(180, 150, 100, 0.4);
+  gap: 4px;
 }
 
 .rt-label {
-  font-size: 0.62rem;
+  font-size: 10px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--color-ink-light);
-  opacity: 0.65;
+  color: var(--color-ink-mute);
+  font-weight: 500;
+}
+
+.rt-hint {
+  font-size: 11px;
+  color: var(--color-ink-mute);
+  margin-top: 2px;
 }
 
 .rt-value {
-  font-family: var(--font-serif);
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
-.running-total--big    .rt-value { color: var(--color-ink); }
-.running-total--small  .rt-value { color: var(--color-ink); }
-.running-total--balut  .rt-value { color: var(--color-ink); }
+.running-total--big .rt-value {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 34px;
+  font-weight: 400;
+  color: var(--color-accent);
+}
+
+.running-total--small .rt-value {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
 
 /* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 800px) {
+  .scorecard {
+    padding: 18px 16px;
+  }
+
+  .scorecard-header {
+    margin-bottom: 14px;
+  }
+
+  .scorecard-title {
+    font-size: 19px;
+  }
+
+  .cat-label { font-size: 13px; }
+  .td-entry  { font-size: 14px; }
+  .td-sum    { font-size: 14px; }
+
+  .scorecard-footer {
+    margin-top: 18px;
+    padding: 14px 14px;
+    gap: 12px;
+  }
+
+  .running-total--big .rt-value {
+    font-size: 26px;
+  }
+
+  .running-total--small .rt-value {
+    font-size: 18px;
+  }
+}
+
 @media (max-width: 480px) {
-  /* Shrink min-width so the full table (incl. BIG column) fits on mobile */
   .scorecard-table {
     min-width: 0;
-    font-size: 0.76rem;
+    font-size: 12px;
   }
 
-  /* Narrower category column, tighter entry/sum/big columns */
   .th-category { width: 26%; }
-  .th-entry    { width: 9%;  }
-  .th-sum      { width: 10%; }
-  .th-big      { width: 10%; }
 
-  .cat-label, .foot-label {
-    font-size: 0.78rem;
-  }
-
-  .td-category {
-    padding-left: 0.5rem !important;
-  }
+  .cat-label { font-size: 12px; }
 
   .srow td {
-    padding: 0 0.3rem;
     height: 36px;
+    padding: 0 2px;
   }
 
-  .rt-value {
-    font-size: 1.2rem;
+  .entry-chip {
+    width: 28px;
+    height: 24px;
+    font-size: 13px;
+    border-radius: 6px;
   }
 }

@@ -2,9 +2,40 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 1rem 3rem;
+  background: var(--color-bg);
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+}
+
+/* ── Logo in header ──────────────────────────────────── */
+.board-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.board-logo__mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 19px;
+  box-shadow: 0 4px 12px rgba(201,122,74,0.25);
+}
+
+.board-logo__word {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 19px;
+  color: var(--color-ink);
+  letter-spacing: -0.3px;
 }
 
 /* ── Header ─────────────────────────────────────────── */
@@ -12,250 +43,206 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0;
-  border-bottom: 2px solid var(--color-gold);
-  margin-bottom: 1.5rem;
-  gap: 1rem;
+  padding: 22px 32px;
+  flex: 0 0 auto;
 }
 
-.board-title {
-  /* Reset button defaults */
+.board-logo-btn {
   background: none;
   border: none;
   padding: 0;
-  /* Typography — same as original h1 */
-  font-family: var(--font-serif);
-  font-size: 2rem;
-  color: var(--color-gold);
-  letter-spacing: 0.2em;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-  flex-shrink: 0;
-  /* Clickable */
   cursor: pointer;
   transition: opacity var(--transition-fast);
 }
 
-.board-title:hover {
+.board-logo-btn:hover {
   opacity: 0.72;
 }
 
 .board-header__meta {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 12px;
 }
 
-.turn-counter {
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.45);
-  letter-spacing: 0.06em;
-  font-variant-numeric: tabular-nums;
-}
-
-.btn-new-game {
+/* Back to home — underline text link */
+.btn-back-home {
   background: transparent;
-  border: 2px solid var(--color-gold);
-  color: var(--color-gold);
-  padding: 0.4rem 1rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  transition: background 0.15s, color 0.15s;
-  white-space: nowrap;
-  flex-shrink: 0;
+  border: none;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-decoration-color: var(--color-edge);
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: color var(--transition-fast);
 }
 
-.btn-new-game:hover {
-  background: var(--color-gold);
+.btn-back-home:hover {
   color: var(--color-ink);
 }
 
-/* ── Two-column layout ───────────────────────────────── */
+/* New game — pill button */
+.btn-new-game {
+  background: transparent;
+  color: var(--color-ink-soft);
+  border: 1px solid var(--color-edge);
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.btn-new-game:hover {
+  border-color: var(--color-ink-soft);
+  color: var(--color-ink);
+}
+
+/* ── Two-column layout ─────────────────────────────── */
 .board-layout {
+  flex: 1;
   display: grid;
-  grid-template-columns: 1fr 310px;
-  gap: 1.5rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 8px 32px 32px;
+  min-height: 0;
   align-items: start;
 }
 
 .board-left {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 20px;
   min-width: 0;
 }
 
 .board-right {
-  position: sticky;
-  top: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* ── Game Over ───────────────────────────────────────── */
-.gameover-banner {
-  background: var(--color-parchment);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg), 0 0 0 3px var(--color-gold);
-  padding: 2rem 1.5rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.gameover-banner__icon {
-  font-size: 2.5rem;
-  line-height: 1;
-}
-
-.gameover-banner h2 {
-  font-family: var(--font-serif);
-  font-size: 1.9rem;
-  color: var(--color-accent);
-  letter-spacing: 0.08em;
-}
-
-.gameover-banner p {
-  color: var(--color-ink-light);
-  font-size: 0.9rem;
-}
-
-.btn-play-again {
-  background: var(--color-accent);
-  color: var(--color-parchment);
-  border: none;
-  padding: 0.65rem 2rem;
-  border-radius: var(--radius-md);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  box-shadow: var(--shadow-md);
-  transition: transform 0.12s, background 0.15s;
-  margin-top: 0.5rem;
-}
-
-.btn-play-again:hover {
-  transform: translateY(-2px);
-  background: var(--color-accent-light);
+  gap: 20px;
+  min-width: 0;
 }
 
 /* ── Player tabs (multiplayer scorecard toggle) ───────── */
 .player-tabs {
   display: flex;
-  gap: 0.35rem;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .player-tab {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.3rem 0.75rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.05);
-  color: rgba(255,255,255,0.5);
-  font-size: 0.78rem;
-  font-weight: 600;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--color-edge);
+  background: transparent;
+  color: var(--color-ink-mute);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .player-tab:hover {
-  background: rgba(255,255,255,0.09);
-  color: rgba(255,255,255,0.75);
-}
-
-.player-tab--active {
-  border-color: rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.75);
-  background: rgba(255,255,255,0.05);
-}
-
-.player-tab--viewing {
-  background: rgba(201, 168, 76, 0.35) !important;
-  border-color: var(--color-gold);
+  background: var(--color-surface-2);
   color: var(--color-ink);
 }
 
+.player-tab--active {
+  color: var(--color-ink);
+}
+
+.player-tab--viewing {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-edge);
+  color: var(--color-ink) !important;
+}
+
 .player-tab__pts {
-  font-size: 0.68rem;
-  opacity: 0.65;
+  font-size: 11px;
+  color: var(--color-ink-mute);
   font-variant-numeric: tabular-nums;
 }
 
-/* ── Inline handoff (replaces dice area between turns) ── */
+/* ── Inline handoff ───────────────────────────────────── */
 .dice-area--handoff {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 48px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 0.9rem;
-  min-height: 190px;
+  gap: 12px;
+  min-height: 200px;
 }
 
 .handoff-inline__sub {
-  font-size: 0.88rem;
-  color: rgba(255,255,255,0.45);
-  letter-spacing: 0.04em;
+  font-size: 13px;
+  color: var(--color-ink-mute);
+  letter-spacing: 0.5px;
 }
 
 .handoff-inline__name {
   font-family: var(--font-serif);
-  font-size: 1.9rem;
-  font-weight: 700;
-  color: var(--color-gold);
-  letter-spacing: 0.04em;
+  font-style: italic;
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--color-ink);
+  letter-spacing: -0.5px;
 }
 
 .handoff-inline__btn {
-  margin-top: 0.25rem;
-  background: var(--color-accent);
-  color: var(--color-parchment);
+  margin-top: 8px;
+  background: var(--color-ink);
+  color: var(--color-surface);
   border: none;
-  padding: 0.7rem 2rem;
+  padding: 16px 32px;
   border-radius: var(--radius-md);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  transition: transform 0.12s, background 0.15s;
-  box-shadow: var(--shadow-md);
+  transition: opacity var(--transition-fast);
 }
 
 .handoff-inline__btn:hover {
-  transform: translateY(-2px);
-  background: var(--color-accent-light);
+  opacity: 0.85;
 }
 
-/* ── Responsive: stack on narrow screens ─────────────── */
+/* ── Responsive: narrow screens ──────────────────────── */
 @media (max-width: 800px) {
+  .board-header {
+    padding: 16px 18px;
+  }
+
   .board-layout {
     grid-template-columns: 1fr;
+    padding: 0 14px 14px;
+    gap: 12px;
   }
 
-  .board-right {
-    position: static;
-    /* Oracle goes below scorecard on mobile */
-    order: 3;
-  }
-
-  .board-left {
-    order: 1;
-  }
+  .board-left  { order: 1; }
+  .board-right { order: 2; }
 }
 
 @media (max-width: 480px) {
   .board-header {
-    padding: 0.75rem 0;
+    padding: 12px 14px;
   }
 
-  .board-title {
-    font-size: 1.6rem;
-  }
-
-  .turn-counter {
+  .btn-back-home {
     display: none;
   }
 }

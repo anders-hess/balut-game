@@ -1,33 +1,59 @@
+/* Scandinavian Warmth — design system tokens */
 :root {
-  --color-parchment:      #f5e6c8;
-  --color-parchment-dark: #e8d4a8;
-  --color-felt:           #274f22;
-  --color-felt-light:     #3a7a33;
-  --color-ink:            #1a1008;
-  --color-ink-light:      #4a3520;
-  --color-accent:         #8b1a1a;
-  --color-accent-light:   #c0392b;
-  --color-gold:           #c9a84c;
-  --color-gold-light:     #e8c96a;
-  --color-dice-white:     #fafafa;
-  --color-dice-shadow:    #d0c0a0;
-  --color-held:           #f0d060;
+  /* Palette */
+  --color-bg:           #f6f1e8;
+  --color-surface:      #fbf7ef;
+  --color-surface-2:    #ede4d3;
+  --color-surface-3:    #f0e7d4;
+  --color-edge:         #e3d8c1;
+  --color-edge-soft:    #ece3cf;
+  --color-ink:          #2a2620;
+  --color-ink-soft:     #5e554a;
+  --color-ink-mute:     #a39a87;
+  --color-accent:       #c97a4a;
+  --color-accent-2:     #e3a36e;
+  --color-accent-soft:  #f3e0cf;
+  --color-danger:       #a44a2c;
+  --color-medal-1:      #b07e2f;
+  --color-medal-2:      #8a8478;
+  --color-medal-3:      #a07a55;
+  --color-dice-bg:      #ffffff;
+  --color-held:         #c97a4a;
+  --color-cell-great:   #ecdec3;
+  --color-cell-ok:      #f5ecd9;
+  --color-cell-zero:    #efd9c8;
 
-  --font-serif: 'Georgia', 'Times New Roman', serif;
-  --font-sans:  system-ui, 'Segoe UI', sans-serif;
+  /* Legacy aliases — keep these so any component not yet migrated still compiles */
+  --color-parchment:      var(--color-surface);
+  --color-parchment-dark: var(--color-surface-2);
+  --color-felt:           var(--color-bg);
+  --color-felt-light:     var(--color-surface-2);
+  --color-gold:           var(--color-accent);
+  --color-gold-light:     var(--color-accent-2);
+  --color-accent-light:   var(--color-accent-2);
+  --color-ink-light:      var(--color-ink-soft);
+  --color-dice-white:     var(--color-dice-bg);
+  --color-dice-shadow:    var(--color-edge);
 
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 16px;
+  /* Typography */
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans:  'Work Sans', system-ui, sans-serif;
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
   --radius-xl: 24px;
 
-  --shadow-sm:    0 1px 3px rgba(0,0,0,0.22);
-  --shadow-md:    0 4px 14px rgba(0,0,0,0.28);
-  --shadow-lg:    0 10px 32px rgba(0,0,0,0.38);
-  --shadow-inset: inset 0 2px 8px rgba(0,0,0,0.25);
+  /* Shadows — much softer than the casino theme */
+  --shadow-sm:    0 2px 8px rgba(42,38,32,0.06);
+  --shadow-md:    0 4px 16px rgba(42,38,32,0.08);
+  --shadow-lg:    0 8px 32px rgba(42,38,32,0.10);
+  --shadow-inset: inset 0 2px 8px rgba(42,38,32,0.05);
 
-  --transition-fast: 0.12s ease;
-  --transition-med:  0.2s ease;
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-med:  0.25s ease;
 }
 
 *, *::before, *::after {
@@ -42,18 +68,7 @@ html, body, #root {
 
 body {
   font-family: var(--font-sans);
-  /* Rich felt table surface */
-  background-color: var(--color-felt);
-  background-image:
-    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(58,122,51,0.55) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 50% at 80% 90%, rgba(20,50,15,0.6)  0%, transparent 55%),
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 4px,
-      rgba(0,0,0,0.015) 4px,
-      rgba(0,0,0,0.015) 5px
-    );
+  background-color: var(--color-bg);
   color: var(--color-ink);
   min-height: 100vh;
 }
@@ -69,8 +84,7 @@ button:disabled {
   opacity: 0.5;
 }
 
-/* Smooth focus rings everywhere */
 :focus-visible {
-  outline: 2px solid var(--color-gold);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }

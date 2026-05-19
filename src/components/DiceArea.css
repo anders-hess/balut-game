@@ -1,90 +1,139 @@
 .dice-area {
-  background: rgba(0, 0, 0, 0.28);
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
-  padding: 1.5rem 1.5rem 1.25rem;
+  padding: 36px 32px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  box-shadow: var(--shadow-inset), 0 0 0 1px rgba(0,0,0,0.2);
+  gap: 0;
 }
 
-.dice-tray {
+/* Turn info row */
+.dice-area__info {
   display: flex;
-  gap: 0.9rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding-bottom: 22px; /* room for HELD label */
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 24px;
 }
 
-.dice-controls {
+.dice-area__turn {
   display: flex;
-  align-items: center;
-  gap: 1.25rem;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.btn-roll {
-  background: var(--color-accent);
-  color: var(--color-parchment);
-  border: none;
-  padding: 0.7rem 2.2rem;
-  border-radius: var(--radius-md);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.12);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-med);
-  min-width: 145px;
+.dice-area__turn-label {
+  font-size: 11px;
+  color: var(--color-ink-mute);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 500;
 }
 
-.btn-roll:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.12);
-  background: var(--color-accent-light);
+.dice-area__turn-status {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 19px;
+  color: var(--color-ink);
+  font-weight: 400;
 }
 
-.btn-roll:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: var(--shadow-sm);
+.dice-area__rolls-wrap {
+  text-align: right;
 }
 
-.btn-roll:disabled {
-  background: #4a2020;
-  box-shadow: none;
-  opacity: 0.55;
+.dice-area__rolls-label {
+  font-size: 10px;
+  color: var(--color-ink-mute);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 4px;
 }
 
-
-/* Roll pips */
+/* Pips */
 .rolls-pips {
   display: flex;
-  gap: 7px;
+  gap: 5px;
+  justify-content: flex-end;
 }
 
 .rolls-pip {
   display: block;
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.12);
-  border: 2px solid rgba(255,255,255,0.25);
-  transition: background var(--transition-med), border-color var(--transition-med), box-shadow var(--transition-med);
+  background: var(--color-edge);
+  transition: background var(--transition-med);
 }
 
 .rolls-pip--active {
-  background: var(--color-gold);
-  border-color: var(--color-gold-light);
-  box-shadow: 0 0 7px rgba(201,168,76,0.55);
+  background: var(--color-accent);
+}
+
+/* Dice tray */
+.dice-tray {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  margin: 8px 0 32px;
+  padding-bottom: 28px; /* room for HOLD label */
+  flex-wrap: wrap;
+}
+
+/* Roll button */
+.dice-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-roll {
+  background: var(--color-ink);
+  color: var(--color-surface);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 16px 0;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  width: 100%;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-roll:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.btn-roll:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .dice-hint {
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.38);
-  letter-spacing: 0.04em;
   text-align: center;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--color-ink-mute);
+  letter-spacing: 0.3px;
 }
 
-@media (max-width: 480px) {
-  .dice-tray { gap: 0.55rem; }
-  .btn-roll  { padding: 0.65rem 1.5rem; font-size: 0.9rem; min-width: 120px; }
+@media (max-width: 800px) {
+  .dice-area {
+    padding: 22px 18px;
+  }
+
+  .dice-area__info {
+    margin-bottom: 18px;
+  }
+
+  .dice-area__turn-status {
+    font-size: 16px;
+  }
+
+  .dice-tray {
+    gap: 12px;
+    margin: 4px 0 22px;
+  }
 }
