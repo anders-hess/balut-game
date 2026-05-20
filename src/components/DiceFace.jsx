@@ -9,7 +9,7 @@ const PIP_POSITIONS = {
 
 // dieIndex makes each gradient ID unique so dice showing the same value
 // don't share (and potentially clobber) each other's SVG gradient definitions.
-export default function DiceFace({ value, size = 64, held = false, dieIndex = 0 }) {
+export default function DiceFace({ value, size = 64, held = false, dieIndex = 0, strokeWidth = 1.5 }) {
   const pips   = PIP_POSITIONS[value] ?? [];
   const gradId = `dg-${dieIndex}-${held ? 1 : 0}`;
 
@@ -39,7 +39,7 @@ export default function DiceFace({ value, size = 64, held = false, dieIndex = 0 
         rx="22" ry="22"
         fill={bodyFill}
         stroke={bodyStroke}
-        strokeWidth="1.5"
+        strokeWidth={strokeWidth}
         filter={`url(#shadow-${gradId})`}
       />
 

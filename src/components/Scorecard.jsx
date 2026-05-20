@@ -174,8 +174,13 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
           </span>
         </div>
         <div className="running-total running-total--big">
-          <span className="rt-label">Grand Total (Big)</span>
-          <span className="rt-value">{totalBig}</span>
+          <span className="rt-label">
+            Grand Total<span className="rt-label-big-suffix"> (Big)</span>
+          </span>
+          <div className="rt-big-row">
+            <span className="rt-value">{totalBig}</span>
+            <span className="rt-big-sub">big points</span>
+          </div>
         </div>
       </div>
     </div>

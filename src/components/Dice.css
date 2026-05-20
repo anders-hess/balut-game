@@ -38,6 +38,11 @@
   pointer-events: none;
 }
 
+/* No holds available — no pointer hand */
+.die--inert {
+  cursor: default;
+}
+
 /* Unrolled */
 .die--unrolled {
   opacity: 0.3;

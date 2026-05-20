@@ -25,7 +25,7 @@ function Logo() {
 export default function GameBoard({
   state,
   onRoll, onToggleHold, onScore, onToggleOracle,
-  onGoHome, onNewGame, onViewHighscores, onDismissHandoff,
+  onGoHome, onNewGame, onViewHighscores, onDismissHandoff, onCancelPending,
   scoreSubmitted, onScoreSubmitted,
   mpSubmittedNames, onMpPlayerSubmitted,
 }) {
@@ -44,6 +44,12 @@ export default function GameBoard({
   const viewingOwnTurn = displayIdx === currentPlayerIndex;
 
   const [hsRefresh, setHsRefresh] = useState(0);
+
+  // Who the handoff screen addresses — the next player when a score is pending,
+  // otherwise the current player (post-roll handoff).
+  const handoffName = pendingScore?.nextPlayerIdx != null
+    ? players[pendingScore.nextPlayerIdx].name
+    : players[currentPlayerIndex].name;
 
   const oracleProps = {
     dice, rollsLeft,
@@ -65,7 +71,9 @@ export default function GameBoard({
         </button>
         <div className="board-header__meta">
           {!isGameOver && isMultiplayer && (
-            <MultiplayerStandings players={players} currentPlayerIndex={currentPlayerIndex} />
+            <div className="standings-header-wrap">
+              <MultiplayerStandings players={players} currentPlayerIndex={currentPlayerIndex} />
+            </div>
           )}
           <button className="btn-back-home" onClick={onGoHome}>
             ← Back to home
@@ -102,10 +110,15 @@ export default function GameBoard({
           ) : (isMultiplayer && showHandoff) ? (
             <section className="dice-area dice-area--handoff">
               <p className="handoff-inline__sub">Pass the device to</p>
-              <p className="handoff-inline__name">{players[currentPlayerIndex].name}</p>
+              <p className="handoff-inline__name">{handoffName}</p>
               <button className="handoff-inline__btn" onClick={onDismissHandoff}>
-                Start {players[currentPlayerIndex].name}'s Turn →
+                Start {handoffName}'s Turn →
               </button>
+              {pendingScore && (
+                <button className="handoff-inline__cancel" onClick={onCancelPending}>
+                  ← Cancel score
+                </button>
+              )}
             </section>
           ) : (
             <DiceArea
@@ -134,7 +147,7 @@ export default function GameBoard({
                   ].filter(Boolean).join(' ')}
                   onClick={() => setViewingIdx(i)}
                 >
-                  {i === currentPlayerIndex ? '● ' : ''}{p.name}
+                  {i === currentPlayerIndex ? '🎲 ' : ''}{p.name}
                   <span className="player-tab__pts">
                     {calcTotals(p.scorecard).totalBig} pts
                   </span>
@@ -144,7 +157,7 @@ export default function GameBoard({
           )}
         </div>
 
-        {/* Right: scorecard + highscores card */}
+        {/* Right: standings (mobile only) + scorecard + highscores card */}
         <div className="board-right">
           <Scorecard
             scorecard={players[displayIdx].scorecard}

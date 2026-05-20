@@ -11,7 +11,7 @@ import './styles/theme.css';
 export default function App() {
   const {
     state,
-    startGame, setupMultiplayer, dismissHandoff,
+    startGame, setupMultiplayer, dismissHandoff, cancelPending,
     goHome, roll, toggleHold, scoreCategory, toggleOracle,
   } = useGameState();
 
@@ -88,6 +88,7 @@ export default function App() {
       onNewGame={handleNewGame}
       onViewHighscores={() => { setHsContext('game'); setShowHighscores(true); }}
       onDismissHandoff={dismissHandoff}
+      onCancelPending={cancelPending}
       scoreSubmitted={scoreSubmitted}
       onScoreSubmitted={() => setScoreSubmitted(true)}
       mpSubmittedNames={mpSubmittedNames}

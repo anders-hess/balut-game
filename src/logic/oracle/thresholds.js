@@ -42,7 +42,22 @@ function _pThresholdSum(cat, scorecard, actionScore) {
   const newSum = categoryCurrentSum(scorecard, cat) + score;
   const K = columnsUnfilled(scorecard, cat) - 1;
 
-  if (K === 0) return newSum >= rule.threshold ? 1.0 : 0.0;
+  if (K === 0) {
+    if (actionScore === BASELINE_SCORE) {
+      // The expected-value point estimate (e.g. 14.21 for sixes) may fall short of
+      // the threshold while the actual score distribution still has meaningful
+      // probability of reaching it. Use SUM_CDF[cat][1] — the single-column score
+      // distribution — so pBaseline correctly reflects P(Oracle score ≥ needed)
+      // rather than a binary check against the mean.
+      const needed0 = rule.threshold - categoryCurrentSum(scorecard, cat);
+      if (needed0 <= 0) return 1.0;
+      const cdf0 = cat === 'choice' ? CHOICE_MIXED_CDF[1] : SUM_CDF[cat][1];
+      const idx0 = Math.ceil(needed0) - 1;
+      if (idx0 >= cdf0.length) return 0.0;
+      return 1 - cdf0[idx0];
+    }
+    return newSum >= rule.threshold ? 1.0 : 0.0;
+  }
 
   const needed = rule.threshold - newSum;
   if (needed <= 0) return 1.0;

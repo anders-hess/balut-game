@@ -74,7 +74,8 @@ function reducer(state, action) {
     }
 
     case 'ROLL': {
-      // Commit a pending score and start the new turn.
+      // Commit a pending score and start the new turn (single player only —
+      // multiplayer commits via DISMISS_HANDOFF instead).
       if (state.pendingScore) {
         const { category, column, score } = state.pendingScore;
         const committed = applyScore(state, category, column, score);
@@ -108,17 +109,11 @@ function reducer(state, action) {
     }
 
     case 'PENDING_SCORE': {
-      // Player clicked a scorecard cell.
-      //
-      // First click  → dice clear, rollsLeft resets, pendingScore set.
-      // Second click on a *different* cell → pendingScore moves there.
-      // Click on the *same* pending cell → cancel; dice restored to original
-      //   values and rollsLeft returns to 0 so the player can choose again.
       const { category } = action;
       const currentPlayer = state.players[state.currentPlayerIndex];
 
       if (state.pendingScore) {
-        // Already pending — use the stored originalDice for all computation.
+        // Already pending (single-player only path — see multiplayer shortcut below).
         const origDice = state.pendingScore.originalDice;
         const rawScore = calculateScore(category, origDice);
         const finalScore = rawScore === null ? 0 : rawScore;
@@ -132,9 +127,8 @@ function reducer(state, action) {
           return {
             ...state,
             pendingScore: null,
-            // Restore original dice (unheld) so the player can see & re-choose.
             dice:      origDice.map(v => ({ value: v, held: false })),
-            rollsLeft: 0,   // all rolls consumed — must score, can't re-roll
+            rollsLeft: 0,
           };
         }
 
@@ -153,7 +147,7 @@ function reducer(state, action) {
       const col        = getTargetColumn(currentPlayer.scorecard, category, finalScore);
       if (col === -1) return state;
 
-      // Last turn: only one unfilled cell exists — lock immediately, no pending state.
+      // Last turn: only one unfilled cell — lock immediately, no pending state.
       const unfilledCount = CATEGORIES.reduce(
         (n, cat) => n + currentPlayer.scorecard[cat].filter(s => s === null).length, 0
       );
@@ -161,16 +155,56 @@ function reducer(state, action) {
         return applyScore(state, category, col, finalScore);
       }
 
+      // Multiplayer: show handoff immediately; score confirmed on "Start Turn".
+      if (state.players.length > 1) {
+        let nextIdx = state.currentPlayerIndex;
+        for (let i = 1; i <= state.players.length; i++) {
+          const idx = (state.currentPlayerIndex + i) % state.players.length;
+          if (!isGameOver(state.players[idx].scorecard)) { nextIdx = idx; break; }
+        }
+        return {
+          ...state,
+          pendingScore: {
+            category, column: col, score: finalScore,
+            originalDice: diceValues,
+            nextPlayerIdx: nextIdx,
+          },
+          dice:        resetTurn(state.dice),
+          rollsLeft:   MAX_ROLLS,
+          showHandoff: true,
+        };
+      }
+
+      // Single player: standard pending state.
       return {
         ...state,
         pendingScore: { category, column: col, score: finalScore, originalDice: diceValues },
-        dice:         resetTurn(state.dice),   // clear: values → 0, all unheld
-        rollsLeft:    MAX_ROLLS,               // "Roll Dice" becomes available
+        dice:         resetTurn(state.dice),
+        rollsLeft:    MAX_ROLLS,
       };
     }
 
-    case 'DISMISS_HANDOFF':
+    case 'DISMISS_HANDOFF': {
+      // In multiplayer, "Start Turn" also commits any pending score.
+      if (state.pendingScore) {
+        const { category, column, score } = state.pendingScore;
+        const next = applyScore(state, category, column, score);
+        // applyScore sets showHandoff: true for multiplayer — override it.
+        return { ...next, showHandoff: false, justScoredBalut: false };
+      }
       return { ...state, showHandoff: false, justScoredBalut: false };
+    }
+
+    case 'CANCEL_PENDING': {
+      if (!state.pendingScore) return state;
+      return {
+        ...state,
+        pendingScore: null,
+        showHandoff:  false,
+        dice:      state.pendingScore.originalDice.map(v => ({ value: v, held: false })),
+        rollsLeft: 0,
+      };
+    }
 
     case 'GO_HOME':
       return createInitialState();
@@ -191,6 +225,7 @@ export function useGameState() {
     startGame:        ()         => dispatch({ type: 'START_GAME' }),
     setupMultiplayer: (names)    => dispatch({ type: 'SETUP_MULTIPLAYER', names }),
     dismissHandoff:   ()         => dispatch({ type: 'DISMISS_HANDOFF' }),
+    cancelPending:    ()         => dispatch({ type: 'CANCEL_PENDING' }),
     goHome:           ()         => dispatch({ type: 'GO_HOME' }),
     roll:             ()         => dispatch({ type: 'ROLL' }),
     toggleHold:       (index)    => dispatch({ type: 'TOGGLE_HOLD', index }),

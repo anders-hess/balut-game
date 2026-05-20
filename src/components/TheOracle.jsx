@@ -9,8 +9,9 @@ export default function TheOracle({
   onToggle,
 }) {
   const diceValues = dice.map(d => d.value);
-  const [openTip, setOpenTip] = useState(null);
-  const [tipPos,  setTipPos]  = useState(null);
+  const [openTip,  setOpenTip]  = useState(null);
+  const [tipPos,   setTipPos]   = useState(null);
+  const [oracleOn, setOracleOn] = useState(true);
   const panelRef = useRef(null);
 
   const result = useMemo(() => {
@@ -58,6 +59,19 @@ export default function TheOracle({
     if (bpiv > 0) return 'oracle__bpiv oracle__bpiv--positive';
     if (bpiv < 0) return 'oracle__bpiv oracle__bpiv--negative';
     return 'oracle__bpiv';
+  }
+
+  if (!oracleOn) {
+    return (
+      <aside className="oracle" ref={panelRef}>
+        <div className="oracle__header">
+          <h2 className="oracle__title oracle__title--off">The Oracle is turned off.</h2>
+          <button className="oracle__power-btn" onClick={() => setOracleOn(true)}>
+            Turn on
+          </button>
+        </div>
+      </aside>
+    );
   }
 
   return (
@@ -129,7 +143,8 @@ export default function TheOracle({
                             <DiceFace
                               key={di}
                               value={v}
-                              size={18}
+                              size={23}
+                              strokeWidth={3}
                               dieIndex={action.rank * 10 + di}
                             />
                           ))}
@@ -156,6 +171,14 @@ export default function TheOracle({
               </ol>
             </>
           )}
+          <div className="oracle__footer">
+            <button
+              className="oracle__power-btn oracle__power-btn--off"
+              onClick={() => setOracleOn(false)}
+            >
+              Turn off Oracle
+            </button>
+          </div>
         </div>
       )}
 

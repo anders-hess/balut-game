@@ -52,6 +52,21 @@ describe('pThreshold – sum types', () => {
     const pLow  = pThreshold('sixes', sc, 6);
     expect(pHigh).toBeGreaterThan(pLow);
   });
+
+  it('last column, BASELINE_SCORE: uses score distribution, not expected-value point estimate', () => {
+    // Sixes: 18+18+24=60, one column left (col #3=null). Need 18 to reach 78.
+    // EXPECTED_SCORE_PER_COLUMN.sixes = 14.21 < 18, so the old code returned 0.
+    // The actual score distribution gives P(sixes score ≥ 18) ≈ 41.6%.
+    const sc = { ...emptySc, sixes: [18, 18, null, 24] };
+    const p = pThreshold('sixes', sc, BASELINE_SCORE);
+    expect(p).toBeGreaterThan(0.3);
+    expect(p).toBeLessThan(0.6);
+  });
+
+  it('last column, BASELINE_SCORE: returns 1.0 when current sum already meets threshold', () => {
+    const sc = { ...emptySc, sixes: [24, 24, null, 30] }; // sum=78, need=0
+    expect(pThreshold('sixes', sc, BASELINE_SCORE)).toBe(1.0);
+  });
 });
 
 // ─── pThreshold – filled types ─────────────────────────────────────────────────

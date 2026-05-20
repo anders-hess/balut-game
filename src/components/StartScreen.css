@@ -311,7 +311,12 @@
     padding: 20px 18px 8px;
   }
 
-  /* Logo word dark on mobile (header not over orange) */
+  /* On mobile the header sits on the beige background — revert to original logo */
+  .start-header .logo__mark {
+    background: var(--color-accent);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(201,122,74,0.25);
+  }
   .start-header .logo__word {
     color: var(--color-ink);
   }
@@ -348,6 +353,10 @@
   .start-hero-right {
     padding: 22px 18px 28px;
     gap: 14px;
+  }
+
+  .start-util-links {
+    justify-content: center;
   }
 
   .start-right-heading {

@@ -133,7 +133,8 @@
   }
 
   .dice-tray {
-    gap: 12px;
-    margin: 4px 0 22px;
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin: 4px 0 4px;
   }
 }

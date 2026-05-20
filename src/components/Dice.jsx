@@ -18,6 +18,7 @@ export default function Dice({ die, index, canHold, onToggleHold, isRolling }) {
         rolling ? 'die--rolling'   : '',
         unrolled ? 'die--unrolled' : '',
         canHold && !unrolled && !rolling ? 'die--holdable' : '',
+        !canHold && !unrolled           ? 'die--inert'    : '',
       ].filter(Boolean).join(' ')}
       onClick={() => canHold && !unrolled && onToggleHold(index)}
       aria-pressed={held}

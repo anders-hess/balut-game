@@ -218,6 +218,20 @@ thead .th-big {
   margin-top: 2px;
 }
 
+/* Value + "big points" side by side */
+.rt-big-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+/* "big points" sub-text — mobile only */
+.rt-big-sub {
+  display: none;
+  font-size: 11px;
+  color: var(--color-ink-mute);
+}
+
 .rt-value {
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -239,6 +253,10 @@ thead .th-big {
 
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 800px) {
+  /* On mobile: hide "(Big)" suffix, show "big points" sub-text instead */
+  .rt-label-big-suffix { display: none; }
+  .rt-big-sub { display: block; }
+
   .scorecard {
     padding: 18px 16px;
   }
