@@ -191,6 +191,8 @@ P(threshold met) = 1 − SUM_CDF[cat][K][⌈threshold − newSum⌉ − 1]
 ```
 Choice uses `CHOICE_MIXED_CDF[K]` instead — a two-regime mixture model (see below).
 
+**Last-column baseline (K = 0):** when scoring the very last column of a sum-type category, the actual score produces a deterministic threshold check (`newSum ≥ threshold`). The *baseline* comparison, however, uses `SUM_CDF[cat][1]` — the single-column Oracle score distribution — rather than the expected-value point estimate. This matters when `EXPECTED_SCORE_PER_COLUMN[cat] < (threshold − currentSum)`: the mean would fail the binary check (returning 0), but the distribution still has meaningful P(score ≥ needed). Using the distribution gives `pBaseline` correctly, so `categoryBigDelta` properly penalises committing to a subpar score in the last column. Example: sixes at 60/78 with one column left — expected score 14.21 < 18 needed, but P(Oracle sixes ≥ 18) ≈ 41.6%.
+
 **Filled types (straight, fullHouse)** — binomial time-pressure model:
 ```
 available_attempts = turnsRemaining × ATTEMPT_FRACTION[cat]
@@ -257,7 +259,7 @@ npm.cmd run validate   # 6 hand-traced BPIV scenarios (spot-check after any Orac
 - TODO Phase 3: OCR scanner to import a physical scorecard via photo
 
 ### Tests
-113 Vitest tests in `__tests__/`. Run with `npm.cmd run test`.
+115 Vitest tests in `__tests__/`. Run with `npm.cmd run test`.
 
 ### SVG gradient ID caution
 `DiceFace` generates SVG gradient IDs as `dg-{dieIndex}-{0|1}`. **Never render two `TheOracle` instances simultaneously** — duplicate IDs corrupt die-face colours. `GameBoard` uses a `useIsNarrow()` hook (≤800px breakpoint) to mount exactly one Oracle instance at a time: in `board-left` on mobile, `board-right` on desktop.
