@@ -3,12 +3,13 @@ import Dice from './Dice.jsx';
 import './DiceArea.css';
 import { MAX_ROLLS } from '../logic/gameConstants.js';
 
-export default function DiceArea({ dice, rollsLeft, onRoll, onToggleHold, turnNumber, totalTurns }) {
+export default function DiceArea({ dice, rollsLeft, onRoll, onToggleHold, turnNumber, totalTurns, disabled = false, waitingFor = null }) {
   const [rolling, setRolling] = useState(false);
 
+  const isDisabled = disabled || !!waitingFor;
   const hasRolled = rollsLeft < MAX_ROLLS;
-  const canRoll   = rollsLeft > 0 && !rolling;
-  const canHold   = hasRolled && rollsLeft > 0;
+  const canRoll   = rollsLeft > 0 && !rolling && !isDisabled;
+  const canHold   = hasRolled && rollsLeft > 0 && !isDisabled;
 
   const handleRoll = useCallback(() => {
     if (!canRoll) return;
@@ -56,7 +57,7 @@ export default function DiceArea({ dice, rollsLeft, onRoll, onToggleHold, turnNu
         </div>
       </div>
 
-      <div className="dice-tray" role="group" aria-label="Dice">
+      <div className={`dice-tray${waitingFor ? ' dice-tray--waiting' : ''}`} role="group" aria-label="Dice">
         {dice.map((die, i) => (
           <Dice
             key={i}
@@ -70,17 +71,21 @@ export default function DiceArea({ dice, rollsLeft, onRoll, onToggleHold, turnNu
       </div>
 
       <div className="dice-controls">
-        <button
-          className="btn-roll"
-          onClick={handleRoll}
-          disabled={!canRoll}
-          aria-label={rollLabel}
-        >
-          {rollLabel}
-        </button>
+        {waitingFor ? (
+          <p className="dice-waiting-msg">Waiting for {waitingFor} to take their turn…</p>
+        ) : (
+          <button
+            className="btn-roll"
+            onClick={handleRoll}
+            disabled={!canRoll}
+            aria-label={rollLabel}
+          >
+            {rollLabel}
+          </button>
+        )}
       </div>
 
-      {canHold && (
+      {canHold && !waitingFor && (
         <p className="dice-hint">Tap a die to hold it between rolls</p>
       )}
     </section>

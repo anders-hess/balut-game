@@ -7,9 +7,9 @@ const PERIOD_LABELS = { weekly: 'Week', monthly: 'Month', yearly: 'Year' };
 const HEADLINE = { weekly: 'This week\'s\nhighest scores.', monthly: 'This month\'s\nhighest scores.', yearly: 'This year\'s\nhighest scores.' };
 
 // Simple logo mark
-function Logo({ size = 36 }) {
+function Logo({ size = 36, onClick }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: onClick ? 'pointer' : undefined }} onClick={onClick}>
       <div style={{
         width: size, height: size, borderRadius: size * 0.27,
         background: 'var(--color-accent)', color: '#fff',
@@ -53,7 +53,7 @@ export default function HighscoresScreen({ onClose, backLabel = '← Back to hom
     <div className="hs-screen">
       {/* Marketing header */}
       <header className="hs-screen__marketing-header">
-        <Logo size={36} />
+        <Logo size={36} onClick={onClose} />
         <button className="hs-screen__back" onClick={onClose}>{backLabel}</button>
       </header>
 
@@ -81,15 +81,16 @@ export default function HighscoresScreen({ onClose, backLabel = '← Back to hom
           </div>
         </div>
 
-        {/* Column header */}
+        {/* Column header + body */}
+        <div className="hs-screen__table">
         <div className="hs-screen__col-header">
           <span>#</span>
           <span>Player</span>
-          <span>Small</span>
+          <span className="hs-screen__col-baluts">Baluts</span>
+          <span className="hs-screen__col-small">Small</span>
           <span className="hs-screen__col-big">Big</span>
         </div>
 
-        {/* Body */}
         <div className="hs-screen__body">
           {loading ? (
             <p className="hs-screen__status">Loading…</p>
@@ -109,17 +110,19 @@ export default function HighscoresScreen({ onClose, backLabel = '← Back to hom
                     {row.player_name}
                     <span className="hs-row__sub">
                       {activePeriod === 'weekly'
-                        ? new Date(row.created_at).toLocaleDateString('en', { weekday: 'short' })
+                        ? new Date(row.created_at).toLocaleDateString('en', { weekday: 'long' })
                         : new Date(row.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric' })
-                      } · {row.balut_count} balut{row.balut_count !== 1 ? 's' : ''}
+                      }
                     </span>
                   </div>
+                  <span className="hs-row__baluts">{row.balut_count}</span>
                   <span className="hs-row__small">{row.small_points}</span>
                   <span className="hs-row__big">{row.big_points}</span>
                 </div>
               );
             })
           )}
+        </div>
         </div>
       </div>
     </div>

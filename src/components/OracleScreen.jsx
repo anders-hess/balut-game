@@ -4,9 +4,9 @@ import { CATEGORIES, CATEGORY_LABELS } from '../logic/gameConstants.js';
 import DiceFace from './DiceFace.jsx';
 import './OracleScreen.css';
 
-function Logo({ size = 36 }) {
+function Logo({ size = 36, onClick }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: onClick ? 'pointer' : undefined }} onClick={onClick}>
       <div style={{
         width: size, height: size, borderRadius: size * 0.27,
         background: 'var(--color-accent)', color: '#fff',
@@ -82,7 +82,7 @@ export default function OracleScreen({ onClose }) {
   return (
     <div className="oracle-screen">
       <header className="oracle-screen__marketing-header">
-        <Logo size={36} />
+        <Logo size={36} onClick={onClose} />
         <button className="oracle-screen__back" onClick={onClose}>← Back to home</button>
       </header>
 

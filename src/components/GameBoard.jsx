@@ -28,12 +28,18 @@ export default function GameBoard({
   onGoHome, onNewGame, onViewHighscores, onDismissHandoff, onCancelPending,
   scoreSubmitted, onScoreSubmitted,
   mpSubmittedNames, onMpPlayerSubmitted,
+  isOnlineGame = false, onlineGame = null,
 }) {
   const { dice, rollsLeft, oracleEnabled, players, currentPlayerIndex, phase, turnNumber, justScoredBalut, showHandoff, pendingScore } = state;
   const isMultiplayer = players.length > 1;
   const isGameOver    = phase === 'gameover';
   const hasRolled     = rollsLeft < 3;
   const allRolled     = dice.every(d => d.value > 0);
+
+  // Online-specific derived values
+  const isOnline  = !!isOnlineGame;
+  const myTurn    = !isOnline || !!onlineGame?.isMyTurn;
+  const myIdx     = isOnline ? (onlineGame?.myPlayerIndex ?? null) : currentPlayerIndex;
 
   const currentPlayer = players[currentPlayerIndex];
 
@@ -72,7 +78,11 @@ export default function GameBoard({
         <div className="board-header__meta">
           {!isGameOver && isMultiplayer && (
             <div className="standings-header-wrap">
-              <MultiplayerStandings players={players} currentPlayerIndex={currentPlayerIndex} />
+              <MultiplayerStandings
+                players={players}
+                currentPlayerIndex={currentPlayerIndex}
+                onlinePlayers={isOnline ? onlineGame?.onlinePlayers : null}
+              />
             </div>
           )}
           <button className="btn-back-home" onClick={onGoHome}>
@@ -107,20 +117,45 @@ export default function GameBoard({
                 scoreSubmitted={scoreSubmitted}
               />
             )
-          ) : (isMultiplayer && showHandoff) ? (
-            <section className="dice-area dice-area--handoff">
-              <p className="handoff-inline__sub">Pass the device to</p>
-              <p className="handoff-inline__name">{handoffName}</p>
-              <button className="handoff-inline__btn" onClick={onDismissHandoff}>
-                Start {handoffName}'s Turn →
-              </button>
-              {pendingScore && (
-                <button className="handoff-inline__cancel" onClick={onCancelPending}>
-                  ← Cancel score
-                </button>
-              )}
-            </section>
-          ) : (
+          ) : (isMultiplayer && showHandoff) ? (() => {
+            const handoffTarget = pendingScore?.nextPlayerIdx ?? currentPlayerIndex;
+            const isMyHandoff   = !isOnline || myIdx === handoffTarget;
+            const canCancel     = !isOnline || myIdx === currentPlayerIndex;
+            return (
+              <section className="dice-area dice-area--handoff">
+                {isOnline ? (
+                  isMyHandoff ? (
+                    <>
+                      <p className="handoff-inline__sub">It's your turn,</p>
+                      <p className="handoff-inline__name">{handoffName}</p>
+                      <button className="handoff-inline__btn" onClick={onDismissHandoff}>
+                        Start my turn →
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <p className="handoff-inline__sub">Waiting for</p>
+                      <p className="handoff-inline__name">{handoffName}</p>
+                      <p className="handoff-inline__waiting">to start their turn…</p>
+                    </>
+                  )
+                ) : (
+                  <>
+                    <p className="handoff-inline__sub">Pass the device to</p>
+                    <p className="handoff-inline__name">{handoffName}</p>
+                    <button className="handoff-inline__btn" onClick={onDismissHandoff}>
+                      Start {handoffName}'s Turn →
+                    </button>
+                  </>
+                )}
+                {pendingScore && canCancel && (
+                  <button className="handoff-inline__cancel" onClick={onCancelPending}>
+                    ← Cancel score
+                  </button>
+                )}
+              </section>
+            );
+          })() : (
             <DiceArea
               dice={dice}
               rollsLeft={rollsLeft}
@@ -128,6 +163,8 @@ export default function GameBoard({
               onToggleHold={onToggleHold}
               turnNumber={turnNumber}
               totalTurns={TOTAL_TURNS}
+              disabled={isOnline && !myTurn}
+              waitingFor={isOnline && !myTurn ? currentPlayer.name : null}
             />
           )}
 
@@ -163,7 +200,7 @@ export default function GameBoard({
             scorecard={players[displayIdx].scorecard}
             dice={dice}
             rollsLeft={rollsLeft}
-            onScore={viewingOwnTurn && !isGameOver ? onScore : null}
+            onScore={viewingOwnTurn && !isGameOver && myTurn ? onScore : null}
             playerName={isMultiplayer ? players[displayIdx].name : null}
             pendingScore={viewingOwnTurn ? pendingScore : null}
           />

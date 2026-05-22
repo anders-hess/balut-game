@@ -91,11 +91,12 @@ function reducer(state, action) {
         };
       }
 
-      // Normal roll.
+      // Normal roll. In online multiplayer, action.dice carries pre-rolled values
+      // so all clients see the same result. Single-player passes no dice payload.
       if (state.rollsLeft === 0) return state;
       return {
         ...state,
-        dice:            rollDice(state.dice),
+        dice:            action.dice ?? rollDice(state.dice),
         rollsLeft:       state.rollsLeft - 1,
         justScoredBalut: false,
       };
@@ -212,10 +213,15 @@ function reducer(state, action) {
     case 'TOGGLE_ORACLE':
       return { ...state, oracleEnabled: !state.oracleEnabled };
 
+    case '__RESTORE__':
+      return { ...action.state };
+
     default:
       return state;
   }
 }
+
+export { reducer };
 
 export function useGameState() {
   const [state, dispatch] = useReducer(reducer, createInitialState());

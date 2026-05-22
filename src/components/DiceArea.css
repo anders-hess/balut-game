@@ -119,6 +119,19 @@
   letter-spacing: 0.3px;
 }
 
+.dice-tray--waiting {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.dice-waiting-msg {
+  font-size: 14px;
+  color: var(--color-ink-mute);
+  text-align: center;
+  margin: 0;
+  font-style: italic;
+}
+
 @media (max-width: 800px) {
   .dice-area {
     padding: 22px 18px;

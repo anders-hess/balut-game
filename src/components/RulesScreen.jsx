@@ -1,8 +1,8 @@
 import './RulesScreen.css';
 
-function Logo({ size = 36 }) {
+function Logo({ size = 36, onClick }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: onClick ? 'pointer' : undefined }} onClick={onClick}>
       <div style={{
         width: size, height: size, borderRadius: size * 0.27,
         background: 'var(--color-accent)', color: '#fff',
@@ -23,7 +23,7 @@ export default function RulesScreen({ onClose }) {
     <div className="rules-screen">
       {/* Marketing header — matches HighscoresScreen style */}
       <header className="rules-marketing-header">
-        <Logo size={36} />
+        <Logo size={36} onClick={onClose} />
         <button className="rules-back" onClick={onClose}>← Back to home</button>
       </header>
 

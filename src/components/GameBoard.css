@@ -239,6 +239,12 @@
   color: var(--color-ink);
 }
 
+.handoff-inline__waiting {
+  font-size: 14px;
+  color: var(--color-ink-mute);
+  margin: 0;
+}
+
 
 /* ── Responsive: narrow screens ──────────────────────── */
 @media (max-width: 800px) {

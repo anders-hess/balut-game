@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import './PlayerSetupScreen.css';
 
-function Logo({ size = 36 }) {
+function Logo({ size = 36, onClick }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: onClick ? 'pointer' : undefined }} onClick={onClick}>
       <div style={{
         width: size, height: size, borderRadius: size * 0.27,
         background: 'var(--color-accent)', color: '#fff',
@@ -33,7 +33,7 @@ export default function PlayerSetupScreen({ onStart, onBack }) {
     <div className="setup-screen">
       {/* Marketing header */}
       <header className="setup-screen__marketing-header">
-        <Logo size={36} />
+        <Logo size={36} onClick={onBack} />
         <button className="setup-screen__cancel" onClick={onBack}>Cancel</button>
       </header>
 

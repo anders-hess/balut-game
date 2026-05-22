@@ -41,3 +41,13 @@
   color: var(--color-accent);
   font-weight: 600;
 }
+
+.mp-standings__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mp-standings__dot--on  { background: #4caf7d; }
+.mp-standings__dot--off { background: var(--color-edge); }

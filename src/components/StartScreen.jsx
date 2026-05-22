@@ -63,7 +63,7 @@ function ModeCard({ title, subtitle, primary, disabled, onClick, icon = '→' })
 }
 
 // ── StartScreen ───────────────────────────────────────────────────────────────
-export default function StartScreen({ onStart, onMultiplayer, onHighscores, onRules, onOracle }) {
+export default function StartScreen({ onStart, onMultiplayer, onOnlineMultiplayer, onHighscores, onRules, onOracle }) {
   const heroRots = [-4, 3, -2, 5, -3];
   const heroVals = [5, 5, 3, 5, 2];
 
@@ -121,9 +121,8 @@ export default function StartScreen({ onStart, onMultiplayer, onHighscores, onRu
             />
             <ModeCard
               title="Online multiplayer"
-              subtitle="Coming soon."
-              icon="···"
-              disabled
+              subtitle="Play with friends anywhere."
+              onClick={onOnlineMultiplayer}
             />
           </div>
 
