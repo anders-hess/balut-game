@@ -9,6 +9,7 @@ import HighscoresScreen from './components/HighscoresScreen.jsx';
 import RulesScreen from './components/RulesScreen.jsx';
 import OracleScreen from './components/OracleScreen.jsx';
 import AppInsightsScreen from './components/AppInsightsScreen.jsx';
+import ScannerScreen from './scanner/ScannerScreen.jsx';
 import { trackEvent } from './services/analytics.js';
 import { calcTotals, countBaluts } from './logic/scoring.js';
 import './styles/theme.css';
@@ -29,6 +30,12 @@ export default function App() {
   const [showOracle,      setShowOracle]      = useState(false);
   const [showOnlineLobby, setShowOnlineLobby] = useState(false);
   const [showInsights,    setShowInsights]    = useState(false);
+  const [showScanner,     setShowScanner]     = useState(
+    () => new URLSearchParams(window.location.search).has('scanner')
+  );
+
+  function openScanner()  { history.replaceState(null, '', '?scanner'); setShowScanner(true); }
+  function closeScanner() { history.replaceState(null, '', window.location.pathname); setShowScanner(false); }
 
   // Submission tracking — lifted here so they survive GameBoard unmount when viewing leaderboard
   const [scoreSubmitted,   setScoreSubmitted]   = useState(false);
@@ -115,6 +122,10 @@ export default function App() {
         onlineGame={onlineGame}
       />
     );
+  }
+
+  if (showScanner) {
+    return <ScannerScreen onClose={closeScanner} />;
   }
 
   if (showInsights) {

@@ -22,6 +22,16 @@ export const CATEGORY_LABELS = {
   balut:     'Balut',
 };
 
+export const CATEGORY_SHORT = {
+  fours:     '4s',
+  fives:     '5s',
+  sixes:     '6s',
+  straight:  'St',
+  fullHouse: 'FH',
+  choice:    'Ch',
+  balut:     'Ba',
+};
+
 // Big point thresholds and values
 export const BIG_POINT_RULES = {
   fours:     { type: 'sum',   threshold: 52,  points: 2 },
