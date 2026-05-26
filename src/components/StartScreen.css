@@ -293,10 +293,55 @@
   letter-spacing: 0.3px;
 }
 
+.link-label--mobile { display: none; }
+
 .start-link:hover {
   color: var(--color-ink);
   text-decoration-color: var(--color-ink-soft);
 }
+
+/* ── Animated game counter ────────────────────────────── */
+.game-counter {
+  position: absolute;
+  bottom: 56px;
+  right: 56px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  text-align: right;
+}
+
+.game-counter__number {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -1.5px;
+  color: rgba(255, 255, 255, 0.95);
+  font-variant-numeric: tabular-nums;
+  display: block;
+  transition: color 0.15s;
+}
+
+.game-counter__label {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  display: block;
+  transition: color 0.15s;
+}
+
+.game-counter:hover .game-counter__number { color: #fff; }
+.game-counter:hover .game-counter__label  { color: rgba(255, 255, 255, 0.88); }
 
 /* ── Mobile ───────────────────────────────────────────── */
 @media (max-width: 800px) {
@@ -357,6 +402,28 @@
 
   .start-util-links {
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .link-label--desktop { display: none; }
+  .link-label--mobile  { display: inline; }
+
+  .game-counter {
+    bottom: auto;
+    top: 18px;
+    right: 18px;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .game-counter__number {
+    font-size: 28px;
+    letter-spacing: -1px;
+  }
+
+  .game-counter__label {
+    word-spacing: 100vw;
   }
 
   .start-right-heading {

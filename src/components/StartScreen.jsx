@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef } from 'react';
+import { fetchGameCount } from '../services/analytics.js';
 import './StartScreen.css';
 
 // ── Logo mark ─────────────────────────────────────────────────────────────────
@@ -62,10 +64,39 @@ function ModeCard({ title, subtitle, primary, disabled, onClick, icon = '→' })
   );
 }
 
+// ── Animated game counter ─────────────────────────────────────────────────────
+function AnimatedCount({ target, onClick }) {
+  const [display, setDisplay] = useState(0);
+  const rafRef = useRef(null);
+
+  useEffect(() => {
+    if (!target) return;
+    const start = performance.now();
+    const duration = 1500;
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      setDisplay(Math.round((1 - Math.pow(1 - t, 3)) * target));
+      if (t < 1) rafRef.current = requestAnimationFrame(step);
+    }
+    rafRef.current = requestAnimationFrame(step);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [target]);
+
+  return (
+    <button className="game-counter" onClick={onClick} aria-label="View App Insights">
+      <span className="game-counter__number">{display.toLocaleString()}</span>
+      <span className="game-counter__label">games played</span>
+    </button>
+  );
+}
+
 // ── StartScreen ───────────────────────────────────────────────────────────────
-export default function StartScreen({ onStart, onMultiplayer, onOnlineMultiplayer, onHighscores, onRules, onOracle }) {
+export default function StartScreen({ onStart, onMultiplayer, onOnlineMultiplayer, onHighscores, onRules, onOracle, onInsights }) {
   const heroRots = [-4, 3, -2, 5, -3];
   const heroVals = [5, 5, 3, 5, 2];
+
+  const [gameCount, setGameCount] = useState(0);
+  useEffect(() => { fetchGameCount().then(setGameCount).catch(() => {}); }, []);
 
   return (
     <div className="start-screen">
@@ -100,6 +131,8 @@ export default function StartScreen({ onStart, onMultiplayer, onOnlineMultiplaye
               </p>
             </div>
           </div>
+
+          {gameCount > 0 && <AnimatedCount target={gameCount} onClick={onInsights} />}
         </div>
 
         {/* ── Right: mode selection ── */}
@@ -130,8 +163,15 @@ export default function StartScreen({ onStart, onMultiplayer, onOnlineMultiplaye
 
           <div className="start-util-links">
             <button className="start-link" onClick={onHighscores}>Leaderboard</button>
-            <button className="start-link" onClick={onRules}>Rules of play</button>
+            <button className="start-link" onClick={onRules}>
+              <span className="link-label--desktop">Rules of play</span>
+              <span className="link-label--mobile">Rules</span>
+            </button>
             <button className="start-link" onClick={onOracle}>The Oracle</button>
+            <button className="start-link" onClick={onInsights}>
+              <span className="link-label--desktop">App Insights</span>
+              <span className="link-label--mobile">Insights</span>
+            </button>
           </div>
         </div>
       </main>

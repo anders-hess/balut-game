@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useGameState } from './hooks/useGameState.js';
 import { useOnlineGame } from './hooks/useOnlineGame.js';
 import StartScreen from './components/StartScreen.jsx';
@@ -8,6 +8,9 @@ import GameBoard from './components/GameBoard.jsx';
 import HighscoresScreen from './components/HighscoresScreen.jsx';
 import RulesScreen from './components/RulesScreen.jsx';
 import OracleScreen from './components/OracleScreen.jsx';
+import AppInsightsScreen from './components/AppInsightsScreen.jsx';
+import { trackEvent } from './services/analytics.js';
+import { calcTotals, countBaluts } from './logic/scoring.js';
 import './styles/theme.css';
 
 export default function App() {
@@ -25,10 +28,44 @@ export default function App() {
   const [showRules,       setShowRules]       = useState(false);
   const [showOracle,      setShowOracle]      = useState(false);
   const [showOnlineLobby, setShowOnlineLobby] = useState(false);
+  const [showInsights,    setShowInsights]    = useState(false);
 
   // Submission tracking — lifted here so they survive GameBoard unmount when viewing leaderboard
   const [scoreSubmitted,   setScoreSubmitted]   = useState(false);
   const [mpSubmittedNames, setMpSubmittedNames] = useState([]);
+
+  // ── Analytics event tracking ──────────────────────────────────────────────
+  useEffect(() => { trackEvent('page_view'); }, []);
+
+  const prevPhaseRef = useRef('start');
+  useEffect(() => {
+    if (state.phase === 'playing' && prevPhaseRef.current === 'start') {
+      trackEvent('game_started');
+    }
+    prevPhaseRef.current = state.phase;
+  }, [state.phase]);
+
+  useEffect(() => {
+    if (state.phase === 'gameover' && state.players.length === 1) {
+      const sc = state.players[0].scorecard;
+      const { totalBig, totalSmall } = calcTotals(sc);
+      const colSum    = (cat) => sc[cat].reduce((a, v) => a + (v ?? 0), 0);
+      const allFilled = (cat) => sc[cat].every(v => v !== null && v > 0);
+      const anyPositive = (cat) => sc[cat].some(v => v !== null && v > 0);
+      trackEvent('game_completed', {
+        bigPoints:    totalBig,
+        smallPoints:  totalSmall,
+        balutCount:   countBaluts(sc),
+        hadFours:     colSum('fours')  >= 52,
+        hadFives:     colSum('fives')  >= 65,
+        hadSixes:     colSum('sixes')  >= 78,
+        hadStraight:  allFilled('straight'),
+        hadFullHouse: allFilled('fullHouse'),
+        hadChoice:    colSum('choice') >= 100,
+        hadBalut:     anyPositive('balut'),
+      });
+    }
+  }, [state.phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { phase } = state;
 
@@ -80,6 +117,10 @@ export default function App() {
     );
   }
 
+  if (showInsights) {
+    return <AppInsightsScreen onClose={() => setShowInsights(false)} />;
+  }
+
   if (showHighscores) {
     return (
       <HighscoresScreen
@@ -114,6 +155,7 @@ export default function App() {
         onHighscores={() => { setHsContext('home'); setShowHighscores(true); }}
         onRules={() => setShowRules(true)}
         onOracle={() => setShowOracle(true)}
+        onInsights={() => setShowInsights(true)}
       />
     );
   }
