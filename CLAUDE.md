@@ -56,14 +56,19 @@ src/
   services/           # External service integrations
     supabase.js           # Supabase client singleton (null when .env.local absent)
     highscores.js         # fetchLeaderboard(), checkQualifies(), submitScore()
+    analytics.js          # trackEvent(), fetchInsights() — writes to events table; all calls no-op if Supabase absent
+    onlineGame.js         # All Supabase DB + Realtime calls for online multiplayer (pure, no React)
   hooks/
-    useGameState.js       # useReducer — all game actions including multiplayer
+    useGameState.js       # useReducer — all game actions including multiplayer; exports reducer + __RESTORE__
+    useOnlineGame.js      # Connection state machine + game action wrappers for online play
   components/
-    App.jsx               # Routing: showHighscores + showSetup + showRules + showOracle
+    App.jsx               # Routing: showHighscores + showSetup + showRules + showOracle + showOnlineLobby + showInsights
     StartScreen           # Hero layout (orange/cream split), mode cards, utility links
-    PlayerSetupScreen     # Multiplayer setup — player count (2–4) + name inputs
+    PlayerSetupScreen     # Local multiplayer setup — player count (2–4) + name inputs
+    OnlineLobbyScreen     # Online multiplayer lobby — create/join room, waiting room UI
     RulesScreen           # Standalone rules page (marketing header style)
     OracleScreen          # Standalone Oracle sandbox (marketing header style)
+    AppInsightsScreen     # Analytics dashboard — visitor stats, games played, score averages, scorecard %s
     GameBoard             # Two-column layout; Oracle always in left column
     MultiplayerStandings  # Header badge strip (names + active indicator, no scores)
     MultiplayerGameOverScreen  # Ranked results table + per-player leaderboard submit
@@ -123,7 +128,9 @@ Single player uses `players.length === 1` — no separate code path.
 | `TOGGLE_ORACLE` | Toggles Oracle panel open/closed |
 
 ### App routing
-`App.jsx` uses four local booleans (`showHighscores`, `showSetup`, `showRules`, `showOracle`) alongside the reducer phase. `hsContext` ('home' | 'game') tracks which context opened the leaderboard so the back button label is correct. Submission tracking (`scoreSubmitted`, `mpSubmittedNames`) is lifted here so it survives navigating to the leaderboard and back.
+`App.jsx` uses six local booleans (`showHighscores`, `showSetup`, `showRules`, `showOracle`, `showOnlineLobby`, `showInsights`) alongside the reducer phase and `onlineGame.connectionPhase`. `hsContext` ('home' | 'game') tracks which context opened the leaderboard so the back button label is correct. Submission tracking (`scoreSubmitted`, `mpSubmittedNames`) is lifted here so it survives navigating to the leaderboard and back.
+
+Online game rendering bypasses the reducer entirely: when `onlineGame.connectionPhase` is `'playing'` or `'reconnecting'`, `GameBoard` receives `onlineGame.state` and `onlineGame.*` action handlers instead of the local reducer's.
 
 ### Scoring categories
 `fours | fives | sixes | straight | fullHouse | choice | balut`  
@@ -152,6 +159,35 @@ Use `getTargetColumn(scorecard, category, score)` (exported from `scoring.js`) t
 - **Mobile**: player tabs (with name + pts) serve as the only active-player indicator
 - **Scorecard toggle**: player tabs let any player peek at others' scorecards (read-only)
 - **Game over**: `MultiplayerGameOverScreen` shows ranked table; each qualifying score gets its own leaderboard submit prompt
+
+---
+
+## Online Multiplayer
+
+Real-time multiplayer via Supabase Realtime (Broadcast + Presence). 2–4 players on separate devices.
+
+### Key files
+- `src/services/onlineGame.js` — all Supabase DB + Realtime calls (pure, no React)
+- `src/hooks/useOnlineGame.js` — connection state machine + game action wrappers
+- `src/components/OnlineLobbyScreen.jsx` — create/join room + waiting room UI
+
+### Supabase table: `online_games`
+`id` (uuid), `room_code` (char 6, unique), `host_session` (text), `player_sessions` (jsonb array of `{sessionId, name, playerIndex}`), `state` (jsonb — full game state snapshot), `status` (`lobby` | `playing` | `gameover` | `abandoned`), timestamps. RLS: open read/insert/update (anonymous, no auth).
+
+### Sync model
+Action-based: active player dispatches locally + broadcasts the action via `game:{ROOMCODE}` channel. Other clients receive and dispatch to their local reducer (same pure reducer, deterministic). Full state snapshot is persisted to DB after each action for reconnection recovery (`__RESTORE__` action in `useGameState.js`).
+
+### Connection phases
+```
+idle → creating → lobby-host → playing
+idle → joining  → lobby-guest → playing
+playing ↔ reconnecting  (channel drop/restore: fetches snapshot from DB)
+```
+
+### Known limitations (v1)
+- No play-again flow — players must create a new room after game over
+- No turn timer — game stalls if a player disconnects
+- Race condition in `joinRoom` (read-modify-write on `player_sessions`) — acceptable for low-concurrency
 
 ---
 
@@ -240,7 +276,8 @@ npm.cmd run validate   # 6 hand-traced BPIV scenarios (spot-check after any Orac
 
 ### Backend: Supabase
 - **Project URL**: `https://ehpguosbtfnrfttghcnz.supabase.co`
-- **Table**: `scores` — `id`, `player_name` (max 20), `big_points`, `small_points`, `balut_count`, `created_at`
+- **Table `scores`**: `id`, `player_name` (max 20), `big_points`, `small_points`, `balut_count`, `created_at` — no `player_count` column; multiplayer scores submit identically to single-player
+- **Table `events`**: `id`, `type` (text), `metadata` (jsonb), `created_at` — stores `page_view` and `game_completed` events for the Insights screen
 - **Sort**: `big_points DESC, small_points DESC, balut_count DESC`
 - **Time windows**: weekly (Mon–Sun) / monthly / yearly filtered at query time
 - **RLS**: anonymous SELECT + INSERT; no auth required
@@ -300,17 +337,11 @@ Rules, Oracle sandbox, and Leaderboard all use a consistent marketing header: ba
 
 ---
 
-## Known cleanup items
-
-- `HandoffOverlay.jsx/.css` — no longer imported or used, safe to delete
-
----
-
 ## Roadmap
 
-- **Online multiplayer**: `players[]` state is already multi-player aware; main work is real-time sync (WebSockets / Supabase Realtime) and a lobby/room system
-- **Oracle Sandbox scorecard input**: Phase 2 = manual per-cell editor; Phase 3 = OCR scanner
-- **`scores` table**: no `player_count` column — multiplayer scores submit identically to single-player
+- **Oracle Sandbox Phase 2**: manual per-cell scorecard editor in `OracleScreen`
+- **Oracle Sandbox Phase 3**: OCR scanner to populate the sandbox from a photo
+- **Online multiplayer v2**: play-again flow after game over (currently requires a new room); turn timer to handle disconnects
 
 ---
 
