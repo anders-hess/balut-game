@@ -1,54 +1,100 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { useCamera } from './useCamera.js';
 import { CATEGORIES, CATEGORY_SHORT, NUM_COLUMNS } from '../../logic/gameConstants.js';
 import './ScannerCamera.css';
 
-const NUM_ROWS = CATEGORIES.length; // 7
+const NUM_ROWS    = CATEGORIES.length; // 7
+const CELL_ASPECT = 2.0;               // physical cell width:height ratio
+const HEADER_H    = 22;               // px above overlay for column/category headers
+const LABEL_W     = 32;              // px left of overlay for row labels
+const MIN_W       = 80;
+const MIN_H       = 80;
 
-// Based on the physical scorecard: cells are ~2:1 wide:tall
-// Grid aspect = (4 cols × 2) / (7 rows × 1) ≈ 1.14 — slightly landscape
-const CELL_ASPECT  = 2.0;
-const GRID_ASPECT  = (NUM_COLUMNS * CELL_ASPECT) / NUM_ROWS; // ≈ 1.14
+const NEXT_ORIENTATION = {
+  'landscape':  'portrait-r',
+  'portrait-r': 'portrait-l',
+  'portrait-l': 'landscape',
+};
+const ROTATE_LABEL = {
+  'landscape':  '⟳ Portrait →',
+  'portrait-r': '⟳ Portrait ←',
+  'portrait-l': '⟳ Landscape',
+};
 
-const HEADER_H     = 22; // px reserved above overlay for column labels
-const LABEL_W      = 32; // px reserved left of overlay for category labels
-const MIN_W        = 140;
-const MIN_H        = 80;
+function gridDims(orientation) {
+  const isLand = orientation === 'landscape';
+  return {
+    rows:   isLand ? NUM_ROWS    : NUM_COLUMNS,
+    cols:   isLand ? NUM_COLUMNS : NUM_ROWS,
+    aspect: isLand
+      ? (NUM_COLUMNS * CELL_ASPECT) / NUM_ROWS           // ≈ 1.14
+      : NUM_ROWS / (NUM_COLUMNS * CELL_ASPECT),          // ≈ 0.875
+  };
+}
+
+function getColHeaders(orientation) {
+  return orientation === 'landscape'
+    ? Array.from({ length: NUM_COLUMNS }, (_, i) => `#${i + 1}`)
+    : CATEGORIES.map(cat => CATEGORY_SHORT[cat]);
+}
+function getRowLabels(orientation) {
+  return orientation === 'landscape'
+    ? CATEGORIES.map(cat => CATEGORY_SHORT[cat])
+    : Array.from({ length: NUM_COLUMNS }, (_, i) => `#${i + 1}`);
+}
+
+function rotateCW(src) {
+  const dst = document.createElement('canvas');
+  dst.width = src.height; dst.height = src.width;
+  const ctx = dst.getContext('2d');
+  ctx.translate(dst.width, 0);
+  ctx.rotate(Math.PI / 2);
+  ctx.drawImage(src, 0, 0);
+  return dst;
+}
+function rotateCCW(src) {
+  const dst = document.createElement('canvas');
+  dst.width = src.height; dst.height = src.width;
+  const ctx = dst.getContext('2d');
+  ctx.translate(0, dst.height);
+  ctx.rotate(-Math.PI / 2);
+  ctx.drawImage(src, 0, 0);
+  return dst;
+}
 
 export default function ScannerCamera({ onCapture, onClose }) {
   const containerRef = useRef(null);
   const overlayRef   = useRef(null);
   const fileRef      = useRef(null);
 
-  const { videoRef, ready, setReady, error, capture } = useCamera();
+  const [photo,       setPhoto]       = useState(null);        // { src, naturalW, naturalH }
+  const [overlay,     setOverlay]     = useState(null);        // { x, y, w, h }
+  const [orientation, setOrientation] = useState('landscape'); // 'landscape'|'portrait-r'|'portrait-l'
 
-  const [overlay,   setOverlay]   = useState(null);
-  const [mode,      setMode]      = useState('camera');
-  const [uploadImg, setUploadImg] = useState(null);
-
-  // ── Initialise overlay (landscape default, proportional to scorecard) ──
-  useEffect(() => {
-    if (overlay || !containerRef.current) return;
+  // ── Overlay initialisation ─────────────────────────────────────────────────
+  const initOverlay = useCallback(() => {
+    if (!containerRef.current || !photo) return;
     const { width, height } = containerRef.current.getBoundingClientRect();
     if (width === 0) return;
 
-    // Fit grid into available space, respecting the reserved header/label margins
+    const { rows, cols, aspect } = gridDims(orientation);
     const maxW = width  - LABEL_W - 12;
-    const maxH = height - HEADER_H - 80; // 80px for bottom panel
+    const maxH = height - HEADER_H - 80;
 
-    // Try filling by width first (landscape bias)
     let w = Math.round(maxW * 0.82);
-    let h = Math.round(w / GRID_ASPECT);
-
-    // If that overflows height, shrink by height instead
-    if (h > maxH) { h = maxH; w = Math.round(h * GRID_ASPECT); }
+    let h = Math.round(w / aspect);
+    if (h > maxH) { h = maxH; w = Math.round(h * aspect); }
 
     const x = Math.round(LABEL_W + (maxW - w) / 2);
     const y = Math.round(HEADER_H + Math.max(4, (maxH - h) / 2));
     setOverlay({ x, y, w, h });
-  }, [ready, uploadImg]);
+  }, [photo, orientation]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Re-init on container resize (e.g. orientation change)
+  useEffect(() => {
+    if (overlay) return;
+    initOverlay();
+  }, [overlay, initOverlay]);
+
+  // Re-init on container resize (e.g. phone rotation)
   useEffect(() => {
     if (!containerRef.current) return;
     const ro = new ResizeObserver(() => setOverlay(null));
@@ -56,7 +102,7 @@ export default function ScannerCamera({ onCapture, onClose }) {
     return () => ro.disconnect();
   }, []);
 
-  // ── Drag to move overlay ──
+  // ── Drag to move overlay ───────────────────────────────────────────────────
   const onOverlayPointerDown = useCallback((e) => {
     if (e.target.closest('.overlay-handle')) return;
     e.preventDefault();
@@ -73,7 +119,7 @@ export default function ScannerCamera({ onCapture, onClose }) {
     document.addEventListener('pointerup',   onUp);
   }, [overlay]);
 
-  // ── Drag bottom-right handle to resize ──
+  // ── Resize handle ──────────────────────────────────────────────────────────
   const onHandlePointerDown = useCallback((e) => {
     e.preventDefault(); e.stopPropagation();
     const sx = e.clientX, sy = e.clientY;
@@ -93,42 +139,42 @@ export default function ScannerCamera({ onCapture, onClose }) {
     document.addEventListener('pointerup',   onUp);
   }, [overlay]);
 
-  // ── Rotate: swap width ↔ height ──
+  // ── Rotate cycles: landscape → portrait-r → portrait-l → landscape ────────
   function handleRotate() {
-    setOverlay(prev => ({ ...prev, w: prev.h, h: prev.w }));
+    setOrientation(prev => NEXT_ORIENTATION[prev]);
+    setOverlay(null);
   }
 
-  // ── Capture from live camera ──
-  function handleScan() {
-    if (!overlayRef.current || !containerRef.current) return;
-    const canvas = capture(
-      overlayRef.current.getBoundingClientRect(),
-      containerRef.current.getBoundingClientRect(),
-    );
-    if (canvas) onCapture(canvas);
-  }
-
-  // ── File upload path ──
+  // ── File selection ─────────────────────────────────────────────────────────
   function handleFileChange(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    e.target.value = ''; // allow re-selecting same file
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
-      setUploadImg({ src: url, naturalW: img.naturalWidth, naturalH: img.naturalHeight });
-      setMode('upload');
+      const isPortrait = img.naturalHeight > img.naturalWidth;
+      setOrientation(isPortrait ? 'portrait-r' : 'landscape');
+      setPhoto({ src: url, naturalW: img.naturalWidth, naturalH: img.naturalHeight });
       setOverlay(null);
     };
     img.src = url;
   }
 
-  // ── Capture from uploaded static image ──
-  function handleUploadScan() {
-    if (!overlayRef.current || !containerRef.current || !uploadImg) return;
+  function handleChangePhoto() {
+    setPhoto(null);
+    setOverlay(null);
+    setOrientation('landscape');
+  }
+
+  // ── Scan: crop overlay region, rotate canvas if portrait mode ──────────────
+  function handleScan() {
+    if (!overlayRef.current || !containerRef.current || !photo) return;
     const cr = containerRef.current.getBoundingClientRect();
     const or = overlayRef.current.getBoundingClientRect();
     const cAspect = cr.width / cr.height;
-    const iAspect = uploadImg.naturalW / uploadImg.naturalH;
+    const iAspect = photo.naturalW / photo.naturalH;
+
     let dispW, dispH, offsetX, offsetY;
     if (iAspect > cAspect) {
       dispW = cr.width; dispH = cr.width / iAspect;
@@ -137,10 +183,12 @@ export default function ScannerCamera({ onCapture, onClose }) {
       dispH = cr.height; dispW = cr.height * iAspect;
       offsetX = (cr.width - dispW) / 2; offsetY = 0;
     }
-    const scaleX = uploadImg.naturalW / dispW;
-    const scaleY = uploadImg.naturalH / dispH;
+
+    const scaleX = photo.naturalW / dispW;
+    const scaleY = photo.naturalH / dispH;
     const relX = or.left - cr.left - offsetX;
     const relY = or.top  - cr.top  - offsetY;
+
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
@@ -152,58 +200,69 @@ export default function ScannerCamera({ onCapture, onClose }) {
         or.width * scaleX, or.height * scaleY,
         0, 0, canvas.width, canvas.height,
       );
-      onCapture(canvas);
+      // Portrait modes: rotate back to landscape so standard OCR mapping works
+      const final = orientation === 'portrait-r' ? rotateCCW(canvas) :
+                    orientation === 'portrait-l' ? rotateCW(canvas)  : canvas;
+      onCapture(final);
     };
-    img.src = uploadImg.src;
+    img.src = photo.src;
   }
 
-  if (error && mode === 'camera') {
+  // ── Phase 1: no photo selected yet ────────────────────────────────────────
+  if (!photo) {
     return (
-      <div className="scanner-error">
-        {onClose && <button className="scanner-back" onClick={onClose}>← Back</button>}
-        <p className="scanner-error__msg">{error}</p>
-        <button className="scanner-btn" onClick={() => fileRef.current?.click()}>
-          Upload a photo instead
-        </button>
-        <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
+      <div className="scanner-upload-prompt">
+        {onClose && (
+          <button className="scanner-back-overlay" onClick={onClose}>← Back</button>
+        )}
+        <div className="scanner-upload-prompt__card">
+          <p className="scanner-upload-prompt__title">Scan scorecard</p>
+          <button
+            className="scanner-btn scanner-btn--primary scanner-upload-prompt__cta"
+            onClick={() => fileRef.current?.click()}
+          >
+            Select scorecard photo
+          </button>
+          <p className="scanner-upload-prompt__hint">
+            Take a photo or choose from your library
+          </p>
+        </div>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+        />
       </div>
     );
   }
 
-  const isUpload = mode === 'upload' && uploadImg;
+  // ── Phase 2: photo loaded — show image with draggable overlay ─────────────
+  const { rows: gridRows, cols: gridCols } = gridDims(orientation);
+  const headers = getColHeaders(orientation);
+  const labels  = getRowLabels(orientation);
 
   return (
     <div className="scanner-camera">
       <div className="scanner-viewfinder" ref={containerRef}>
 
-        {/* Live feed or uploaded image */}
-        {!isUpload && (
-          <video
-            ref={videoRef}
-            className="scanner-video"
-            autoPlay playsInline muted
-            onLoadedMetadata={() => setReady(true)}
-          />
-        )}
-        {isUpload && (
-          <img className="scanner-upload-img" src={uploadImg.src} alt="Uploaded scorecard" />
-        )}
+        <img className="scanner-upload-img" src={photo.src} alt="Uploaded scorecard" />
 
-        {/* Back button overlay */}
         {onClose && (
           <button className="scanner-back-overlay" onClick={onClose}>← Back</button>
         )}
 
         {overlay && (
           <>
-            {/* Category labels — LEFT of overlay, outside crop */}
+            {/* Row labels — LEFT of overlay, outside crop */}
             <div
               className="overlay-row-labels"
               style={{ left: overlay.x - LABEL_W, top: overlay.y, height: overlay.h }}
             >
-              {CATEGORIES.map(cat => (
-                <div key={cat} className="overlay-row-label" style={{ height: `${100 / NUM_ROWS}%` }}>
-                  {CATEGORY_SHORT[cat]}
+              {labels.map((label, i) => (
+                <div key={i} className="overlay-row-label" style={{ height: `${100 / gridRows}%` }}>
+                  {label}
                 </div>
               ))}
             </div>
@@ -211,14 +270,19 @@ export default function ScannerCamera({ onCapture, onClose }) {
             {/* Column headers — ABOVE overlay, outside crop */}
             <div
               className="overlay-col-headers-ext"
-              style={{ left: overlay.x, top: overlay.y - HEADER_H, width: overlay.w }}
+              style={{
+                left: overlay.x,
+                top: overlay.y - HEADER_H,
+                width: overlay.w,
+                gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
+              }}
             >
-              {Array.from({ length: NUM_COLUMNS }, (_, i) => (
-                <div key={i} className="overlay-col-header-ext">#{i + 1}</div>
+              {headers.map((h, i) => (
+                <div key={i} className="overlay-col-header-ext">{h}</div>
               ))}
             </div>
 
-            {/* The overlay itself — ONLY THIS REGION IS CROPPED AND SENT TO OCR */}
+            {/* The overlay grid — ONLY THIS REGION IS CROPPED AND SENT TO OCR */}
             <div
               ref={overlayRef}
               className="overlay-grid"
@@ -226,9 +290,13 @@ export default function ScannerCamera({ onCapture, onClose }) {
               onPointerDown={onOverlayPointerDown}
             >
               <div className="overlay-cells">
-                {Array.from({ length: NUM_ROWS }, (_, r) => (
-                  <div key={r} className="overlay-row">
-                    {Array.from({ length: NUM_COLUMNS }, (_, c) => (
+                {Array.from({ length: gridRows }, (_, r) => (
+                  <div
+                    key={r}
+                    className="overlay-row"
+                    style={{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }}
+                  >
+                    {Array.from({ length: gridCols }, (_, c) => (
                       <div key={c} className="overlay-cell" />
                     ))}
                   </div>
@@ -240,48 +308,38 @@ export default function ScannerCamera({ onCapture, onClose }) {
             </div>
           </>
         )}
-
-        {!ready && !isUpload && <div className="scanner-loading">Starting camera…</div>}
       </div>
 
       <p className="scanner-hint">
-        {isUpload
-          ? 'Drag the grid over the 4 score columns, then tap Scan.'
-          : 'Hold phone in landscape — align the grid over the 4 score columns, then tap Scan.'}
+        Drag the grid over the score columns, then tap Scan.
       </p>
 
       <div className="scanner-actions">
         <button
           className="scanner-btn scanner-btn--primary"
-          onClick={isUpload ? handleUploadScan : handleScan}
-          disabled={!overlay || (!ready && !isUpload)}
+          onClick={handleScan}
+          disabled={!overlay}
         >
           Scan
         </button>
 
-        {/* Rotate overlay button */}
-        {overlay && (
-          <button className="scanner-btn scanner-btn--icon" onClick={handleRotate} title="Rotate overlay">
-            ⟳
-          </button>
-        )}
+        <button className="scanner-btn scanner-btn--rotate" onClick={handleRotate} title="Change orientation">
+          {ROTATE_LABEL[orientation]}
+        </button>
 
-        {mode === 'camera' && (
-          <>
-            <span className="scanner-divider">or</span>
-            <button className="scanner-btn" onClick={() => fileRef.current?.click()}>Upload photo</button>
-            <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
-          </>
-        )}
+        <span className="scanner-divider">·</span>
 
-        {isUpload && (
-          <>
-            <span className="scanner-divider">or</span>
-            <button className="scanner-btn" onClick={() => { setMode('camera'); setUploadImg(null); setOverlay(null); }}>
-              Use camera
-            </button>
-          </>
-        )}
+        <button className="scanner-btn" onClick={handleChangePhoto}>
+          Change photo
+        </button>
+
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+        />
       </div>
     </div>
   );
