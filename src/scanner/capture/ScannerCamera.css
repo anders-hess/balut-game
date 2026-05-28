@@ -52,7 +52,7 @@
   background: rgba(0,0,0,0.4);
 }
 
-/* Row labels outside overlay */
+/* ── Category labels — left of overlay, outside crop ── */
 .overlay-row-labels {
   position: absolute;
   display: flex;
@@ -64,76 +64,92 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-right: 4px;
-  color: rgba(255,255,255,0.85);
+  padding-right: 5px;
+  color: rgba(255,255,255,0.9);
   font-family: var(--font-sans);
-  font-size: 0.6rem;
-  font-weight: 600;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
 
-/* Grid overlay */
+/* ── Column headers — above overlay, outside crop ── */
+.overlay-col-headers-ext {
+  position: absolute;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  pointer-events: none;
+  z-index: 10;
+  height: 20px;
+}
+.overlay-col-header-ext {
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 3px;
+}
+
+/* ── Grid overlay — this is what gets cropped ── */
 .overlay-grid {
   position: absolute;
-  border: 2px solid rgba(255,255,255,0.85);
-  border-radius: 4px;
+  border: 2px solid rgba(255, 200, 100, 0.9);  /* warm amber — distinct from white UI */
+  border-radius: 3px;
   display: flex;
   flex-direction: column;
   cursor: grab;
   touch-action: none;
   z-index: 10;
   user-select: none;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.5);
 }
 .overlay-grid:active { cursor: grabbing; }
 
-.overlay-col-headers {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  border-bottom: 1px solid rgba(255,255,255,0.5);
-}
-.overlay-col-header {
-  text-align: center;
-  font-family: var(--font-sans);
-  font-size: 0.55rem;
-  font-weight: 600;
-  color: rgba(255,255,255,0.85);
-  padding: 2px 0;
-  border-right: 1px solid rgba(255,255,255,0.3);
-}
-.overlay-col-header:last-child { border-right: none; }
-
 .overlay-cells { flex: 1; display: flex; flex-direction: column; }
+
 .overlay-row {
   flex: 1;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  border-bottom: 1px solid rgba(255,255,255,0.3);
+  border-bottom: 1px solid rgba(255,200,100,0.5);
 }
 .overlay-row:last-child { border-bottom: none; }
-.overlay-cell { border-right: 1px solid rgba(255,255,255,0.3); }
+
+.overlay-cell {
+  border-right: 1px solid rgba(255,200,100,0.5);
+}
 .overlay-cell:last-child { border-right: none; }
 
+/* Resize handle — bottom-right */
 .overlay-handle {
   position: absolute;
-  bottom: -1px; right: -1px;
-  width: 28px; height: 28px;
+  bottom: -1px;
+  right: -1px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255,200,100,0.95);
   cursor: se-resize;
   touch-action: none;
-  background: rgba(0,0,0,0.35);
-  border-radius: 0 0 4px 0;
+  background: rgba(0,0,0,0.4);
+  border-radius: 0 0 3px 0;
 }
 
-/* Bottom panel */
+/* ── Bottom action panel ── */
 .scanner-hint {
   margin: 0;
-  padding: 10px 16px 4px;
+  padding: 8px 16px 4px;
   font-family: var(--font-sans);
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.7);
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.65);
   text-align: center;
   background: #111;
 }
@@ -142,36 +158,45 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 12px 16px 20px;
+  gap: 10px;
+  padding: 10px 16px 18px;
   background: #111;
+  flex-wrap: wrap;
 }
 
 .scanner-btn {
   font-family: var(--font-sans);
   font-size: 0.9rem;
   font-weight: 500;
-  padding: 10px 24px;
+  padding: 10px 22px;
   border-radius: var(--radius-md);
-  border: 1.5px solid rgba(255,255,255,0.25);
-  background: rgba(255,255,255,0.1);
+  border: 1.5px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.09);
   color: #fff;
   cursor: pointer;
   transition: background 0.15s;
 }
-.scanner-btn:hover   { background: rgba(255,255,255,0.18); }
-.scanner-btn:disabled{ opacity: 0.4; cursor: default; }
+.scanner-btn:hover    { background: rgba(255,255,255,0.16); }
+.scanner-btn:disabled { opacity: 0.4; cursor: default; }
 
 .scanner-btn--primary {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  padding: 12px 36px;
+  padding: 12px 34px;
   font-size: 1rem;
 }
-.scanner-btn--primary:hover { background: var(--color-accent-dk); }
+.scanner-btn--primary:hover { background: var(--color-accent-dk, #a85e32); }
 
-.scanner-divider { color: rgba(255,255,255,0.4); font-size: 0.8rem; }
+/* Rotate icon button */
+.scanner-btn--icon {
+  padding: 10px 14px;
+  font-size: 1.1rem;
+  line-height: 1;
+}
 
+.scanner-divider { color: rgba(255,255,255,0.35); font-size: 0.8rem; }
+
+/* ── Error fallback ── */
 .scanner-error {
   display: flex;
   flex-direction: column;
