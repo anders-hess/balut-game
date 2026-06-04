@@ -8,10 +8,10 @@ export default function ErrorLogPanel() {
 
   function handleOpen() { setLogs(getLogs()); setOpen(true); }
 
-  const latest   = logs[0];
-  const okCount  = latest?.cellResults?.filter(c => c.status === 'ok').length          ?? 0;
-  const lowCount = latest?.cellResults?.filter(c => c.status === 'low_confidence').length ?? 0;
-  const missCount= latest?.cellResults?.filter(c => c.status === 'no_detection').length  ?? 0;
+  const latest    = logs[0];
+  const okCount   = latest?.cellResults?.filter(c => c.status === 'ok' || c.status === 'zero_marker').length ?? 0;
+  const ambigCount= latest?.cellResults?.filter(c => c.status === 'ambiguous').length    ?? 0;
+  const missCount = latest?.cellResults?.filter(c => c.status === 'no_detection').length ?? 0;
 
   return (
     <>
@@ -38,7 +38,7 @@ export default function ErrorLogPanel() {
                 <span className="log-entry__ts">{entry.timestamp}</span>
                 {i === 0 && (
                   <span className="log-entry__stats">
-                    ✓ {okCount} · ⚠ {lowCount} · ✗ {missCount}
+                    ✓ {okCount} · ⚠ {ambigCount} · ✗ {missCount}
                     {entry.error ? ' · ERROR' : ''}
                   </span>
                 )}
@@ -50,7 +50,7 @@ export default function ErrorLogPanel() {
               {entry.rawText && <pre className="log-entry__raw">{entry.rawText}</pre>}
               <table className="log-table">
                 <thead>
-                  <tr><th>Category</th><th>Col</th><th>Raw</th><th>Value</th><th>Conf</th><th>Status</th></tr>
+                  <tr><th>Category</th><th>Col</th><th>Raw</th><th>Value</th><th>Status</th></tr>
                 </thead>
                 <tbody>
                   {entry.cellResults?.map((c, j) => (
@@ -59,7 +59,6 @@ export default function ErrorLogPanel() {
                       <td>{c.column + 1}</td>
                       <td className="log-raw">{c.rawText || '—'}</td>
                       <td>{c.parsedValue ?? '—'}</td>
-                      <td>{c.confidence != null ? `${(c.confidence * 100).toFixed(0)}%` : '—'}</td>
                       <td>{c.status}</td>
                     </tr>
                   ))}

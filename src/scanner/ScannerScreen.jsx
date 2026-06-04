@@ -16,7 +16,7 @@ export default function ScannerScreen({ onClose }) {
   const [finalCard,  setFinalCard]  = useState(null);
   const [errorMsg,   setErrorMsg]   = useState(null);
 
-  async function handleCapture(capturedCanvas) {
+  async function handleCapture(capturedCanvas, orientation = 'landscape') {
     setCanvas(capturedCanvas);
     setStep('processing');
 
@@ -25,7 +25,7 @@ export default function ScannerScreen({ onClose }) {
 
     try {
       ocrResponse = await recognizeGrid(capturedCanvas);
-      cells = mapOcrToGrid(ocrResponse, capturedCanvas.width, capturedCanvas.height);
+      cells = mapOcrToGrid(ocrResponse, capturedCanvas.width, capturedCanvas.height, orientation);
       const scorecard    = cellsToScorecard(cells);
       const flaggedCells = buildFlaggedCells(cells, isInvalid);
       appendLog(buildLogEntry({ canvas: capturedCanvas, ocrResponse, cells, error: null }));

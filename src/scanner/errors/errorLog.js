@@ -46,10 +46,10 @@ export function buildLogEntry({ canvas, ocrResponse, cells, error }) {
           column:      col,
           rawText:     cell.rawText,
           parsedValue: cell.value,
-          confidence:  Number(cell.confidence.toFixed(3)),
           status:
-            cell.value === null      ? 'no_detection'    :
-            cell.confidence < 0.70   ? 'low_confidence'  : 'ok',
+            cell.value === null ? 'no_detection' :
+            cell.dirty          ? 'ambiguous'    :
+            cell.zero           ? 'zero_marker'  : 'ok',
         }))
       )
     : [];

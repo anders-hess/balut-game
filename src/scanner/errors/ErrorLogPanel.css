@@ -73,5 +73,6 @@
 .log-table td { padding: 3px 8px; border-bottom: 1px solid rgba(214,202,184,0.4); }
 .log-raw { font-family: monospace; }
 .log-row--ok             { background: #f0faf0; }
-.log-row--low_confidence { background: #fff8e1; }
+.log-row--zero_marker    { background: #f0faf0; }
+.log-row--ambiguous      { background: #fff8e1; }
 .log-row--no_detection   { background: #fff1ee; }
