@@ -61,7 +61,7 @@ export default function DiceArea({ dice, rollsLeft, onRoll, onToggleHold, turnNu
         {dice.map((die, i) => (
           <Dice
             key={i}
-            die={rollsLeft === 0 ? { ...die, held: false } : die}
+            die={die}
             index={i}
             canHold={canHold}
             onToggleHold={onToggleHold}
