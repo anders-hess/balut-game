@@ -10,6 +10,11 @@ export default function GameOverScreen({ scorecard, onPlayAgain, onViewHighscore
   const { totalSmall, totalBig, bonus } = calcTotals(scorecard);
   const balutCount = countBaluts(scorecard);
 
+  const bonusText =
+    bonus > 0 ? `+${bonus} bonus point${bonus !== 1 ? 's' : ''}`
+    : bonus < 0 ? `${bonus} big points`
+    : 'no bonus';
+
   const [qualifyingPeriods, setQualifyingPeriods] = useState(null);
   const [playerName, setPlayerName] = useState(() => localStorage.getItem(NAME_KEY) ?? '');
   const [submitState, setSubmitState] = useState('idle');
@@ -63,6 +68,30 @@ export default function GameOverScreen({ scorecard, onPlayAgain, onViewHighscore
           <span className="gameover__stat-label">Baluts</span>
           <span className="gameover__stat-value">{balutCount}</span>
           <span className="gameover__stat-hint">× 2 big pts</span>
+        </div>
+      </div>
+
+      {/* Compact summary bar — mobile only (CSS-gated) */}
+      <div className="gameover__bar">
+        <div className="gameover__bar-cell">
+          <span className="gameover__bar-label">Grand total</span>
+          <span className="gameover__bar-value gameover__bar-value--big">{totalBig}</span>
+          <span className="gameover__bar-sub">big points</span>
+        </div>
+        <div className="gameover__bar-cell">
+          <span className="gameover__bar-label">Small</span>
+          <span className="gameover__bar-value">{totalSmall}</span>
+          <span
+            className="gameover__bar-sub"
+            style={{ color: bonus > 0 ? 'var(--color-accent)' : bonus < 0 ? 'var(--color-danger)' : undefined }}
+          >
+            {bonusText}
+          </span>
+        </div>
+        <div className="gameover__bar-cell">
+          <span className="gameover__bar-label">Baluts</span>
+          <span className="gameover__bar-value">{balutCount}</span>
+          <span className="gameover__bar-sub">× 2 big pts</span>
         </div>
       </div>
 

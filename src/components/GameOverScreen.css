@@ -82,6 +82,50 @@
   margin-top: 6px;
 }
 
+/* ── Compact summary bar (mobile only) ────────────────── */
+.gameover__bar {
+  display: none; /* desktop: hidden; shown at <=800px */
+}
+
+.gameover__bar-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.gameover__bar-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-ink-mute);
+  font-weight: 500;
+}
+
+.gameover__bar-value {
+  font-family: var(--font-sans);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.gameover__bar-value--big {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 30px;
+  color: var(--color-accent);
+  letter-spacing: -1px;
+}
+
+.gameover__bar-sub {
+  font-size: 11px;
+  color: var(--color-ink-mute);
+}
+
 /* ── Leaderboard qualify card ─────────────────────────── */
 .gameover__leaderboard {
   display: flex;
@@ -242,15 +286,18 @@
     font-size: 30px;
   }
 
+  /* Replace the desktop stats grid with the compact footer-style bar */
   .gameover__stats {
-    grid-template-columns: 1fr 1fr;
-    padding: 18px 18px;
-    gap: 14px;
+    display: none;
   }
 
-  .gameover__stat-value--big {
-    font-size: 48px;
-    grid-column: 1 / -1;
+  .gameover__bar {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 0.8fr;
+    gap: 12px;
+    background: var(--color-surface-2);
+    border-radius: 14px;
+    padding: 14px 16px;
   }
 
   .gameover__hs-form {
