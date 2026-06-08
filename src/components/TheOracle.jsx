@@ -7,11 +7,11 @@ export default function TheOracle({
   dice, rollsLeft, scorecard,
   isOpen, hasRolled, isGameOver,
   onToggle,
+  oracleOn, onPowerToggle,
 }) {
   const diceValues = dice.map(d => d.value);
   const [openTip,  setOpenTip]  = useState(null);
   const [tipPos,   setTipPos]   = useState(null);
-  const [oracleOn, setOracleOn] = useState(true);
   const panelRef = useRef(null);
 
   const result = useMemo(() => {
@@ -66,7 +66,7 @@ export default function TheOracle({
       <aside className="oracle" ref={panelRef}>
         <div className="oracle__header">
           <h2 className="oracle__title oracle__title--off">The Oracle is turned off.</h2>
-          <button className="oracle__power-btn" onClick={() => setOracleOn(true)}>
+          <button className="oracle__power-btn" onClick={onPowerToggle}>
             Turn on
           </button>
         </div>
@@ -174,7 +174,7 @@ export default function TheOracle({
           <div className="oracle__footer">
             <button
               className="oracle__power-btn oracle__power-btn--off"
-              onClick={() => setOracleOn(false)}
+              onClick={onPowerToggle}
             >
               Turn off Oracle
             </button>

@@ -34,7 +34,38 @@ export async function fetchGameCount() {
   }
 }
 
-export async function fetchInsights() {
+// Average aggregates from a set of score rows (one decimal place).
+function aggregateScores(rows) {
+  const n = rows.length;
+  return {
+    avgBig:      n ? +(rows.reduce((a, s) => a + s.big_points,   0) / n).toFixed(1) : null,
+    avgSmall:    n ? +(rows.reduce((a, s) => a + s.small_points, 0) / n).toFixed(1) : null,
+    avgBaluts:   n ? +(rows.reduce((a, s) => a + s.balut_count,  0) / n).toFixed(1) : null,
+    scoresCount: n,
+  };
+}
+
+// Threshold-hit percentages from a set of game_completed events.
+function aggregatePcts(evts) {
+  const mc  = evts.length;
+  const pct = (key) => mc === 0 ? null
+    : Math.round(evts.filter(e => e.metadata?.[key]).length / mc * 100);
+  return {
+    pctFours:     pct('hadFours'),
+    pctFives:     pct('hadFives'),
+    pctSixes:     pct('hadSixes'),
+    pctStraight:  pct('hadStraight'),
+    pctFullHouse: pct('hadFullHouse'),
+    pctChoice:    pct('hadChoice'),
+    pctBalut:     pct('hadBalut'),
+    eventsCount:  mc,
+  };
+}
+
+// fetchInsights() returns all-players stats. When a userId is passed, it
+// additionally returns that user's own stats under `user` (null otherwise) so
+// the Insights screen can render an all-players vs. you comparison.
+export async function fetchInsights(userId = null) {
   if (!supabase) return null;
 
   const ws = weekStart();
@@ -51,21 +82,12 @@ export async function fetchInsights() {
   ]);
 
   const completedEvts = eventsRes.data ?? [];
+  const scoreRows     = scoresRes.data ?? [];
 
-  const scoreRows = scoresRes.data ?? [];
-  const n = scoreRows.length;
-  const avgBig    = n ? Math.round(scoreRows.reduce((a, s) => a + s.big_points,   0) / n) : null;
-  const avgSmall  = n ? Math.round(scoreRows.reduce((a, s) => a + s.small_points, 0) / n) : null;
-  const avgBaluts = n ? +(scoreRows.reduce((a, s) => a + s.balut_count, 0) / n).toFixed(1) : null;
-
-  const mc  = completedEvts.length;
-  const pct = (key) => mc === 0 ? null
-    : Math.round(completedEvts.filter(e => e.metadata?.[key]).length / mc * 100);
-
-  return {
+  const result = {
     visits: {
-      allTime:   pvAll.count  ?? 0,
-      thisWeek:  pvWeek.count  ?? 0,
+      allTime:   pvAll.count   ?? 0,
+      thisWeek:  pvWeek.count   ?? 0,
       thisMonth: pvMonth.count ?? 0,
     },
     games: {
@@ -73,21 +95,31 @@ export async function fetchInsights() {
       thisWeek:  scoresWeek.count  ?? 0,
       thisMonth: scoresMonth.count ?? 0,
     },
-    scores: {
-      avgBig,
-      avgSmall,
-      avgBaluts,
-      scoresCount: n,
-    },
-    scorecard: {
-      pctFours:     pct('hadFours'),
-      pctFives:     pct('hadFives'),
-      pctSixes:     pct('hadSixes'),
-      pctStraight:  pct('hadStraight'),
-      pctFullHouse: pct('hadFullHouse'),
-      pctChoice:    pct('hadChoice'),
-      pctBalut:     pct('hadBalut'),
-      eventsCount:  mc,
-    },
+    scores:    aggregateScores(scoreRows),
+    scorecard: aggregatePcts(completedEvts),
+    user:      null,
   };
+
+  if (userId) {
+    const [uScores, uWeek, uMonth] = await Promise.all([
+      supabase.from('scores').select('big_points, small_points, balut_count').eq('user_id', userId).limit(1000),
+      supabase.from('scores').select('*', { count: 'exact', head: true }).eq('user_id', userId).gte('created_at', ws),
+      supabase.from('scores').select('*', { count: 'exact', head: true }).eq('user_id', userId).gte('created_at', ms),
+    ]);
+    const uRows   = uScores.data ?? [];
+    // Per-user threshold rates rely on game_completed events carrying the user's
+    // id in metadata (stamped at submit time once auth is wired).
+    const uEvents = completedEvts.filter(e => e.metadata?.userId === userId);
+    result.user = {
+      games: {
+        allTime:   uRows.length,
+        thisWeek:  uWeek.count  ?? 0,
+        thisMonth: uMonth.count ?? 0,
+      },
+      scores:    aggregateScores(uRows),
+      scorecard: aggregatePcts(uEvents),
+    };
+  }
+
+  return result;
 }

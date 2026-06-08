@@ -1,0 +1,126 @@
+.profile-screen {
+  min-height: 100vh;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+}
+
+.profile-screen__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 56px 12px;
+}
+
+.profile-logo { display: flex; align-items: center; gap: 10px; }
+.profile-logo__mark {
+  border-radius: 27%;
+  background: var(--color-accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-style: italic; font-weight: 500;
+}
+.profile-logo__word {
+  font-family: var(--font-sans); font-weight: 500;
+  color: var(--color-ink); letter-spacing: -0.3px;
+}
+
+.profile-screen__header-actions { display: flex; align-items: center; gap: 18px; }
+
+.profile-screen__back,
+.profile-screen__signout {
+  background: transparent; border: none; padding: 0;
+  font-family: var(--font-sans); font-size: 13px; font-weight: 500;
+  color: var(--color-ink-soft); text-decoration: underline;
+  text-decoration-color: var(--color-edge); text-underline-offset: 4px;
+  cursor: pointer;
+}
+.profile-screen__back:hover,
+.profile-screen__signout:hover { color: var(--color-ink); }
+
+.profile-screen__inner {
+  flex: 1;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 12px 56px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.profile-screen__kicker {
+  font-weight: 500; font-size: 11px; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--color-accent); margin-bottom: 12px;
+}
+.profile-screen__title {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 52px; line-height: 0.95; letter-spacing: -1.4px;
+  color: var(--color-ink); margin: 0;
+  word-break: break-word;
+}
+
+.profile-screen__status { font-size: 15px; color: var(--color-ink-mute); padding: 24px 0; margin: 0; }
+.profile-screen__status--error { color: var(--color-danger); }
+
+.profile-screen__sections { display: flex; flex-direction: column; gap: 20px; }
+
+.profile-section {
+  background: var(--color-surface);
+  border-radius: 16px;
+  padding: 24px 28px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.profile-section__title {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 22px; letter-spacing: -0.4px; color: var(--color-ink);
+  border-bottom: 1px solid var(--color-edge-soft); padding-bottom: 12px; margin: 0;
+}
+.profile-section__sub { font-size: 12px; color: var(--color-ink-mute); margin: -8px 0 0; line-height: 1.5; }
+
+.profile-tiles {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+}
+.profile-tiles--six { grid-template-columns: repeat(2, 1fr); }
+
+.profile-tile {
+  background: var(--color-surface-2); border-radius: 12px;
+  padding: 18px 20px; display: flex; flex-direction: column; gap: 6px;
+}
+.profile-tile__value {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 36px; line-height: 1; letter-spacing: -1px;
+  color: var(--color-ink); font-variant-numeric: tabular-nums;
+}
+.profile-tile__label {
+  font-family: var(--font-sans); font-size: 11px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-ink-mute);
+}
+
+/* Play history table */
+.profile-history { overflow-x: auto; }
+.profile-history__table {
+  width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums;
+}
+.profile-history__table th {
+  text-align: left; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--color-ink-mute); font-weight: 500; padding: 8px 10px;
+  border-bottom: 1px solid var(--color-edge-soft);
+}
+.profile-history__table td {
+  padding: 10px 10px; font-size: 14px; color: var(--color-ink);
+  border-bottom: 1px solid var(--color-edge-soft);
+}
+.profile-history__big { color: var(--color-accent); font-weight: 600; }
+
+@media (max-width: 800px) {
+  .profile-screen__header { padding: 24px 18px 8px; }
+  .profile-screen__inner { padding: 14px 18px 40px; gap: 22px; }
+  .profile-screen__title { font-size: 36px; }
+  .profile-section { padding: 18px 16px; }
+  .profile-tiles { gap: 8px; }
+  .profile-tile { padding: 12px 12px; }
+  .profile-tile__value { font-size: 24px; }
+  .profile-tile__label { font-size: 9px; letter-spacing: 1px; }
+}

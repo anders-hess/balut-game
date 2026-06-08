@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useGameState } from './hooks/useGameState.js';
 import { useOnlineGame } from './hooks/useOnlineGame.js';
+import { useAuth } from './hooks/useAuth.js';
 import StartScreen from './components/StartScreen.jsx';
 import PlayerSetupScreen from './components/PlayerSetupScreen.jsx';
 import OnlineLobbyScreen from './components/OnlineLobbyScreen.jsx';
@@ -9,10 +10,32 @@ import HighscoresScreen from './components/HighscoresScreen.jsx';
 import RulesScreen from './components/RulesScreen.jsx';
 import OracleScreen from './components/OracleScreen.jsx';
 import AppInsightsScreen from './components/AppInsightsScreen.jsx';
+import AuthScreen from './components/AuthScreen.jsx';
+import ProfileScreen from './components/ProfileScreen.jsx';
 import ScannerScreen from './scanner/ScannerScreen.jsx';
 import { trackEvent } from './services/analytics.js';
 import { calcTotals, countBaluts } from './logic/scoring.js';
 import './styles/theme.css';
+
+// game_completed metadata for one player's final scorecard (drives Insights).
+function scorecardMetadata(sc) {
+  const { totalBig, totalSmall } = calcTotals(sc);
+  const colSum      = (cat) => sc[cat].reduce((a, v) => a + (v ?? 0), 0);
+  const allFilled   = (cat) => sc[cat].every(v => v !== null && v > 0);
+  const anyPositive = (cat) => sc[cat].some(v => v !== null && v > 0);
+  return {
+    bigPoints:    totalBig,
+    smallPoints:  totalSmall,
+    balutCount:   countBaluts(sc),
+    hadFours:     colSum('fours')  >= 52,
+    hadFives:     colSum('fives')  >= 65,
+    hadSixes:     colSum('sixes')  >= 78,
+    hadStraight:  allFilled('straight'),
+    hadFullHouse: allFilled('fullHouse'),
+    hadChoice:    colSum('choice') >= 100,
+    hadBalut:     anyPositive('balut'),
+  };
+}
 
 export default function App() {
   const {
@@ -22,6 +45,7 @@ export default function App() {
   } = useGameState();
 
   const onlineGame = useOnlineGame();
+  const auth = useAuth();
 
   const [showHighscores,  setShowHighscores]  = useState(false);
   const [hsContext,       setHsContext]       = useState('home'); // 'home' | 'game'
@@ -30,6 +54,8 @@ export default function App() {
   const [showOracle,      setShowOracle]      = useState(false);
   const [showOnlineLobby, setShowOnlineLobby] = useState(false);
   const [showInsights,    setShowInsights]    = useState(false);
+  const [showAuth,        setShowAuth]        = useState(false);
+  const [showProfile,     setShowProfile]     = useState(false);
   const [showScanner,     setShowScanner]     = useState(
     () => new URLSearchParams(window.location.search).has('scanner')
   );
@@ -52,27 +78,38 @@ export default function App() {
     prevPhaseRef.current = state.phase;
   }, [state.phase]);
 
+  // Local game over: count each player's game separately. Single player attributes
+  // to the logged-in user; local pass-and-play players are treated as guests.
   useEffect(() => {
-    if (state.phase === 'gameover' && state.players.length === 1) {
-      const sc = state.players[0].scorecard;
-      const { totalBig, totalSmall } = calcTotals(sc);
-      const colSum    = (cat) => sc[cat].reduce((a, v) => a + (v ?? 0), 0);
-      const allFilled = (cat) => sc[cat].every(v => v !== null && v > 0);
-      const anyPositive = (cat) => sc[cat].some(v => v !== null && v > 0);
+    if (state.phase !== 'gameover') return;
+    const single = state.players.length === 1;
+    state.players.forEach((p) => {
       trackEvent('game_completed', {
-        bigPoints:    totalBig,
-        smallPoints:  totalSmall,
-        balutCount:   countBaluts(sc),
-        hadFours:     colSum('fours')  >= 52,
-        hadFives:     colSum('fives')  >= 65,
-        hadSixes:     colSum('sixes')  >= 78,
-        hadStraight:  allFilled('straight'),
-        hadFullHouse: allFilled('fullHouse'),
-        hadChoice:    colSum('choice') >= 100,
-        hadBalut:     anyPositive('balut'),
+        ...scorecardMetadata(p.scorecard),
+        userId: single ? (auth.user?.id ?? null) : null,
       });
-    }
+    });
   }, [state.phase]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Online game over: each device tracks only its own player's game.
+  const onlinePhase = onlineGame.state.phase;
+  useEffect(() => {
+    const live = onlineGame.connectionPhase === 'playing' || onlineGame.connectionPhase === 'reconnecting';
+    if (!live || onlinePhase !== 'gameover') return;
+    const me = onlineGame.state.players[onlineGame.myPlayerIndex];
+    if (!me) return;
+    trackEvent('game_completed', { ...scorecardMetadata(me.scorecard), userId: auth.user?.id ?? null });
+  }, [onlinePhase]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-arm submission prompts when an online rematch starts (gameover → playing).
+  const prevOnlinePhaseRef = useRef(onlinePhase);
+  useEffect(() => {
+    if (prevOnlinePhaseRef.current === 'gameover' && onlinePhase === 'playing') {
+      setScoreSubmitted(false);
+      setMpSubmittedNames([]);
+    }
+    prevOnlinePhaseRef.current = onlinePhase;
+  }, [onlinePhase]);
 
   const { phase } = state;
 
@@ -87,6 +124,21 @@ export default function App() {
     setScoreSubmitted(false);
     setMpSubmittedNames([]);
     setShowSetup(false);
+  }
+
+  // ── Reconnecting into a game in progress (after reload) ───────────────────
+  // Neutral full-screen loader — never the lobby — until the snapshot lands.
+  if (onlineGame.connectionPhase === 'restoring') {
+    return (
+      <div style={{
+        minHeight: '100vh', background: 'var(--color-bg)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        gap: 16, fontFamily: 'var(--font-sans)', color: 'var(--color-ink-mute)',
+      }}>
+        <div className="lobby-spinner" aria-label="Reconnecting" />
+        <p>Reconnecting to your game…</p>
+      </div>
+    );
   }
 
   // ── Online lobby (before game starts) ────────────────────────────────────
@@ -118,6 +170,8 @@ export default function App() {
         onScoreSubmitted={() => setScoreSubmitted(true)}
         mpSubmittedNames={mpSubmittedNames}
         onMpPlayerSubmitted={(name) => setMpSubmittedNames(prev => [...prev, name])}
+        authUser={auth.user}
+        authUsername={auth.username}
         isOnlineGame
         onlineGame={onlineGame}
       />
@@ -128,8 +182,36 @@ export default function App() {
     return <ScannerScreen onClose={closeScanner} />;
   }
 
+  if (showAuth) {
+    return (
+      <AuthScreen
+        onClose={() => setShowAuth(false)}
+        onAuthed={() => setShowAuth(false)}
+        signIn={auth.signIn}
+        signUp={auth.signUp}
+      />
+    );
+  }
+
+  if (showProfile && auth.user) {
+    return (
+      <ProfileScreen
+        onClose={() => setShowProfile(false)}
+        onSignOut={async () => { await auth.signOut(); setShowProfile(false); }}
+        userId={auth.user.id}
+        username={auth.username}
+      />
+    );
+  }
+
   if (showInsights) {
-    return <AppInsightsScreen onClose={() => setShowInsights(false)} />;
+    return (
+      <AppInsightsScreen
+        onClose={() => setShowInsights(false)}
+        userId={auth.user?.id ?? null}
+        username={auth.username}
+      />
+    );
   }
 
   if (showHighscores) {
@@ -167,6 +249,10 @@ export default function App() {
         onRules={() => setShowRules(true)}
         onOracle={() => setShowOracle(true)}
         onInsights={() => setShowInsights(true)}
+        authAvailable={auth.available}
+        username={auth.username}
+        onLogin={() => setShowAuth(true)}
+        onProfile={() => setShowProfile(true)}
       />
     );
   }
@@ -187,6 +273,8 @@ export default function App() {
       onScoreSubmitted={() => setScoreSubmitted(true)}
       mpSubmittedNames={mpSubmittedNames}
       onMpPlayerSubmitted={(name) => setMpSubmittedNames(prev => [...prev, name])}
+      authUser={auth.user}
+      authUsername={auth.username}
     />
   );
 }

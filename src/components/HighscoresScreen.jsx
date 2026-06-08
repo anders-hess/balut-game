@@ -107,7 +107,12 @@ export default function HighscoresScreen({ onClose, backLabel = '← Back to hom
                 <div key={i} className="hs-row">
                   <span className={`hs-row__rank${medalClass}`}>{i + 1}</span>
                   <div className="hs-row__name">
-                    {row.player_name}
+                    <span className="hs-row__name-line">
+                      {row.player_name}
+                      {row.is_guest
+                        ? <span className="hs-row__tag hs-row__tag--guest">guest</span>
+                        : <span className="hs-row__tag hs-row__tag--verified" title="Registered player">✓</span>}
+                    </span>
                     <span className="hs-row__sub">
                       {activePeriod === 'weekly'
                         ? new Date(row.created_at).toLocaleDateString('en', { weekday: 'long' })

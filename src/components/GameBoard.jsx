@@ -28,6 +28,7 @@ export default function GameBoard({
   onGoHome, onNewGame, onViewHighscores, onDismissHandoff, onCancelPending,
   scoreSubmitted, onScoreSubmitted,
   mpSubmittedNames, onMpPlayerSubmitted,
+  authUser = null, authUsername = null,
   isOnlineGame = false, onlineGame = null,
 }) {
   const { dice, rollsLeft, oracleEnabled, players, currentPlayerIndex, phase, turnNumber, justScoredBalut, showHandoff, pendingScore } = state;
@@ -42,6 +43,10 @@ export default function GameBoard({
   const myIdx     = isOnline ? (onlineGame?.myPlayerIndex ?? null) : currentPlayerIndex;
 
   const currentPlayer = players[currentPlayerIndex];
+
+  const playerTurn = CATEGORIES.reduce((n, cat) => n + currentPlayer.scorecard[cat].filter(s => s !== null).length, 0) + 1;
+
+  const [oracleOn, setOracleOn] = useState(true);
 
   const [viewingIdx, setViewingIdx] = useState(currentPlayerIndex);
   useEffect(() => { setViewingIdx(currentPlayerIndex); }, [currentPlayerIndex]);
@@ -64,6 +69,8 @@ export default function GameBoard({
     hasRolled:   hasRolled && allRolled,
     isGameOver,
     onToggle:    onToggleOracle,
+    oracleOn,
+    onPowerToggle: () => setOracleOn(o => !o),
   };
 
   return (
@@ -102,11 +109,16 @@ export default function GameBoard({
             isMultiplayer ? (
               <MultiplayerGameOverScreen
                 players={players}
-                onPlayAgain={onNewGame}
+                onPlayAgain={isOnline ? onlineGame?.playAgain : onNewGame}
                 onViewHighscores={onViewHighscores}
                 onScoreSubmitted={() => setHsRefresh(n => n + 1)}
                 submittedNames={mpSubmittedNames}
                 onMpPlayerSubmitted={onMpPlayerSubmitted}
+                isOnline={isOnline}
+                isHost={isOnline ? !!onlineGame?.isHost : true}
+                myPlayerIndex={isOnline ? onlineGame?.myPlayerIndex : null}
+                authUser={authUser}
+                authUsername={authUsername}
               />
             ) : (
               <GameOverScreen
@@ -115,6 +127,8 @@ export default function GameBoard({
                 onViewHighscores={onViewHighscores}
                 onScoreSubmitted={() => { setHsRefresh(n => n + 1); onScoreSubmitted?.(); }}
                 scoreSubmitted={scoreSubmitted}
+                authUser={authUser}
+                authUsername={authUsername}
               />
             )
           ) : (isMultiplayer && showHandoff) ? (() => {
@@ -161,15 +175,15 @@ export default function GameBoard({
               rollsLeft={rollsLeft}
               onRoll={onRoll}
               onToggleHold={onToggleHold}
-              turnNumber={turnNumber}
+              turnNumber={playerTurn}
               totalTurns={TOTAL_TURNS}
               disabled={isOnline && !myTurn}
               waitingFor={isOnline && !myTurn ? currentPlayer.name : null}
             />
           )}
 
-          {/* Oracle — always in left column */}
-          {!isGameOver && <TheOracle {...oracleProps} />}
+          {/* Oracle — in left column when ON */}
+          {!isGameOver && oracleOn && <TheOracle {...oracleProps} />}
 
           {/* Player tabs (multiplayer) */}
           {isMultiplayer && !isGameOver && (
@@ -203,7 +217,10 @@ export default function GameBoard({
             onScore={viewingOwnTurn && !isGameOver && myTurn ? onScore : null}
             playerName={isMultiplayer ? players[displayIdx].name : null}
             pendingScore={viewingOwnTurn ? pendingScore : null}
+            showAvailability={viewingOwnTurn && myTurn && !isGameOver}
           />
+          {/* Oracle — below scorecard when OFF */}
+          {!isGameOver && !oracleOn && <TheOracle {...oracleProps} />}
           <HighscoresCard
             onViewAll={onViewHighscores}
             refreshTrigger={hsRefresh}

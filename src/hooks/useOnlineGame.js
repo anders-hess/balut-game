@@ -7,7 +7,9 @@ export function useOnlineGame() {
   const sessionId = svc.getSessionId();
 
   const [state, dispatch]             = useReducer(reducer, createInitialState());
-  const [connectionPhase, setPhase]   = useState('idle');
+  // Start in 'restoring' (not 'idle') when a game is remembered, so the app
+  // shows a neutral reconnecting screen on first paint — never the lobby.
+  const [connectionPhase, setPhase]   = useState(() => svc.getActiveRoom() ? 'restoring' : 'idle');
   const [roomCode, setRoomCode]       = useState(null);
   const [gameId, setGameId]           = useState(null);
   const [myPlayerIndex, setMyIdx]     = useState(null);
@@ -23,6 +25,7 @@ export function useOnlineGame() {
   const stateRef          = useRef(state);
   const playerSessionsRef = useRef([]);  // { sessionId, name, playerIndex }[]
   const hasConnectedRef   = useRef(false);
+  const reconnectStartedRef = useRef(false);
 
   // Keep refs current
   useEffect(() => { stateRef.current = state; }, [state]);
@@ -30,6 +33,38 @@ export function useOnlineGame() {
   useEffect(() => { gameIdRef.current = gameId; }, [gameId]);
   useEffect(() => { roomCodeRef.current = roomCode; }, [roomCode]);
   useEffect(() => { myIdxRef.current = myPlayerIndex; }, [myPlayerIndex]);
+
+  // On mount, if a game is remembered, rejoin straight into it — no lobby detour.
+  useEffect(() => {
+    if (reconnectStartedRef.current) return; // run once (guards StrictMode double-mount)
+    const code = svc.getActiveRoom();
+    if (!code) return;
+    reconnectStartedRef.current = true;
+    let cancelled = false;
+    (async () => {
+      try {
+        const snap     = await svc.fetchGameSnapshot(code);
+        const okStatus = snap && (snap.status === 'playing' || snap.status === 'gameover');
+        const sessions = snap?.player_sessions || [];
+        const me       = sessions.find(s => s.sessionId === sessionId);
+        if (cancelled) return;
+        if (!okStatus || !me) { svc.clearActiveRoom(); setPhase('idle'); return; }
+
+        setRoomCode(code);        roomCodeRef.current = code;
+        setGameId(snap.id);       gameIdRef.current   = snap.id;
+        setMyIdx(me.playerIndex); myIdxRef.current    = me.playerIndex;
+        if (snap.state && snap.state.phase) dispatch({ type: '__RESTORE__', state: snap.state });
+
+        openChannel(code, { name: me.name, playerIndex: me.playerIndex }, sessions);
+        hasConnectedRef.current = true; // already hydrated from the snapshot
+        setPhase('playing');
+      } catch {
+        if (!cancelled) { svc.clearActiveRoom(); setPhase('idle'); }
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isMyTurn = myPlayerIndex !== null && state.currentPlayerIndex === myPlayerIndex;
 
@@ -102,6 +137,7 @@ export function useOnlineGame() {
         // Guest auto-transitions when host starts game
         if (action.type === 'SETUP_MULTIPLAYER') {
           if (action.playerSessions) playerSessionsRef.current = action.playerSessions;
+          svc.saveActiveRoom(roomCodeRef.current);
           setPhase('playing');
         }
       },
@@ -169,6 +205,7 @@ export function useOnlineGame() {
 
     const newState = reducer(stateRef.current, action);
     dispatch(action);
+    svc.saveActiveRoom(roomCodeRef.current);
     setPhase('playing');
 
     await Promise.all([
@@ -188,6 +225,7 @@ export function useOnlineGame() {
     if (gameIdRef.current && phase === 'lobby-host') {
       svc.abandonRoom(gameIdRef.current).catch(() => {});
     }
+    svc.clearActiveRoom();
     playerSessionsRef.current = [];
     hasConnectedRef.current   = false;
     setPhase('idle');
@@ -204,7 +242,9 @@ export function useOnlineGame() {
     const newState = reducer(stateRef.current, action);
     dispatch(action);
     svc.broadcastAction(channelRef.current, action).catch(console.error);
-    const newStatus = newState.phase === 'gameover' ? 'gameover' : undefined;
+    // Keep the persisted status in sync so reconnects land in the right place
+    // (notably a rematch flips gameover → playing).
+    const newStatus = newState.phase === 'gameover' ? 'gameover' : 'playing';
     svc.persistState(gameIdRef.current, newState, newStatus).catch(console.error);
   }
 
@@ -248,6 +288,12 @@ export function useOnlineGame() {
     dispatch({ type: 'TOGGLE_ORACLE' });
   }
 
+  function playAgain() {
+    // Host-only rematch: reset the game for everyone, staying in the room.
+    if (myPlayerIndex !== 0) return;
+    dispatchAndBroadcast({ type: 'PLAY_AGAIN' });
+  }
+
   function goHome() {
     leaveRoom();
   }
@@ -257,6 +303,7 @@ export function useOnlineGame() {
     roomCode,
     gameId,
     myPlayerIndex,
+    isHost: myPlayerIndex === 0,
     sessionId,
     onlinePlayers,
     errorMessage,
@@ -272,6 +319,7 @@ export function useOnlineGame() {
     dismissHandoff,
     cancelPending,
     toggleOracle,
+    playAgain,
     goHome,
   };
 }
