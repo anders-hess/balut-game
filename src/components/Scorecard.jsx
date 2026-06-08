@@ -143,7 +143,7 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
                   })}
 
                   <td className="td-sum">
-                    {catTotal > 0 ? catTotal : ''}
+                    {displayScorecard[cat].some(s => s !== null) ? catTotal : ''}
                   </td>
                   <td className="td-big">
                     {bigPts > 0

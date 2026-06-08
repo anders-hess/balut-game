@@ -128,8 +128,8 @@ function reducer(state, action) {
           return {
             ...state,
             pendingScore: null,
-            dice:      origDice.map(v => ({ value: v, held: false })),
-            rollsLeft: 0,
+            dice:      state.pendingScore.prevDice,
+            rollsLeft: state.pendingScore.prevRollsLeft,
           };
         }
 
@@ -169,6 +169,8 @@ function reducer(state, action) {
             category, column: col, score: finalScore,
             originalDice: diceValues,
             nextPlayerIdx: nextIdx,
+            prevRollsLeft: state.rollsLeft,
+            prevDice: state.dice,
           },
           dice:        resetTurn(state.dice),
           rollsLeft:   MAX_ROLLS,
@@ -179,7 +181,7 @@ function reducer(state, action) {
       // Single player: standard pending state.
       return {
         ...state,
-        pendingScore: { category, column: col, score: finalScore, originalDice: diceValues },
+        pendingScore: { category, column: col, score: finalScore, originalDice: diceValues, prevRollsLeft: state.rollsLeft, prevDice: state.dice },
         dice:         resetTurn(state.dice),
         rollsLeft:    MAX_ROLLS,
       };
@@ -202,8 +204,8 @@ function reducer(state, action) {
         ...state,
         pendingScore: null,
         showHandoff:  false,
-        dice:      state.pendingScore.originalDice.map(v => ({ value: v, held: false })),
-        rollsLeft: 0,
+        dice:      state.pendingScore.prevDice,
+        rollsLeft: state.pendingScore.prevRollsLeft,
       };
     }
 
