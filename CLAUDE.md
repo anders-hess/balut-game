@@ -62,7 +62,7 @@ src/
     useGameState.js       # useReducer — all game actions including multiplayer; exports reducer + __RESTORE__
     useOnlineGame.js      # Connection state machine + game action wrappers for online play
   components/
-    App.jsx               # Routing: showHighscores + showSetup + showRules + showOracle + showOnlineLobby + showInsights
+    App.jsx               # Routing: showHighscores + showSetup + showRules + showOracle + showOnlineLobby + showInsights + showScanner (opened via ?scanner URL param)
     StartScreen           # Hero layout (orange/cream split), mode cards, utility links
     PlayerSetupScreen     # Local multiplayer setup — player count (2–4) + name inputs
     OnlineLobbyScreen     # Online multiplayer lobby — create/join room, waiting room UI
@@ -81,6 +81,13 @@ src/
     HighscoresScreen      # Full leaderboard (This Week / Month / Year tabs)
     HighscoresCard        # Compact "This Week's Top 3" widget in GameBoard right column
     BalutToast            # Fixed-position celebration toast (2.8 s)
+  scanner/            # OCR scorecard scanner (see Scorecard Scanner section below)
+    ScannerScreen.jsx     # Step machine: capture → processing → review → done | error
+    capture/              # ScannerCamera.jsx (entry + live camera + photo editor), useCamera.js
+    ocr/                  # ocrSpace.js (OCR.space call), cellMapper.js (+ __tests__/)
+    review/               # ScannerReview.jsx, CellEditor.jsx, ScorecardDisplay.jsx
+    errors/               # errorLog.js, ErrorLogPanel.jsx (debug log, bottom-left toggle)
+    validators.js         # isInvalid(category, value) — exact legal-score check, enumerated from logic/scoring.js
   styles/
     theme.css             # All CSS custom properties (colors, fonts, radii, shadows)
 ```
@@ -337,10 +344,38 @@ Rules, Oracle sandbox, and Leaderboard all use a consistent marketing header: ba
 
 ---
 
+## Scorecard Scanner (OCR)
+
+Scans a handwritten Balut scorecard photo and produces a `{ [category]: [null|number ×4] }` scorecard.
+Lives in `src/scanner/`. Opened via the `?scanner` URL param (`App.jsx` → `<ScannerScreen onClose=…>`).
+**Note:** an older standalone copy exists at the repo-sibling `scorecard-scanner/` — it is NOT the live one; always edit `balut-app/src/scanner/`.
+
+### Pipeline
+`ScannerScreen.jsx` step machine: `capture → processing → review → done | error`. On capture it calls
+`recognizeGrid` (OCR.space Engine 2 handwriting, key `VITE_OCR_SPACE_KEY` in `.env.local`) → `mapOcrToGrid` → `cellsToScorecard` + `buildFlaggedCells`. Every scan is logged to `localStorage` (`scorecard_ocr_log`, 20 max) and viewable via the bottom-left **Debug log** toggle (`ErrorLogPanel`).
+
+### Capture (`capture/ScannerCamera.jsx`)
+Refactored into `useOverlay` hook + `OverlayBox` + `LiveCamera` + `PhotoEditor`. Entry screen offers two paths:
+- **Take photo** (mobile only — gated on `getUserMedia` + `(pointer: coarse)`): in-app live `getUserMedia` preview with a **landscape-only** ghost overlay (drag + resize) and a shutter button. Captures via `useCamera.capture()`; no rotation.
+- **Upload photo** (all devices): pick an existing file → `PhotoEditor` shows the static image with the 3-way orientation toggle, drag, resize, then Scan.
+
+### Orientation & overlay
+Orientations: `landscape | portrait-r | portrait-l`. Overlay labels are arranged so **4s and #1 always meet at the top-left** corner (landscape = categories down the left as 7 rows, players #1–#4 across the top; portrait transposes to 4 rows × 7 cols but keeps 4s/#1 top-left). Portrait crops are rotated upright for OCR (`rotateCCW` for portrait-r, `rotateCW` for portrait-l). `mapOcrToGrid(resp, w, h, orientation)` then undoes the axis the rotation reversed: **portrait-r reverses the category axis**, **portrait-l reverses the player axis**. (If a real scan ever comes out mirrored, swap that axis — it's the two `orientation === 'portrait-*'` lines in `cellMapper.js`.)
+
+### Cell parsing & flagging (`ocr/cellMapper.js`)
+- Cell shape: `{ value: number|null, rawText, dirty, zero }` — **no `confidence`** (OCR.space Engine 2 returns no reliable per-word confidence; the old hardcoded `0.5` made every cell read "50% / low", so it was removed).
+- A token matching `/^[-–—xX×]+$/` (dash variants / x) is read as a deliberate **0**. A real number overrides a marker-0 in the same cell; first non-null wins on ties.
+- `dirty` = the token needed non-digit stripping (e.g. `"l2"` → 2) — flagged as uncertain.
+- `buildFlaggedCells` reasons: **`invalid`** (not a legal score for that category → RED, **blocks Confirm**), **`empty`** / **`ambiguous`** (→ YELLOW, non-blocking). `ScannerReview` recomputes flags live from edited values, so fixing a cell clears its flag; Confirm is disabled while any red remains.
+- `validators.js` `isInvalid` enforces **true per-category legality**, not a coarse range: it enumerates all 7776 dice rolls through `logic/scoring.js` `calculateScore` once at load and checks membership (e.g. fours ∈ {0,4,8,12,16,20}, straight ∈ {0,15,20}, balut ∈ {0,25,30,35,40,45,50}, full house = 0 or an achievable 3a+2b sum — note 10 and 25 are impossible). `0` is always legal (scratch). Single source of truth — stays in sync if scoring rules change.
+- Logic unit tests: `ocr/__tests__/cellMapper.test.js`.
+
+---
+
 ## Roadmap
 
 - **Oracle Sandbox Phase 2**: manual per-cell scorecard editor in `OracleScreen`
-- **Oracle Sandbox Phase 3**: OCR scanner to populate the sandbox from a photo
+- **Oracle Sandbox Phase 3**: ✅ OCR scanner built (`src/scanner/`, see Scorecard Scanner section) — still TODO: wire it into a visible button (currently only reachable via `?scanner`) and feed its output into the sandbox/game
 - **Online multiplayer v2**: play-again flow after game over (currently requires a new room); turn timer to handle disconnects
 
 ---

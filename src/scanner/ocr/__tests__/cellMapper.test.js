@@ -68,18 +68,50 @@ describe('zero markers', () => {
 });
 
 describe('buildFlaggedCells', () => {
-  it('flags out-of-range as invalid (red), dirty token as ambiguous, missing as empty', () => {
+  it('flags illegal value as invalid (red), legal-but-dirty token as ambiguous, missing as empty', () => {
     const cells = mapOcrToGrid(ocr([
-      { text: '99', row: 0, col: 0 }, // fours max 20 → invalid
-      { text: 'l2', row: 1, col: 1 }, // stray letter → ambiguous, value 2
+      { text: '99',  row: 0, col: 0 }, // illegal for fours → invalid
+      { text: 'l15', row: 1, col: 1 }, // stray letter, but 15 is legal for fives → ambiguous
     ]), W, H, 'landscape');
 
     const sc = cellsToScorecard(cells);
-    expect(sc.fives[1]).toBe(2); // 'l2' parsed to 2
+    expect(sc.fives[1]).toBe(15); // 'l15' parsed to 15
 
     const flagged = buildFlaggedCells(cells, isInvalid);
     expect(flagged['fours:0'].reason).toBe('invalid');
     expect(flagged['fives:1'].reason).toBe('ambiguous');
     expect(flagged['fours:1'].reason).toBe('empty'); // never filled
+  });
+});
+
+describe('isInvalid — true per-category legality', () => {
+  it('accepts only legal small-point scores (0 always allowed)', () => {
+    const legal = {
+      fours:     [0, 4, 8, 12, 16, 20],
+      fives:     [0, 5, 10, 15, 20, 25],
+      sixes:     [0, 6, 12, 18, 24, 30],
+      straight:  [0, 15, 20],
+      fullHouse: [0, 7, 8, 9, 28],     // achievable 3a+2b sums
+      choice:    [0, 5, 17, 30],
+      balut:     [0, 25, 35, 50],
+    };
+    for (const [cat, values] of Object.entries(legal)) {
+      for (const v of values) expect(isInvalid(cat, v), `${cat}=${v} should be legal`).toBe(false);
+    }
+  });
+
+  it('rejects illegal scores', () => {
+    const illegal = {
+      fours:     [6, 17, 21],          // not a multiple of 4 / too big
+      fives:     [2, 7, 26],
+      sixes:     [5, 31],
+      straight:  [10, 16, 21],         // only 15 or 20
+      fullHouse: [5, 6, 10, 25, 29],   // 10 and 25 are not achievable full-house sums
+      choice:    [4, 31],              // min 5, max 30
+      balut:     [5, 20, 26, 55],      // only 25/30/35/40/45/50
+    };
+    for (const [cat, values] of Object.entries(illegal)) {
+      for (const v of values) expect(isInvalid(cat, v), `${cat}=${v} should be illegal`).toBe(true);
+    }
   });
 });
