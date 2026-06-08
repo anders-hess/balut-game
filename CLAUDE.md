@@ -131,8 +131,11 @@ Single player uses `players.length === 1` — no separate code path.
 | `PENDING_SCORE({ category })` | **Single player**: stores `pendingScore`, clears dice, resets rollsLeft. Second click same cell = cancel. Click different cell = move. **Multiplayer**: commits immediately via handoff (see below). Last turn always calls `applyScore` directly. |
 | `DISMISS_HANDOFF` | If `pendingScore` exists: commits it via `applyScore` then clears handoff. Otherwise just clears handoff. |
 | `CANCEL_PENDING` | Clears `pendingScore` + `showHandoff`, restores original dice, sets rollsLeft→0. |
+| `PLAY_AGAIN` | Rematch: rebuilds fresh scorecards for the same players, resets everything else to `playing` (used by online host rematch) |
 | `GO_HOME` | Full reset |
 | `TOGGLE_ORACLE` | Toggles Oracle panel open/closed |
+
+Note: `CANCEL_PENDING` / the cancel branch in `PENDING_SCORE` now restore `prevDice` + `prevRollsLeft` (captured when the pending score was placed) so cancelling keeps the player's remaining rolls.
 
 ### App routing
 `App.jsx` uses six local booleans (`showHighscores`, `showSetup`, `showRules`, `showOracle`, `showOnlineLobby`, `showInsights`) alongside the reducer phase and `onlineGame.connectionPhase`. `hsContext` ('home' | 'game') tracks which context opened the leaderboard so the back button label is correct. Submission tracking (`scoreSubmitted`, `mpSubmittedNames`) is lifted here so it survives navigating to the leaderboard and back.
@@ -191,12 +194,36 @@ idle → joining  → lobby-guest → playing
 playing ↔ reconnecting  (channel drop/restore: fetches snapshot from DB)
 ```
 
-### Known limitations (v1)
-- No play-again flow — players must create a new room after game over
-- No turn timer — game stalls if a player disconnects
+### Play-again & reconnect
+- **Play again (host-controlled rematch)**: host taps "Play again" on the online game-over screen → `useOnlineGame.playAgain()` dispatches+broadcasts `PLAY_AGAIN` (rebuilds fresh scorecards for the same players, keeps the room). Non-hosts see "Waiting for the host to start a rematch…". `App.jsx` re-arms submission prompts on the gameover→playing transition.
+- **Reconnect on reload**: session identity is in **`localStorage`** (`balut_session_id`), and the active room code is saved to `localStorage` (`balut_active_room`) while playing. On mount `useOnlineGame` starts in a `restoring` phase (App shows a neutral "Reconnecting…" loader — never the lobby), fetches the snapshot, restores state, reopens the channel, and goes straight to `playing`. Cleared on `leaveRoom`.
+
+### Known limitations
+- No turn timer — game stalls if a player disconnects mid-turn
 - Race condition in `joinRoom` (read-modify-write on `player_sessions`) — acceptable for low-concurrency
 
 ---
+
+## User Accounts (Auth & Profile)
+
+Email + password via **Supabase Auth** (passwords stored only as a salted hash — never visible). Accounts are **optional**: guests play exactly as before. Session persists in `localStorage`, so users stay logged in.
+
+### Key files
+- `src/services/auth.js` — `signUp/signIn/signOut/getSession/fetchProfile/onAuthChange`; all no-op/throw friendly when Supabase absent.
+- `src/hooks/useAuth.js` — session + profile mirror; lifted in `App.jsx`, passed down. Exposes `{ user, profile, username, loading, available, signIn, signUp, signOut }`.
+- `src/components/AuthScreen.jsx` — login/sign-up (toggled by `showAuth` in App).
+- `src/components/ProfileScreen.jsx` — "My Profile": games played, personal best, averages, scorecard rates, recent-games history (`showProfile` in App). Data via `services/profile.js` + `fetchInsights(userId)`.
+- Account control in `StartScreen` header: "Log in" → `AuthScreen`; "{username}" chip → `ProfileScreen`.
+
+### DB (run `db/001_auth_profiles.sql` in Supabase)
+- `profiles` (`id`=auth uid, `username` citext unique) — created by an `on_auth_user_created` trigger from signup metadata. RLS: usernames public-readable, self-update only.
+- `scores` gains `user_id` (uuid) + `is_guest` (bool). **Disable email confirmation** in Supabase Auth for immediate login.
+
+### Score identity & submission
+- **Logged-in**: every finished game **auto-saves** (stamped `user_id`, `is_guest=false`, username) — to profile history *and* leaderboard, no form.
+- **Guest**: existing manual qualify→name→submit flow (`is_guest=true`).
+- Leaderboard tags: accounts show a ✓; guests show a "guest" tag (`HighscoresScreen`/`HighscoresCard`).
+- **Insights** (`fetchInsights(userId)`): all-players always; when logged in, a per-user `user` block enables the all-players-vs-you side-by-side view. `game_completed` events carry `userId` for per-user scorecard rates. Each player's game is tracked separately (local: each player; online: each device its own).
 
 ## The Oracle
 
@@ -219,7 +246,7 @@ recommend({ currentDice, rollsRemaining, scorecard, turnsRemaining? })
 ### Oracle UI
 - Lives in the left column of `GameBoard` (always — not split between mobile/desktop)
 - **Show/Hide** toggle collapses/expands the recommendations panel (`oracleEnabled` in state)
-- **Turn on/off** toggle is local state in `TheOracle.jsx` (`oracleOn`). When off, only the header with "The Oracle is turned off." and a "Turn on" link is shown. Resets to `on` on component remount (new game).
+- **Turn on/off**: `oracleOn` is lifted to `GameBoard` (passed to `TheOracle` as `oracleOn`/`onPowerToggle`). When **on**, the panel sits in the left column; when **off**, it renders *below the Scorecard* in the right column (just the "The Oracle is turned off / Turn on" bar). Resets to `on` on remount (new game).
 
 ### How BPIV works
 ```
@@ -283,7 +310,7 @@ npm.cmd run validate   # 6 hand-traced BPIV scenarios (spot-check after any Orac
 
 ### Backend: Supabase
 - **Project URL**: `https://ehpguosbtfnrfttghcnz.supabase.co`
-- **Table `scores`**: `id`, `player_name` (max 20), `big_points`, `small_points`, `balut_count`, `created_at` — no `player_count` column; multiplayer scores submit identically to single-player
+- **Table `scores`**: `id`, `player_name` (max 20), `big_points`, `small_points`, `balut_count`, `created_at`, `user_id` (nullable → auth user), `is_guest` (bool) — no `player_count` column; multiplayer scores submit identically to single-player
 - **Table `events`**: `id`, `type` (text), `metadata` (jsonb), `created_at` — stores `page_view` and `game_completed` events for the Insights screen
 - **Sort**: `big_points DESC, small_points DESC, balut_count DESC`
 - **Time windows**: weekly (Mon–Sun) / monthly / yearly filtered at query time
@@ -376,7 +403,7 @@ Orientations: `landscape | portrait-r | portrait-l`. Overlay labels are arranged
 
 - **Oracle Sandbox Phase 2**: manual per-cell scorecard editor in `OracleScreen`
 - **Oracle Sandbox Phase 3**: ✅ OCR scanner built (`src/scanner/`, see Scorecard Scanner section) — still TODO: wire it into a visible button (currently only reachable via `?scanner`) and feed its output into the sandbox/game
-- **Online multiplayer v2**: play-again flow after game over (currently requires a new room); turn timer to handle disconnects
+- **Online multiplayer v2**: ✅ play-again rematch + reconnect-on-reload done (see Online Multiplayer section); still TODO: turn timer to handle disconnects
 
 ---
 
