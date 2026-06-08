@@ -4,13 +4,22 @@ import { supabase } from './supabase.js';
 
 export function getSessionId() {
   const KEY = 'balut_session_id';
-  let id = sessionStorage.getItem(KEY);
+  // localStorage (not sessionStorage) so identity — and the ability to rejoin a
+  // game in progress — survives a full reload or mobile tab eviction.
+  let id = localStorage.getItem(KEY);
   if (!id) {
     id = crypto.randomUUID();
-    sessionStorage.setItem(KEY, id);
+    localStorage.setItem(KEY, id);
   }
   return id;
 }
+
+// Remembers the room the player is actively in, so we can rejoin straight into
+// the game on reload instead of bouncing through the lobby.
+const ACTIVE_ROOM_KEY = 'balut_active_room';
+export function saveActiveRoom(roomCode) { try { localStorage.setItem(ACTIVE_ROOM_KEY, roomCode); } catch { /* ignore */ } }
+export function getActiveRoom()           { try { return localStorage.getItem(ACTIVE_ROOM_KEY); } catch { return null; } }
+export function clearActiveRoom()         { try { localStorage.removeItem(ACTIVE_ROOM_KEY); } catch { /* ignore */ } }
 
 // ─── Room Code ────────────────────────────────────────────────────────────────
 

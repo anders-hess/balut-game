@@ -209,6 +209,14 @@ function reducer(state, action) {
       };
     }
 
+    case 'PLAY_AGAIN':
+      // Rematch: keep the same players (names/order), reset everything else.
+      return {
+        ...createInitialState(),
+        phase:   'playing',
+        players: state.players.map(p => createInitialPlayer(p.name)),
+      };
+
     case 'GO_HOME':
       return createInitialState();
 

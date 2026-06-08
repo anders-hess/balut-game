@@ -196,6 +196,14 @@
   align-items: center;
 }
 
+.mp-gameover__waiting-rematch {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-ink-mute);
+  margin: 0;
+  font-style: italic;
+}
+
 .mp-gameover__play-again {
   background: var(--color-ink);
   color: var(--color-surface);

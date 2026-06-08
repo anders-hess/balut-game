@@ -9,7 +9,7 @@ const PERIOD_LABELS = { weekly: 'This Week', monthly: 'This Month', yearly: 'Thi
 export default function MultiplayerGameOverScreen({
   players, onPlayAgain, onViewHighscores, onScoreSubmitted,
   submittedNames = [], onMpPlayerSubmitted,
-  isOnline = false, myPlayerIndex = null, authUser = null, authUsername = null,
+  isOnline = false, isHost = true, myPlayerIndex = null, authUser = null, authUsername = null,
 }) {
   const ranked = players
     .map((p, i) => ({ ...p, origIndex: i, ...calcTotals(p.scorecard), balutCount: countBaluts(p.scorecard) }))
@@ -76,9 +76,13 @@ export default function MultiplayerGameOverScreen({
       </div>
 
       <div className="mp-gameover__actions">
-        <button className="mp-gameover__play-again" onClick={onPlayAgain}>
-          Play again
-        </button>
+        {isOnline && !isHost ? (
+          <p className="mp-gameover__waiting-rematch">Waiting for the host to start a rematch…</p>
+        ) : (
+          <button className="mp-gameover__play-again" onClick={onPlayAgain}>
+            Play again
+          </button>
+        )}
         <button className="mp-gameover__hs-btn" onClick={onViewHighscores}>
           View leaderboard →
         </button>

@@ -109,12 +109,13 @@ export default function GameBoard({
             isMultiplayer ? (
               <MultiplayerGameOverScreen
                 players={players}
-                onPlayAgain={onNewGame}
+                onPlayAgain={isOnline ? onlineGame?.playAgain : onNewGame}
                 onViewHighscores={onViewHighscores}
                 onScoreSubmitted={() => setHsRefresh(n => n + 1)}
                 submittedNames={mpSubmittedNames}
                 onMpPlayerSubmitted={onMpPlayerSubmitted}
                 isOnline={isOnline}
+                isHost={isOnline ? !!onlineGame?.isHost : true}
                 myPlayerIndex={isOnline ? onlineGame?.myPlayerIndex : null}
                 authUser={authUser}
                 authUsername={authUsername}

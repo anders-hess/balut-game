@@ -101,6 +101,16 @@ export default function App() {
     trackEvent('game_completed', { ...scorecardMetadata(me.scorecard), userId: auth.user?.id ?? null });
   }, [onlinePhase]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Re-arm submission prompts when an online rematch starts (gameover → playing).
+  const prevOnlinePhaseRef = useRef(onlinePhase);
+  useEffect(() => {
+    if (prevOnlinePhaseRef.current === 'gameover' && onlinePhase === 'playing') {
+      setScoreSubmitted(false);
+      setMpSubmittedNames([]);
+    }
+    prevOnlinePhaseRef.current = onlinePhase;
+  }, [onlinePhase]);
+
   const { phase } = state;
 
   function handleNewGame() {
@@ -114,6 +124,21 @@ export default function App() {
     setScoreSubmitted(false);
     setMpSubmittedNames([]);
     setShowSetup(false);
+  }
+
+  // ── Reconnecting into a game in progress (after reload) ───────────────────
+  // Neutral full-screen loader — never the lobby — until the snapshot lands.
+  if (onlineGame.connectionPhase === 'restoring') {
+    return (
+      <div style={{
+        minHeight: '100vh', background: 'var(--color-bg)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        gap: 16, fontFamily: 'var(--font-sans)', color: 'var(--color-ink-mute)',
+      }}>
+        <div className="lobby-spinner" aria-label="Reconnecting" />
+        <p>Reconnecting to your game…</p>
+      </div>
+    );
   }
 
   // ── Online lobby (before game starts) ────────────────────────────────────
