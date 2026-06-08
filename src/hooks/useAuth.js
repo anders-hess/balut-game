@@ -8,26 +8,41 @@ export function useAuth() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(auth.isAuthAvailable());
 
+  // Track the session/user only.
+  // IMPORTANT: never `await` another Supabase call inside the onAuthStateChange
+  // callback. gotrue serializes auth ops behind a lock; awaiting a query (e.g.
+  // fetchProfile) inside the callback can hold that lock and deadlock the auth
+  // client, making every later query — and signOut — hang. This was the cause
+  // of "profile stats won't load / can't log out" after revisiting the profile
+  // (a TOKEN_REFRESHED event firing mid-navigation tripped the deadlock).
+  // Profile loading is decoupled into the effect below.
   useEffect(() => {
     if (!auth.isAuthAvailable()) { setLoading(false); return; }
     let active = true;
 
-    auth.getSession().then(async (session) => {
+    auth.getSession().then((session) => {
       if (!active) return;
-      const u = session?.user ?? null;
-      setUser(u);
-      setProfile(u ? await auth.fetchProfile(u.id) : null);
+      setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    const unsub = auth.onAuthChange(async (session) => {
-      const u = session?.user ?? null;
-      setUser(u);
-      setProfile(u ? await auth.fetchProfile(u.id) : null);
+    const unsub = auth.onAuthChange((session) => {
+      setUser(session?.user ?? null);   // synchronous state only
     });
 
     return () => { active = false; unsub(); };
   }, []);
+
+  // Load the profile whenever the signed-in user changes — outside the auth
+  // callback, so it never contends with the gotrue lock.
+  useEffect(() => {
+    if (!user) { setProfile(null); return; }
+    let active = true;
+    auth.fetchProfile(user.id)
+      .then((p) => { if (active) setProfile(p); })
+      .catch(() => { /* leave profile null; UI falls back to "You" */ });
+    return () => { active = false; };
+  }, [user?.id]);
 
   const signIn  = useCallback((creds) => auth.signIn(creds),  []);
   const signUp  = useCallback((creds) => auth.signUp(creds),  []);
