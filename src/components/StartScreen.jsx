@@ -91,7 +91,7 @@ function AnimatedCount({ target, onClick }) {
 }
 
 // ── StartScreen ───────────────────────────────────────────────────────────────
-export default function StartScreen({ onStart, onMultiplayer, onOnlineMultiplayer, onHighscores, onRules, onOracle, onInsights }) {
+export default function StartScreen({ onStart, onMultiplayer, onOnlineMultiplayer, onHighscores, onRules, onOracle, onInsights, authAvailable = false, username = null, onLogin, onProfile }) {
   const heroRots = [-4, 3, -2, 5, -3];
   const heroVals = [5, 5, 3, 5, 2];
 
@@ -100,9 +100,19 @@ export default function StartScreen({ onStart, onMultiplayer, onOnlineMultiplaye
 
   return (
     <div className="start-screen">
-      {/* Marketing header — logo only, no nav links */}
+      {/* Marketing header — logo + account control */}
       <header className="start-header">
         <Logo size={36} />
+        {authAvailable && (
+          username ? (
+            <button className="start-account" onClick={onProfile}>
+              <span className="start-account__avatar" aria-hidden="true">{username.charAt(0).toUpperCase()}</span>
+              <span className="start-account__name">{username}</span>
+            </button>
+          ) : (
+            <button className="start-account start-account--login" onClick={onLogin}>Log in</button>
+          )
+        )}
       </header>
 
       {/* Hero split */}

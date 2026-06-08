@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useGameState } from './hooks/useGameState.js';
 import { useOnlineGame } from './hooks/useOnlineGame.js';
+import { useAuth } from './hooks/useAuth.js';
 import StartScreen from './components/StartScreen.jsx';
 import PlayerSetupScreen from './components/PlayerSetupScreen.jsx';
 import OnlineLobbyScreen from './components/OnlineLobbyScreen.jsx';
@@ -9,6 +10,8 @@ import HighscoresScreen from './components/HighscoresScreen.jsx';
 import RulesScreen from './components/RulesScreen.jsx';
 import OracleScreen from './components/OracleScreen.jsx';
 import AppInsightsScreen from './components/AppInsightsScreen.jsx';
+import AuthScreen from './components/AuthScreen.jsx';
+import ProfileScreen from './components/ProfileScreen.jsx';
 import ScannerScreen from './scanner/ScannerScreen.jsx';
 import { trackEvent } from './services/analytics.js';
 import { calcTotals, countBaluts } from './logic/scoring.js';
@@ -22,6 +25,7 @@ export default function App() {
   } = useGameState();
 
   const onlineGame = useOnlineGame();
+  const auth = useAuth();
 
   const [showHighscores,  setShowHighscores]  = useState(false);
   const [hsContext,       setHsContext]       = useState('home'); // 'home' | 'game'
@@ -30,6 +34,8 @@ export default function App() {
   const [showOracle,      setShowOracle]      = useState(false);
   const [showOnlineLobby, setShowOnlineLobby] = useState(false);
   const [showInsights,    setShowInsights]    = useState(false);
+  const [showAuth,        setShowAuth]        = useState(false);
+  const [showProfile,     setShowProfile]     = useState(false);
   const [showScanner,     setShowScanner]     = useState(
     () => new URLSearchParams(window.location.search).has('scanner')
   );
@@ -128,8 +134,36 @@ export default function App() {
     return <ScannerScreen onClose={closeScanner} />;
   }
 
+  if (showAuth) {
+    return (
+      <AuthScreen
+        onClose={() => setShowAuth(false)}
+        onAuthed={() => setShowAuth(false)}
+        signIn={auth.signIn}
+        signUp={auth.signUp}
+      />
+    );
+  }
+
+  if (showProfile && auth.user) {
+    return (
+      <ProfileScreen
+        onClose={() => setShowProfile(false)}
+        onSignOut={async () => { await auth.signOut(); setShowProfile(false); }}
+        userId={auth.user.id}
+        username={auth.username}
+      />
+    );
+  }
+
   if (showInsights) {
-    return <AppInsightsScreen onClose={() => setShowInsights(false)} />;
+    return (
+      <AppInsightsScreen
+        onClose={() => setShowInsights(false)}
+        userId={auth.user?.id ?? null}
+        username={auth.username}
+      />
+    );
   }
 
   if (showHighscores) {
@@ -167,6 +201,10 @@ export default function App() {
         onRules={() => setShowRules(true)}
         onOracle={() => setShowOracle(true)}
         onInsights={() => setShowInsights(true)}
+        authAvailable={auth.available}
+        username={auth.username}
+        onLogin={() => setShowAuth(true)}
+        onProfile={() => setShowProfile(true)}
       />
     );
   }
