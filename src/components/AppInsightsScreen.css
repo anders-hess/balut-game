@@ -116,8 +116,36 @@
   gap: 12px;
 }
 
+/* Scorecard insights: two columns (7th tile — Balut — sits alone on the last row) */
 .ai-tiles--six {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* ── All-players vs. you comparison ───────────────────────── */
+.ai-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.ai-compare__col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ai-compare__heading {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-ink-mute);
+}
+
+.ai-compare__col--you .ai-compare__heading {
+  color: var(--color-accent);
 }
 
 .ai-tile {
@@ -169,19 +197,44 @@
     padding: 18px 16px;
   }
 
-  .ai-tiles,
+  /* Keep three tiles side-by-side on mobile; tighten so they fit */
+  .ai-tiles {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
   .ai-tiles--six {
     grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .ai-tile {
+    padding: 12px 12px;
   }
 
   .ai-tile__value {
-    font-size: 28px;
+    font-size: 22px;
+  }
+
+  .ai-tile__label {
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+
+  /* Stack all-players above your stats on narrow screens */
+  .ai-compare {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
 
 @media (max-width: 480px) {
-  .ai-tiles,
-  .ai-tiles--six {
-    grid-template-columns: 1fr;
+  .ai-tile {
+    padding: 10px 8px;
+  }
+
+  .ai-tile__value {
+    font-size: 18px;
+    letter-spacing: -0.5px;
   }
 }
