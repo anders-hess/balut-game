@@ -43,6 +43,10 @@ export default function GameBoard({
 
   const currentPlayer = players[currentPlayerIndex];
 
+  const playerTurn = CATEGORIES.reduce((n, cat) => n + currentPlayer.scorecard[cat].filter(s => s !== null).length, 0) + 1;
+
+  const [oracleOn, setOracleOn] = useState(true);
+
   const [viewingIdx, setViewingIdx] = useState(currentPlayerIndex);
   useEffect(() => { setViewingIdx(currentPlayerIndex); }, [currentPlayerIndex]);
 
@@ -64,6 +68,8 @@ export default function GameBoard({
     hasRolled:   hasRolled && allRolled,
     isGameOver,
     onToggle:    onToggleOracle,
+    oracleOn,
+    onPowerToggle: () => setOracleOn(o => !o),
   };
 
   return (
@@ -161,15 +167,15 @@ export default function GameBoard({
               rollsLeft={rollsLeft}
               onRoll={onRoll}
               onToggleHold={onToggleHold}
-              turnNumber={turnNumber}
+              turnNumber={playerTurn}
               totalTurns={TOTAL_TURNS}
               disabled={isOnline && !myTurn}
               waitingFor={isOnline && !myTurn ? currentPlayer.name : null}
             />
           )}
 
-          {/* Oracle — always in left column */}
-          {!isGameOver && <TheOracle {...oracleProps} />}
+          {/* Oracle — in left column when ON */}
+          {!isGameOver && oracleOn && <TheOracle {...oracleProps} />}
 
           {/* Player tabs (multiplayer) */}
           {isMultiplayer && !isGameOver && (
@@ -204,6 +210,8 @@ export default function GameBoard({
             playerName={isMultiplayer ? players[displayIdx].name : null}
             pendingScore={viewingOwnTurn ? pendingScore : null}
           />
+          {/* Oracle — below scorecard when OFF */}
+          {!isGameOver && !oracleOn && <TheOracle {...oracleProps} />}
           <HighscoresCard
             onViewAll={onViewHighscores}
             refreshTrigger={hsRefresh}
