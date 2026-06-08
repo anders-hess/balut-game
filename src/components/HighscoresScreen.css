@@ -209,6 +209,41 @@
   color: var(--color-ink);
 }
 
+.hs-row__name-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.hs-row__tag {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.hs-row__tag--guest {
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-ink-mute);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-edge);
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+
+.hs-row__tag--verified {
+  font-size: 11px;
+  color: #fff;
+  background: var(--color-accent);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .hs-row__sub {
   display: block;
   font-size: 12px;

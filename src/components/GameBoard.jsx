@@ -28,6 +28,7 @@ export default function GameBoard({
   onGoHome, onNewGame, onViewHighscores, onDismissHandoff, onCancelPending,
   scoreSubmitted, onScoreSubmitted,
   mpSubmittedNames, onMpPlayerSubmitted,
+  authUser = null, authUsername = null,
   isOnlineGame = false, onlineGame = null,
 }) {
   const { dice, rollsLeft, oracleEnabled, players, currentPlayerIndex, phase, turnNumber, justScoredBalut, showHandoff, pendingScore } = state;
@@ -113,6 +114,10 @@ export default function GameBoard({
                 onScoreSubmitted={() => setHsRefresh(n => n + 1)}
                 submittedNames={mpSubmittedNames}
                 onMpPlayerSubmitted={onMpPlayerSubmitted}
+                isOnline={isOnline}
+                myPlayerIndex={isOnline ? onlineGame?.myPlayerIndex : null}
+                authUser={authUser}
+                authUsername={authUsername}
               />
             ) : (
               <GameOverScreen
@@ -121,6 +126,8 @@ export default function GameBoard({
                 onViewHighscores={onViewHighscores}
                 onScoreSubmitted={() => { setHsRefresh(n => n + 1); onScoreSubmitted?.(); }}
                 scoreSubmitted={scoreSubmitted}
+                authUser={authUser}
+                authUsername={authUsername}
               />
             )
           ) : (isMultiplayer && showHandoff) ? (() => {

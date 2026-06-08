@@ -17,6 +17,26 @@ import { trackEvent } from './services/analytics.js';
 import { calcTotals, countBaluts } from './logic/scoring.js';
 import './styles/theme.css';
 
+// game_completed metadata for one player's final scorecard (drives Insights).
+function scorecardMetadata(sc) {
+  const { totalBig, totalSmall } = calcTotals(sc);
+  const colSum      = (cat) => sc[cat].reduce((a, v) => a + (v ?? 0), 0);
+  const allFilled   = (cat) => sc[cat].every(v => v !== null && v > 0);
+  const anyPositive = (cat) => sc[cat].some(v => v !== null && v > 0);
+  return {
+    bigPoints:    totalBig,
+    smallPoints:  totalSmall,
+    balutCount:   countBaluts(sc),
+    hadFours:     colSum('fours')  >= 52,
+    hadFives:     colSum('fives')  >= 65,
+    hadSixes:     colSum('sixes')  >= 78,
+    hadStraight:  allFilled('straight'),
+    hadFullHouse: allFilled('fullHouse'),
+    hadChoice:    colSum('choice') >= 100,
+    hadBalut:     anyPositive('balut'),
+  };
+}
+
 export default function App() {
   const {
     state,
@@ -58,27 +78,28 @@ export default function App() {
     prevPhaseRef.current = state.phase;
   }, [state.phase]);
 
+  // Local game over: count each player's game separately. Single player attributes
+  // to the logged-in user; local pass-and-play players are treated as guests.
   useEffect(() => {
-    if (state.phase === 'gameover' && state.players.length === 1) {
-      const sc = state.players[0].scorecard;
-      const { totalBig, totalSmall } = calcTotals(sc);
-      const colSum    = (cat) => sc[cat].reduce((a, v) => a + (v ?? 0), 0);
-      const allFilled = (cat) => sc[cat].every(v => v !== null && v > 0);
-      const anyPositive = (cat) => sc[cat].some(v => v !== null && v > 0);
+    if (state.phase !== 'gameover') return;
+    const single = state.players.length === 1;
+    state.players.forEach((p) => {
       trackEvent('game_completed', {
-        bigPoints:    totalBig,
-        smallPoints:  totalSmall,
-        balutCount:   countBaluts(sc),
-        hadFours:     colSum('fours')  >= 52,
-        hadFives:     colSum('fives')  >= 65,
-        hadSixes:     colSum('sixes')  >= 78,
-        hadStraight:  allFilled('straight'),
-        hadFullHouse: allFilled('fullHouse'),
-        hadChoice:    colSum('choice') >= 100,
-        hadBalut:     anyPositive('balut'),
+        ...scorecardMetadata(p.scorecard),
+        userId: single ? (auth.user?.id ?? null) : null,
       });
-    }
+    });
   }, [state.phase]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Online game over: each device tracks only its own player's game.
+  const onlinePhase = onlineGame.state.phase;
+  useEffect(() => {
+    const live = onlineGame.connectionPhase === 'playing' || onlineGame.connectionPhase === 'reconnecting';
+    if (!live || onlinePhase !== 'gameover') return;
+    const me = onlineGame.state.players[onlineGame.myPlayerIndex];
+    if (!me) return;
+    trackEvent('game_completed', { ...scorecardMetadata(me.scorecard), userId: auth.user?.id ?? null });
+  }, [onlinePhase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { phase } = state;
 
@@ -124,6 +145,8 @@ export default function App() {
         onScoreSubmitted={() => setScoreSubmitted(true)}
         mpSubmittedNames={mpSubmittedNames}
         onMpPlayerSubmitted={(name) => setMpSubmittedNames(prev => [...prev, name])}
+        authUser={auth.user}
+        authUsername={auth.username}
         isOnlineGame
         onlineGame={onlineGame}
       />
@@ -225,6 +248,8 @@ export default function App() {
       onScoreSubmitted={() => setScoreSubmitted(true)}
       mpSubmittedNames={mpSubmittedNames}
       onMpPlayerSubmitted={(name) => setMpSubmittedNames(prev => [...prev, name])}
+      authUser={auth.user}
+      authUsername={auth.username}
     />
   );
 }

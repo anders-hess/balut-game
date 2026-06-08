@@ -95,6 +95,21 @@
   white-space: nowrap;
 }
 
+.hs-card__verified {
+  margin-left: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-accent);
+  border-radius: 50%;
+  width: 13px;
+  height: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
 .hs-card__pts {
   font-family: var(--font-serif);
   font-style: italic;

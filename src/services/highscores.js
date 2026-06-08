@@ -20,7 +20,7 @@ export async function fetchLeaderboard(period) {
   if (!supabase) return [];
   const { data, error } = await supabase
     .from('scores')
-    .select('player_name, big_points, small_points, balut_count, created_at')
+    .select('player_name, big_points, small_points, balut_count, created_at, is_guest')
     .gte('created_at', windowStart(period).toISOString())
     .order('big_points',   { ascending: false })
     .order('small_points', { ascending: false })
@@ -51,13 +51,15 @@ function _beats(bigPts, smallPts, balutCount, board) {
 
 // ─── Submit ───────────────────────────────────────────────────────────────────
 
-export async function submitScore(playerName, bigPts, smallPts, balutCount) {
+export async function submitScore(playerName, bigPts, smallPts, balutCount, { userId = null } = {}) {
   if (!supabase) throw new Error('Supabase not configured');
   const { error } = await supabase.from('scores').insert({
     player_name:  playerName.trim().slice(0, 20),
     big_points:   bigPts,
     small_points: smallPts,
     balut_count:  balutCount,
+    user_id:      userId,
+    is_guest:     !userId,
   });
   if (error) throw error;
 }
