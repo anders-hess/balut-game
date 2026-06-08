@@ -4,7 +4,7 @@ import './Scorecard.css';
 
 const MAX_ROLLS_IMPORT = 3;
 
-export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerName, pendingScore }) {
+export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerName, pendingScore, showAvailability = true }) {
   const hasRolled  = rollsLeft < MAX_ROLLS_IMPORT;
   const diceValues = dice.map(d => d.value);
   const allRolled  = diceValues.every(v => v > 0);
@@ -88,12 +88,12 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
                       pendingScore.column   === colIdx;
 
                     // Normal scoring availability (no pending state).
-                    const isAvailableNormal = !hasPending && isNext &&
+                    const isAvailableNormal = showAvailability && !hasPending && isNext &&
                       (cellState === 'valid' || cellState === 'zero') &&
                       hasRolled && allRolled;
 
                     // Move-target availability (pending state active, different unfilled cell).
-                    const isAvailableMove = hasPending && !isPending && !isFilled &&
+                    const isAvailableMove = showAvailability && hasPending && !isPending && !isFilled &&
                       isNext && cellState !== 'full' && cellState !== 'empty';
 
                     const isAvailable = isPending || isAvailableNormal || isAvailableMove;
