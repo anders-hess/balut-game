@@ -209,6 +209,7 @@ export default function GameBoard({
             onScore={viewingOwnTurn && !isGameOver && myTurn ? onScore : null}
             playerName={isMultiplayer ? players[displayIdx].name : null}
             pendingScore={viewingOwnTurn ? pendingScore : null}
+            showAvailability={viewingOwnTurn && myTurn && !isGameOver}
           />
           {/* Oracle — below scorecard when OFF */}
           {!isGameOver && !oracleOn && <TheOracle {...oracleProps} />}
