@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchInsights } from '../services/analytics.js';
 import { fetchUserGames, fetchUserBest } from '../services/profile.js';
+import AchievementsPanel from './AchievementsPanel.jsx';
 import './ProfileScreen.css';
 
 function Logo({ size = 36, onClick }) {
@@ -82,6 +83,8 @@ export default function ProfileScreen({ onClose, onSignOut, userId, username }) 
               </div>
               {best && <p className="profile-section__sub">Your best game was {best.big_points} big · {best.small_points} small on {fmtDate(best.created_at)}.</p>}
             </section>
+
+            <AchievementsPanel userId={userId} username={username} />
 
             <section className="profile-section">
               <h2 className="profile-section__title">Averages</h2>

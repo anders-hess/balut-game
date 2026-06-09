@@ -26,6 +26,9 @@ export function createInitialState() {
     // Pending score: set when player clicks a cell, committed on next Roll.
     // null | { category: string, column: number, score: number }
     pendingScore: null,
+    // Transient per-game feat flags raised during play (e.g. one_roll_wonder),
+    // consumed by the achievements evaluator at game-end.
+    featFlags: {},
   };
 }
 

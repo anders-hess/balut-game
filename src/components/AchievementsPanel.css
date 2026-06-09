@@ -1,0 +1,132 @@
+/* ── Streak cards ─────────────────────────────────────────────────────────── */
+.achv-streaks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.achv-streak-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 16px 18px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-accent-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.achv-streak-card__icon { font-size: 1.4rem; line-height: 1; }
+
+.achv-streak-card__current {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  line-height: 1.1;
+  color: var(--color-accent);
+}
+.achv-streak-card__unit { font-size: 1rem; color: var(--color-ink-mute); }
+
+.achv-streak-card__label {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.achv-streak-card__longest {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--color-ink-mute);
+}
+
+/* ── Badge grid ───────────────────────────────────────────────────────────── */
+.achv-count {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-ink-mute);
+  margin-left: 6px;
+}
+
+.achv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+}
+
+.achv-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 14px 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-accent-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.achv-badge__icon { font-size: 1.7rem; line-height: 1; }
+
+.achv-badge__name {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+.achv-badge--locked {
+  background: var(--color-surface-2);
+  border-color: transparent;
+  box-shadow: none;
+}
+.achv-badge--locked .achv-badge__icon { filter: grayscale(1); opacity: 0.4; }
+.achv-badge--locked .achv-badge__name { color: var(--color-ink-mute); }
+
+/* ── Progression bars ─────────────────────────────────────────────────────── */
+.achv-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.achv-progress__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+}
+.achv-progress__icon { font-size: 1.05rem; }
+.achv-progress__name { font-weight: 600; color: var(--color-ink); }
+.achv-progress__tier {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+.achv-progress__val { margin-left: auto; color: var(--color-ink-mute); font-size: 0.8rem; }
+
+.achv-progress__bar {
+  height: 8px;
+  background: var(--color-surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.achv-progress__fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+@media (max-width: 480px) {
+  .achv-streaks { grid-template-columns: 1fr; }
+}

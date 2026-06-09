@@ -148,12 +148,18 @@ function reducer(state, action) {
       const col        = getTargetColumn(currentPlayer.scorecard, category, finalScore);
       if (col === -1) return state;
 
+      // One-Roll Wonder: a Balut scored having taken only the first roll
+      // (rollsLeft still MAX_ROLLS - 1). Raise the transient feat flag for the
+      // game-end achievements evaluator.
+      const oneRollBalut = category === 'balut' && finalScore > 0 && state.rollsLeft === MAX_ROLLS - 1;
+      const featFlags = oneRollBalut ? { ...state.featFlags, one_roll_wonder: true } : state.featFlags;
+
       // Last turn: only one unfilled cell — lock immediately, no pending state.
       const unfilledCount = CATEGORIES.reduce(
         (n, cat) => n + currentPlayer.scorecard[cat].filter(s => s === null).length, 0
       );
       if (unfilledCount === 1) {
-        return applyScore(state, category, col, finalScore);
+        return applyScore({ ...state, featFlags }, category, col, finalScore);
       }
 
       // Multiplayer: show handoff immediately; score confirmed on "Start Turn".
@@ -165,6 +171,7 @@ function reducer(state, action) {
         }
         return {
           ...state,
+          featFlags,
           pendingScore: {
             category, column: col, score: finalScore,
             originalDice: diceValues,
@@ -181,6 +188,7 @@ function reducer(state, action) {
       // Single player: standard pending state.
       return {
         ...state,
+        featFlags,
         pendingScore: { category, column: col, score: finalScore, originalDice: diceValues, prevRollsLeft: state.rollsLeft, prevDice: state.dice },
         dice:         resetTurn(state.dice),
         rollsLeft:    MAX_ROLLS,
