@@ -246,11 +246,19 @@
 }
 
 
+/* ── Oracle OFF bar placement ─────────────────────────── */
+/* Desktop: the "turned off" bar stays in the left column.
+   Mobile: it drops below the scorecard (right column). */
+.oracle-off-slot--mobile { display: none; }
+
 /* ── Responsive: narrow screens ──────────────────────── */
 @media (max-width: 800px) {
   .board-header {
     padding: 16px 18px;
   }
+
+  .oracle-off-slot--desktop { display: none; }
+  .oracle-off-slot--mobile  { display: block; }
 
   .board-layout {
     grid-template-columns: 1fr;

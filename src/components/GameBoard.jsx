@@ -185,6 +185,13 @@ export default function GameBoard({
           {/* Oracle — in left column when ON */}
           {!isGameOver && oracleOn && <TheOracle {...oracleProps} />}
 
+          {/* Oracle OFF bar — stays in the left column on desktop */}
+          {!isGameOver && !oracleOn && (
+            <div className="oracle-off-slot oracle-off-slot--desktop">
+              <TheOracle {...oracleProps} />
+            </div>
+          )}
+
           {/* Player tabs (multiplayer) */}
           {isMultiplayer && !isGameOver && (
             <div className="player-tabs">
@@ -219,8 +226,12 @@ export default function GameBoard({
             pendingScore={viewingOwnTurn ? pendingScore : null}
             showAvailability={viewingOwnTurn && myTurn && !isGameOver}
           />
-          {/* Oracle — below scorecard when OFF */}
-          {!isGameOver && !oracleOn && <TheOracle {...oracleProps} />}
+          {/* Oracle OFF bar — moves below the scorecard on mobile only */}
+          {!isGameOver && !oracleOn && (
+            <div className="oracle-off-slot oracle-off-slot--mobile">
+              <TheOracle {...oracleProps} />
+            </div>
+          )}
           <HighscoresCard
             onViewAll={onViewHighscores}
             refreshTrigger={hsRefresh}
