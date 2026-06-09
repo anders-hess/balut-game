@@ -352,7 +352,7 @@ npm.cmd run validate   # 6 hand-traced BPIV scenarios (spot-check after any Orac
 ### Backend: Supabase
 - **Project URL**: `https://ehpguosbtfnrfttghcnz.supabase.co`
 - **Table `scores`**: `id`, `player_name` (max 20), `big_points`, `small_points`, `balut_count`, `created_at`, `user_id` (nullable → auth user), `is_guest` (bool) — no `player_count` column; multiplayer scores submit identically to single-player
-- **Table `events`**: `id`, `type` (text), `metadata` (jsonb), `created_at` — stores `page_view` and `game_completed` events for the Insights screen
+- **Table `events`**: `id`, `type` (text), `metadata` (jsonb), `created_at` — stores `page_view` and `game_completed` events for the Insights screen. **RLS must allow `anon` AND `authenticated`** for both SELECT and INSERT (`db/003_events_rls.sql`) — the original policies were `to anon` only, so logged-in users silently couldn't read or write events (all Insights blank when logged in). `trackEvent()` warns on insert error in dev.
 - **Sort**: `big_points DESC, small_points DESC, balut_count DESC`
 - **Time windows**: weekly (Mon–Sun) / monthly / yearly filtered at query time
 - **RLS**: anonymous SELECT + INSERT; no auth required

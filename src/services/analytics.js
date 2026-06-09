@@ -15,9 +15,15 @@ function monthStart() {
 export async function trackEvent(type, metadata = null) {
   if (!supabase) return;
   try {
-    await supabase.from('events').insert({ type, metadata });
-  } catch {
+    // Supabase returns RLS/constraint failures as { error } rather than throwing,
+    // so surface them in dev — a silent insert block is otherwise invisible.
+    const { error } = await supabase.from('events').insert({ type, metadata });
+    if (error && import.meta.env.DEV) {
+      console.warn(`trackEvent('${type}') insert failed:`, error.message);
+    }
+  } catch (err) {
     // analytics are best-effort — never throw
+    if (import.meta.env.DEV) console.warn(`trackEvent('${type}') threw:`, err);
   }
 }
 
