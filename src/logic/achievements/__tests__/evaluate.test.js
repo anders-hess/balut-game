@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { evaluateFeats, computeStats, evaluateProgression } from '../evaluate.js';
+import { evaluateFeats, computeStats, evaluateProgression, overallTier } from '../evaluate.js';
 
 /**
  * Full scorecard whose defaults trigger NO feats. Override single rows per test.
@@ -135,19 +135,35 @@ describe('computeStats', () => {
 });
 
 describe('evaluateProgression', () => {
-  it('awards the highest tier reached', () => {
+  it('awards the highest per-metric tier reached', () => {
     const result = evaluateProgression({
-      gamesPlayed: 60, lifetimeBaluts: 12, lifetimeBigPoints: 90, weeksActive: 4,
+      gamesPlayed: 60, lifetimeBaluts: 12, lifetimeBigPoints: 90,
     });
-    expect(result.games_played).toBe(2);        // ≥ 50
-    expect(result.lifetime_baluts).toBe(1);      // ≥ 10
+    expect(result.games_played).toBe(2);                // ≥ 50
+    expect(result.lifetime_baluts).toBe(1);             // ≥ 10
     expect(result.lifetime_big_points).toBeUndefined(); // < 100
-    expect(result.weeks_active).toBe(1);         // ≥ 4
   });
 
   it('returns empty below all thresholds', () => {
     expect(evaluateProgression({
-      gamesPlayed: 3, lifetimeBaluts: 0, lifetimeBigPoints: 10, weeksActive: 1,
+      gamesPlayed: 3, lifetimeBaluts: 0, lifetimeBigPoints: 10,
     })).toEqual({});
+  });
+});
+
+describe('overallTier', () => {
+  it('is the highest tier met by ALL three metrics', () => {
+    // bronze = games≥10, baluts≥10, big≥100
+    expect(overallTier({ gamesPlayed: 10, lifetimeBaluts: 10, lifetimeBigPoints: 100 })).toBe(1);
+    // one metric short of bronze → 0
+    expect(overallTier({ gamesPlayed: 10, lifetimeBaluts: 9, lifetimeBigPoints: 100 })).toBe(0);
+    // games/baluts at gold but big points only at silver → capped at silver
+    expect(overallTier({ gamesPlayed: 100, lifetimeBaluts: 100, lifetimeBigPoints: 500 })).toBe(2);
+    // all platinum
+    expect(overallTier({ gamesPlayed: 500, lifetimeBaluts: 500, lifetimeBigPoints: 5000 })).toBe(4);
+  });
+
+  it('is 0 with no games', () => {
+    expect(overallTier({ gamesPlayed: 0, lifetimeBaluts: 0, lifetimeBigPoints: 0 })).toBe(0);
   });
 });

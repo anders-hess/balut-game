@@ -243,9 +243,9 @@ Solo-play gamification to drive engagement. Full design in `docs/gamification-sp
 
 ### Layers
 - **Feat badges** (11, one-time) — derived from one game's final scorecard, e.g. `first_balut`, `balut_hoarder`, `the_long_road`, `spoilt_for_choice` (choice total > 110), `four_by_four` (one badge, lights up on any of fours/fives/sixes at 4-of-a-kind), `the_tent` (full house = 7), `campsite`, `big_roller` (≥500 small), `clean_sheet`, `the_perfect_game`, plus `one_roll_wonder` (Balut on the first roll — the only live-detected feat).
-- **Progression badges** (tiered) — `games_played`, `lifetime_baluts`, `lifetime_big_points`, `weeks_active`. Counters are **derived from `scores`**, never stored.
-- **Streaks/competitive** — `play_streak` + `leaderboard_streak` (weekly Mon–Sun, **no grace**; in-progress current week never breaks), `first_blood`, `top_of_the_week`.
-- **Toasts** — personal-best + milestone (games/baluts tier crossings) toasts via `AchievementToast`.
+- **Progression → one overall Collector tier** (bronze/silver/gold/platinum). A tier is reached only when **all three** metrics — `games_played` (10/50/100/500), `lifetime_baluts` (10/50/100/500), `lifetime_big_points` (100/500/2000/5000) — meet that tier's threshold (`overallTier(stats)` in `evaluate.js`). Thresholds ascend, so reached tiers are contiguous (badge earned iff `tier <= current`). Counters are **derived from `scores`**, never stored; the overall tier persists as `overall_progress`. (The old per-metric badges and `weeks_active` were removed.)
+- **Streaks/competitive** — `play_streak` + `leaderboard_streak` (weekly Mon–Sun, **no grace**; in-progress current week never breaks), `first_blood` (first time at **#1** on any board), `top_of_the_week` (#1 in a week), `top_of_the_month` (#1 in a calendar month).
+- **Toasts** — personal-best + overall-tier toasts via `AchievementToast`.
 
 ### Pure logic — `src/logic/achievements/` (zero React, mirrors `oracle/`)
 `evaluateFeats({ scorecard, featFlags })`, `computeStats(scores)`, `evaluateProgression(stats)`; weekly streak math in `streaks.js` (`weekIndex` = absolute Monday-based integer index, so streaks are integer-adjacency on a Set). 26 Vitest tests.
@@ -255,7 +255,10 @@ Solo-play gamification to drive engagement. Full design in `docs/gamification-sp
 - **`App.jsx`** runs a solo-only (`players.length === 1`) game-over effect → `processSoloGame()`. For logged-in users it waits for `scoreSubmitted` (the auto-save) so lifetime aggregates include the game; guests process immediately. Results are queued into `achievementQueue` and shown by `<AchievementToast>`. The screen branches are wrapped in an IIFE (`const screen`) so the toast overlays every screen.
 
 ### Service — `services/achievements.js`
-`processSoloGame()` (award + persist: Supabase `achievements` table for logged-in, `localStorage 'balut_achievements'` for guests) and `loadProfileAchievements(user, username)` (feeds `AchievementsPanel`). Leaderboard presence is computed by grouping `scores` per week and ranking the real top-10 (matches logged-in scores by `player_name === username && !is_guest`). Safe no-ops when Supabase absent (guests still work).
+`processSoloGame()` (award + persist: Supabase `achievements` table for logged-in, `localStorage 'balut_achievements'` for guests) and `loadProfileAchievements(user, username)` → `{ feats, competitive, overall, trackers, play, leaderboard }` (feeds `AchievementsPanel`). `fetchCompetitive(username, since)` groups `scores` by week (top-10 → streak presence + weekly #1) and by calendar month (monthly #1), matching logged-in scores by `player_name === username && !is_guest`. Safe no-ops when Supabase absent (guests still work). `loadProfileAchievements` is logged-in only (the profile is login-gated).
+
+### Profile UI — `AchievementsPanel.jsx`
+Three sections: **Collector** (a 4-medallion tier rail linked by a progress line — serif Roman numerals, metallic gradients, ✓ disc when reached — above three per-metric trackers), **Streaks** (two cards: serif current number + longest, watermark glyph, live-state accent), and the **Achievements** badge grid (feats + competitive, earned/locked). Styling in `AchievementsPanel.css`, all on Scandinavian-Warmth tokens.
 
 ### DB — `db/002_achievements.sql` (✅ APPLIED to live Supabase; do not re-run)
 `achievements` (`user_id`, `achievement_id`, `tier` smallint [0 = one-time feat; 1..4 = bronze..platinum, highest reached], `unlocked_at`), PK `(user_id, achievement_id)`. RLS: public SELECT (profiles show badges), self-only insert/update.

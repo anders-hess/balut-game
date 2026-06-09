@@ -30,12 +30,18 @@ Evaluated from the **final scorecard at game-end**, except ⚡ which needs live 
 Computed on the fly from existing `scores` rows — no counter column. Persist only *when* a tier
 is first crossed (for the toast + "unlocked on" date).
 
-| ID | Name | Metric | Tiers |
-|---|---|---|---|
-| `games_played` | Games Played | count of games | 10 / 50 / 100 / 500 |
-| `lifetime_baluts` | Balut Collector | Σ `balut_count` | 10 / 50 / 100 / 500 |
-| `lifetime_big_points` | Big Points | Σ `big_points` | 100 / 500 / 2000 |
-| `weeks_active` | Regular | distinct Mon–Sun weeks with ≥1 game | 4 / 12 / 52 |
+**One overall Collector tier** (`overall_progress`, bronze/silver/gold/platinum). A tier is reached
+only when **all three** metrics meet that tier's threshold:
+
+| Metric | Bronze | Silver | Gold | Platinum |
+|---|---|---|---|---|
+| `games_played` (count of games) | 10 | 50 | 100 | 500 |
+| `lifetime_baluts` (Σ `balut_count`) | 10 | 50 | 100 | 500 |
+| `lifetime_big_points` (Σ `big_points`) | 100 | 500 | 2000 | 5000 |
+
+Thresholds ascend, so reached tiers are contiguous (`1..current`) — a tier badge is earned iff
+`tier <= current`. The three metrics are still shown as individual progress trackers. (The earlier
+per-metric badges and the `weeks_active` badge were removed.)
 
 ## 3. Streak & competitive badges
 
@@ -43,8 +49,9 @@ is first crossed (for the toast + "unlocked on" date).
 |---|---|---|
 | `play_streak` | Play Streak | Consecutive Mon–Sun weeks with ≥1 solo game. Resets on a missed week. Show current + longest. |
 | `leaderboard_streak` | Leaderboard Streak | Consecutive weeks in the weekly Top 10. Tiers 2 / 4 / 8 / 12. No grace. Show current + longest. |
-| `first_blood` | First Blood | First time appearing in a weekly Top 10. |
+| `first_blood` | First Blood | First time reaching **#1** on any leaderboard (weekly or monthly). |
 | `top_of_the_week` | Top of the Week | Finish a week ranked #1. |
+| `top_of_the_month` | Top of the Month | Finish a calendar month ranked #1. |
 
 **Top-10 membership:** a user is "on the leaderboard" for a week if ≥1 of their submissions is in
 that week's Top 10, ranked `big_points DESC, small_points DESC, balut_count DESC`. Multiple
@@ -54,7 +61,7 @@ streak (only a fully-elapsed missed week does).
 ## 4. Personal bests & milestones (toasts, no badge)
 
 - **New Personal Best** — at game-end when grand total > stored best. Works solo/offline.
-- **Milestone toasts** — on crossing a `games_played` or `lifetime_baluts` tier (not big-points / weeks-active).
+- **Overall-tier toast** — when the Collector tier increases (bronze→…→platinum).
 
 ## 5. Detection architecture
 

@@ -52,17 +52,22 @@ export const PROGRESSION = [
       { tier: 1, threshold: 100,  label: 'Bronze' },
       { tier: 2, threshold: 500,  label: 'Silver' },
       { tier: 3, threshold: 2000, label: 'Gold' },
+      { tier: 4, threshold: 5000, label: 'Platinum' },
     ],
   },
-  {
-    id: 'weeks_active', icon: '📅', name: 'Regular', metric: 'weeksActive',
-    description: 'Play in many different weeks.',
-    tiers: [
-      { tier: 1, threshold: 4,  label: 'Bronze' },
-      { tier: 2, threshold: 12, label: 'Silver' },
-      { tier: 3, threshold: 52, label: 'Gold' },
-    ],
-  },
+];
+
+/**
+ * The four overall tiers. A tier is "reached" only when ALL progression metrics
+ * meet that tier's threshold (see overallTier() in evaluate.js). Because every
+ * per-metric threshold is ascending, reached tiers are always contiguous
+ * (1..current) — so a tier badge is earned iff tier <= the current overall tier.
+ */
+export const TIERS = [
+  { tier: 1, key: 'bronze',   label: 'Bronze',   numeral: 'I'   },
+  { tier: 2, key: 'silver',   label: 'Silver',   numeral: 'II'  },
+  { tier: 3, key: 'gold',     label: 'Gold',     numeral: 'III' },
+  { tier: 4, key: 'platinum', label: 'Platinum', numeral: 'IV'  },
 ];
 
 /**
@@ -81,8 +86,9 @@ export const STREAKS = [
       { tier: 4, threshold: 12, label: 'Platinum' },
     ],
   },
-  { id: 'first_blood',        icon: '🩸', name: 'First Blood',        description: 'Reach the weekly Top 10 for the first time.' },
+  { id: 'first_blood',        icon: '🩸', name: 'First Blood',        description: 'Reach the #1 position on the leaderboard for the first time.' },
   { id: 'top_of_the_week',    icon: '🥇', name: 'Top of the Week',    description: 'Finish a week ranked #1.' },
+  { id: 'top_of_the_month',   icon: '👑', name: 'Top of the Month',   description: 'Finish a month ranked #1.' },
 ];
 
 /** Four-of-a-kind score per number category (used by the `four_by_four` feat). */

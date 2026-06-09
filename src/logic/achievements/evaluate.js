@@ -86,3 +86,21 @@ export function evaluateProgression(stats) {
   }
   return result;
 }
+
+/**
+ * The overall collector tier (0..4). A tier counts only when EVERY progression
+ * metric meets that tier's threshold. Thresholds are ascending, so the result
+ * is the highest fully-satisfied tier (reached tiers are contiguous 1..result).
+ */
+export function overallTier(stats) {
+  let reached = 0;
+  for (let t = 1; t <= 4; t++) {
+    const allMet = PROGRESSION.every(def => {
+      const td = def.tiers.find(x => x.tier === t);
+      return td != null && (stats[def.metric] ?? 0) >= td.threshold;
+    });
+    if (allMet) reached = t;
+    else break;
+  }
+  return reached;
+}

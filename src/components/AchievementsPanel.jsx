@@ -2,36 +2,64 @@ import { useState, useEffect } from 'react';
 import { loadProfileAchievements } from '../services/achievements.js';
 import './AchievementsPanel.css';
 
-function StreakCard({ icon, label, current, longest }) {
-  const unit = (n) => (n === 1 ? 'wk' : 'wks');
+// ── Overall tier rail: four medallions linked by a progression line ──────────
+function TierRail({ overall }) {
+  // Fill reaches the centre of the current tier's medallion (12.5% per cell).
+  const fillPct = overall.current > 0 ? (overall.current - 1) * 25 : 0;
   return (
-    <div className="achv-streak-card">
-      <span className="achv-streak-card__icon">{icon}</span>
-      <span className="achv-streak-card__current">
-        {current}<span className="achv-streak-card__unit"> {unit(current)}</span>
-      </span>
-      <span className="achv-streak-card__label">{label}</span>
-      <span className="achv-streak-card__longest">Best: {longest} {unit(longest)}</span>
+    <div className="tier-rail" role="img" aria-label={`Collector tier ${overall.current} of 4`}>
+      <span className="tier-rail__line" />
+      <span className="tier-rail__line tier-rail__line--fill" style={{ width: `${fillPct}%` }} />
+      {overall.tiers.map(t => (
+        <div className="tier-cell" key={t.tier}>
+          <div className={`tier-medal tier-medal--${t.key}${t.reached ? ' is-reached' : ''}`}>
+            <span className="tier-medal__numeral">{t.numeral}</span>
+            {t.reached && <span className="tier-medal__check" aria-hidden>✓</span>}
+          </div>
+          <span className={`tier-cell__label${t.reached ? ' is-reached' : ''}`}>{t.label}</span>
+        </div>
+      ))}
     </div>
   );
 }
 
-function ProgressRow({ p }) {
-  const reached = p.tier > 0 ? p.tiers.find(t => t.tier === p.tier) : null;
-  const pct = p.next ? Math.min(100, Math.round((p.value / p.next) * 100)) : 100;
+function Tracker({ t }) {
+  const span = t.next != null ? t.next - t.prev : 1;
+  const pct = t.next != null ? Math.max(0, Math.min(100, Math.round(((t.value - t.prev) / span) * 100))) : 100;
   return (
-    <div className="achv-progress">
-      <div className="achv-progress__head">
-        <span className="achv-progress__icon">{p.icon}</span>
-        <span className="achv-progress__name">{p.name}</span>
-        {reached && <span className="achv-progress__tier">{reached.label}</span>}
-        <span className="achv-progress__val">
-          {p.next ? `${p.value} / ${p.next}` : `${p.value} ✓`}
+    <div className="tracker">
+      <div className="tracker__top">
+        <span className="tracker__icon">{t.icon}</span>
+        <span className="tracker__name">{t.name}</span>
+        <span className="tracker__value">
+          <b>{t.value.toLocaleString()}</b>{t.next != null ? ` / ${t.next.toLocaleString()}` : ''}
         </span>
       </div>
-      <div className="achv-progress__bar">
-        <div className="achv-progress__fill" style={{ width: `${pct}%` }} />
+      <div className="tracker__bar">
+        <div className="tracker__fill" style={{ width: `${pct}%` }} />
       </div>
+      <div className="tracker__foot">
+        {t.next != null
+          ? `${(t.next - t.value).toLocaleString()} more to ${t.nextLabel}`
+          : 'Top tier reached ✓'}
+      </div>
+    </div>
+  );
+}
+
+function StreakCard({ variant, glyph, label, current, longest }) {
+  const wk = (n) => (n === 1 ? 'week' : 'weeks');
+  return (
+    <div className={`streak-card streak-card--${variant}${current > 0 ? ' is-active' : ''}`}>
+      <span className="streak-card__watermark" aria-hidden>{glyph}</span>
+      <span className="streak-card__head">{label}</span>
+      <div className="streak-card__figure">
+        <span className="streak-card__num">{current}</span>
+        <span className="streak-card__unit">{wk(current)}</span>
+      </div>
+      <span className="streak-card__foot">
+        Longest <b>{longest}</b> {longest === 1 ? 'wk' : 'wks'}
+      </span>
     </div>
   );
 }
@@ -67,17 +95,28 @@ export default function AchievementsPanel({ userId, username }) {
     );
   }
 
-  const { feats, competitive, progression, play, leaderboard } = data;
+  const { feats, competitive, overall, trackers, play, leaderboard } = data;
   const badges = [...feats, ...competitive];
   const earnedCount = badges.filter(b => b.earned).length;
 
   return (
     <>
       <section className="profile-section">
+        <h2 className="profile-section__title">Collector</h2>
+        <p className="profile-section__sub">
+          Reach a tier by meeting <em>all three</em> milestones below.
+        </p>
+        <TierRail overall={overall} />
+        <div className="tracker-list">
+          {trackers.map(t => <Tracker key={t.id} t={t} />)}
+        </div>
+      </section>
+
+      <section className="profile-section">
         <h2 className="profile-section__title">Streaks</h2>
-        <div className="achv-streaks">
-          <StreakCard icon="🔥" label="Play streak"        current={play.current}        longest={play.longest} />
-          <StreakCard icon="🏆" label="Leaderboard streak" current={leaderboard.current} longest={leaderboard.longest} />
+        <div className="streaks">
+          <StreakCard variant="play"  glyph="🔥" label="Play streak"        current={play.current}        longest={play.longest} />
+          <StreakCard variant="board" glyph="🏆" label="Leaderboard streak" current={leaderboard.current} longest={leaderboard.longest} />
         </div>
       </section>
 
@@ -96,13 +135,6 @@ export default function AchievementsPanel({ userId, username }) {
               <span className="achv-badge__name">{b.name}</span>
             </div>
           ))}
-        </div>
-      </section>
-
-      <section className="profile-section">
-        <h2 className="profile-section__title">Progress</h2>
-        <div className="achv-progress-list">
-          {progression.map(p => <ProgressRow key={p.id} p={p} />)}
         </div>
       </section>
     </>

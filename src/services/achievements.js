@@ -10,8 +10,8 @@
  */
 
 import { supabase } from './supabase.js';
-import { FEATS, PROGRESSION, STREAKS } from '../logic/achievements/definitions.js';
-import { evaluateFeats, computeStats, evaluateProgression } from '../logic/achievements/evaluate.js';
+import { FEATS, PROGRESSION, STREAKS, TIERS } from '../logic/achievements/definitions.js';
+import { evaluateFeats, computeStats, overallTier } from '../logic/achievements/evaluate.js';
 import { weekIndex, streakFromWeekSet, playStreak } from '../logic/achievements/streaks.js';
 
 const GUEST_KEY = 'balut_achievements';
@@ -19,6 +19,18 @@ const GUEST_KEY = 'balut_achievements';
 const DEF_BY_ID = {};
 for (const d of [...FEATS, ...PROGRESSION, ...STREAKS]) DEF_BY_ID[d.id] = d;
 export function getAchievementDef(id) { return DEF_BY_ID[id]; }
+
+const TIER_BY_NUM = Object.fromEntries(TIERS.map(t => [t.tier, t]));
+const TIER_MEDAL = { bronze: '🥉', silver: '🥈', gold: '🥇', platinum: '💎' };
+
+/** Build an AchievementToast-ready def for a newly unlocked entry. */
+function toastDef(id, tier) {
+  if (id === 'overall_progress') {
+    const t = TIER_BY_NUM[tier];
+    return { id, icon: TIER_MEDAL[t.key], name: `${t.label} Collector`, isMilestone: true };
+  }
+  return { ...DEF_BY_ID[id], isMilestone: false };
+}
 
 // ─── Guest localStorage ───────────────────────────────────────────────────────
 
@@ -72,38 +84,55 @@ async function fetchUserScores(userId) {
 }
 
 /**
- * Weeks (by index) in which `username`'s logged-in scores made the weekly Top 10,
- * ranked across ALL players. Bounded to the last `weeksBack` weeks.
+ * Competitive standings for `username`'s logged-in scores, ranked across ALL
+ * players. Returns the weeks they made the weekly Top 10 (for the streak), plus
+ * whether they were ever ranked #1 in any week and in any calendar month.
+ * Bounded to scores on/after `since`.
  */
-async function fetchLeaderboardWeeks(username, weeksBack = 26) {
-  if (!supabase || !username) return { present: [], everTop1: false };
-  const since = new Date(Date.now() - weeksBack * 7 * 24 * 60 * 60 * 1000);
+async function fetchCompetitive(username, since) {
+  const empty = { present: [], everTop1Week: false, everTop1Month: false };
+  if (!supabase || !username) return empty;
   const { data, error } = await supabase
     .from('scores')
     .select('player_name, big_points, small_points, balut_count, created_at, is_guest')
     .gte('created_at', since.toISOString());
-  if (error) { console.error('fetchLeaderboardWeeks:', error); return { present: [], everTop1: false }; }
-
-  const byWeek = new Map();
-  for (const r of data ?? []) {
-    const wk = weekIndex(new Date(r.created_at));
-    if (!byWeek.has(wk)) byWeek.set(wk, []);
-    byWeek.get(wk).push(r);
-  }
+  if (error) { console.error('fetchCompetitive:', error); return empty; }
 
   const isMe = (r) => !r.is_guest && r.player_name === username;
+  const cmp = (a, b) =>
+    b.big_points - a.big_points ||
+    b.small_points - a.small_points ||
+    b.balut_count - a.balut_count;
+
+  const group = (keyFn) => {
+    const m = new Map();
+    for (const r of data ?? []) {
+      const k = keyFn(r);
+      if (!m.has(k)) m.set(k, []);
+      m.get(k).push(r);
+    }
+    return m;
+  };
+
   const present = [];
-  let everTop1 = false;
-  for (const [wk, rows] of byWeek) {
-    rows.sort((a, b) =>
-      b.big_points - a.big_points ||
-      b.small_points - a.small_points ||
-      b.balut_count - a.balut_count);
+  let everTop1Week = false;
+  for (const [wk, rows] of group(r => weekIndex(new Date(r.created_at)))) {
+    rows.sort(cmp);
     const top10 = rows.slice(0, 10);
     if (top10.some(isMe)) present.push(wk);
-    if (top10[0] && isMe(top10[0])) everTop1 = true;
+    if (top10[0] && isMe(top10[0])) everTop1Week = true;
   }
-  return { present, everTop1 };
+
+  let everTop1Month = false;
+  for (const [, rows] of group(r => {
+    const d = new Date(r.created_at);
+    return d.getUTCFullYear() * 12 + d.getUTCMonth();
+  })) {
+    rows.sort(cmp);
+    if (rows[0] && isMe(rows[0])) everTop1Month = true;
+  }
+
+  return { present, everTop1Week, everTop1Month };
 }
 
 // ─── Public: unlocked map (logged-in or guest) ────────────────────────────────
@@ -151,29 +180,32 @@ export async function processSoloGame({ user, username, scorecard, featFlags, to
     fetchUserScores(user.id),
   ]);
 
-  const newEntries = [];
+  const entries = [];   // { id, tier } to persist
 
   // Feats (tier 0, one-time).
   for (const id of earnedFeats) {
-    if (!(id in unlockedMap)) newEntries.push({ id, tier: 0, isMilestone: false });
+    if (!(id in unlockedMap)) entries.push({ id, tier: 0 });
   }
 
-  // Progression (tiered) — `scores` already includes the just-saved game.
+  // Overall collector tier — `scores` already includes the just-saved game.
   const stats = computeStats(scores);
-  const progTiers = evaluateProgression(stats);
-  for (const [id, tier] of Object.entries(progTiers)) {
-    if (tier > (unlockedMap[id]?.tier ?? 0)) {
-      newEntries.push({ id, tier, isMilestone: id === 'games_played' || id === 'lifetime_baluts' });
-    }
+  const ot = overallTier(stats);
+  if (ot > (unlockedMap.overall_progress?.tier ?? 0)) {
+    entries.push({ id: 'overall_progress', tier: ot });
   }
 
-  // Competitive — match this user's logged-in scores against the weekly board.
-  const { present, everTop1 } = await fetchLeaderboardWeeks(username, 1);
-  if (present.length > 0 && !('first_blood' in unlockedMap)) {
-    newEntries.push({ id: 'first_blood', tier: 0, isMilestone: false });
+  // Competitive — rank this user's logged-in scores against everyone. A ~40-day
+  // window covers the current week and month.
+  const since = new Date(Date.now() - 40 * 24 * 60 * 60 * 1000);
+  const { everTop1Week, everTop1Month } = await fetchCompetitive(username, since);
+  if ((everTop1Week || everTop1Month) && !('first_blood' in unlockedMap)) {
+    entries.push({ id: 'first_blood', tier: 0 });
   }
-  if (everTop1 && !('top_of_the_week' in unlockedMap)) {
-    newEntries.push({ id: 'top_of_the_week', tier: 0, isMilestone: false });
+  if (everTop1Week && !('top_of_the_week' in unlockedMap)) {
+    entries.push({ id: 'top_of_the_week', tier: 0 });
+  }
+  if (everTop1Month && !('top_of_the_month' in unlockedMap)) {
+    entries.push({ id: 'top_of_the_month', tier: 0 });
   }
 
   // Personal best: strictly the unique highest grand total (suppress on 1st game).
@@ -181,10 +213,10 @@ export async function processSoloGame({ user, username, scorecard, featFlags, to
   const equal  = scores.filter(s => s.big_points === totalBig).length;
   const personalBest = scores.length > 1 && higher === 0 && equal === 1;
 
-  await persistUnlocks(user, newEntries);
+  await persistUnlocks(user, entries);
 
   return {
-    unlocked: newEntries.map(e => ({ ...DEF_BY_ID[e.id], tier: e.tier, isMilestone: e.isMilestone })),
+    unlocked: entries.map(e => ({ ...toastDef(e.id, e.tier), tier: e.tier })),
     personalBest,
     isGuest: false,
   };
@@ -203,32 +235,30 @@ function processGuest({ earnedFeats, totalBig, balutCount }) {
   if (!data.stats.weeks.includes(wk)) data.stats.weeks.push(wk);
   data.stats.best = Math.max(priorBest, totalBig);
 
-  const newEntries = [];
+  const entries = [];
   for (const id of earnedFeats) {
-    if (!(id in data.unlocked)) newEntries.push({ id, tier: 0, isMilestone: false });
+    if (!(id in data.unlocked)) entries.push({ id, tier: 0 });
   }
 
+  // Overall collector tier (guests have no competitive badges — no identity).
   const stats = {
     gamesPlayed: data.stats.gamesPlayed,
     lifetimeBaluts: data.stats.lifetimeBaluts,
     lifetimeBigPoints: data.stats.lifetimeBigPoints,
-    weeksActive: data.stats.weeks.length,
   };
-  const progTiers = evaluateProgression(stats);
-  for (const [id, tier] of Object.entries(progTiers)) {
-    if (tier > (data.unlocked[id]?.tier ?? 0)) {
-      newEntries.push({ id, tier, isMilestone: id === 'games_played' || id === 'lifetime_baluts' });
-    }
+  const ot = overallTier(stats);
+  if (ot > (data.unlocked.overall_progress?.tier ?? 0)) {
+    entries.push({ id: 'overall_progress', tier: ot });
   }
 
   const now = new Date().toISOString();
-  for (const e of newEntries) data.unlocked[e.id] = { tier: e.tier, at: now };
+  for (const e of entries) data.unlocked[e.id] = { tier: e.tier, at: now };
   saveGuest(data);
 
   const personalBest = priorGames > 0 && totalBig > priorBest;
 
   return {
-    unlocked: newEntries.map(e => ({ ...DEF_BY_ID[e.id], tier: e.tier, isMilestone: e.isMilestone })),
+    unlocked: entries.map(e => ({ ...toastDef(e.id, e.tier), tier: e.tier })),
     personalBest,
     isGuest: true,
   };
@@ -236,24 +266,48 @@ function processGuest({ earnedFeats, totalBig, balutCount }) {
 
 // ─── Profile aggregation ──────────────────────────────────────────────────────
 
+const COMPETITIVE_IDS = ['first_blood', 'top_of_the_week', 'top_of_the_month'];
+
+function buildTrackers(stats) {
+  return PROGRESSION.map(d => {
+    const value = stats[d.metric] ?? 0;
+    let tier = 0;
+    let prev = 0;          // threshold of the current tier (band lower bound)
+    let next = null;       // threshold of the next tier (band upper bound)
+    let nextLabel = null;
+    for (const t of d.tiers) {
+      if (value >= t.threshold) { tier = t.tier; prev = t.threshold; }
+      else if (next === null) { next = t.threshold; nextLabel = t.label; }
+    }
+    return { id: d.id, icon: d.icon, name: d.name, value, tier, prev, next, nextLabel };
+  });
+}
+
+function buildOverall(current) {
+  return { current, tiers: TIERS.map(t => ({ ...t, reached: t.tier <= current })) };
+}
+
 /**
- * Everything the profile achievements UI needs for a logged-in user:
- * feat earned-state, progression tier + progress, and both streaks.
+ * Everything the profile achievements UI needs for a logged-in user: feat /
+ * competitive earned-state, the overall collector tier, per-metric trackers,
+ * and both streaks.
  */
 export async function loadProfileAchievements(user, username) {
   const empty = {
     feats: FEATS.map(d => ({ ...d, earned: false })),
-    competitive: [STREAKS[2], STREAKS[3]].map(d => ({ ...d, earned: false })),
-    progression: PROGRESSION.map(d => ({ ...d, value: 0, tier: 0, next: d.tiers[0].threshold })),
+    competitive: COMPETITIVE_IDS.map(id => ({ ...DEF_BY_ID[id], earned: false })),
+    overall: buildOverall(0),
+    trackers: buildTrackers({}),
     play: { current: 0, longest: 0 },
     leaderboard: { current: 0, longest: 0 },
   };
   if (!user?.id || !supabase) return empty;
 
-  const [unlockedMap, scores, lb] = await Promise.all([
+  const since = new Date(Date.now() - 26 * 7 * 24 * 60 * 60 * 1000);
+  const [unlockedMap, scores, comp] = await Promise.all([
     fetchUnlockedRows(user.id),
     fetchUserScores(user.id),
-    fetchLeaderboardWeeks(username),
+    fetchCompetitive(username, since),
   ]);
 
   const stats = computeStats(scores);
@@ -261,25 +315,17 @@ export async function loadProfileAchievements(user, username) {
   const feats = FEATS.map(d => ({
     ...d, earned: d.id in unlockedMap, at: unlockedMap[d.id]?.at,
   }));
-
-  const competitive = [DEF_BY_ID.first_blood, DEF_BY_ID.top_of_the_week].map(d => ({
-    ...d, earned: d.id in unlockedMap, at: unlockedMap[d.id]?.at,
+  const competitive = COMPETITIVE_IDS.map(id => ({
+    ...DEF_BY_ID[id], earned: id in unlockedMap, at: unlockedMap[id]?.at,
   }));
 
-  const progression = PROGRESSION.map(d => {
-    const value = stats[d.metric] ?? 0;
-    let tier = 0;
-    let next = null;
-    for (const t of d.tiers) {
-      if (value >= t.threshold) tier = t.tier;
-      else if (next === null) next = t.threshold;
-    }
-    return { ...d, value, tier, next };
-  });
-
   const now = new Date();
-  const play = playStreak(scores, now);
-  const leaderboard = streakFromWeekSet(new Set(lb.present), weekIndex(now));
-
-  return { feats, competitive, progression, play, leaderboard };
+  return {
+    feats,
+    competitive,
+    overall: buildOverall(overallTier(stats)),
+    trackers: buildTrackers(stats),
+    play: playStreak(scores, now),
+    leaderboard: streakFromWeekSet(new Set(comp.present), weekIndex(now)),
+  };
 }
