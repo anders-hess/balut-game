@@ -162,6 +162,16 @@
   color: var(--color-ink-mute);
 }
 
+/* Metric has cleared the collector's target tier — full bar + checkmark while
+   it waits for the other two metrics to catch up. */
+.tracker__check {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+.tracker--done .tracker__fill {
+  background: linear-gradient(90deg, #4f9d57, #74b97b);
+}
+
 /* ════════════════════════════════════════════════════════════════════════════
    Streak cards
    ════════════════════════════════════════════════════════════════════════════ */

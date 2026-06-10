@@ -9,10 +9,15 @@ import {
 } from '../logic/gameState.js';
 import { calculateScore, isGameOver, getTargetColumn } from '../logic/scoring.js';
 
+// True when the five dice show a Balut (any five-of-a-kind), regardless of how
+// the turn is eventually scored. Drives the instant "BALUT!" celebration toast.
+function isBalutRoll(dice) {
+  return calculateScore('balut', dice.map(d => d.value)) > 0;
+}
+
 // ─── Commit a score to the scorecard and rotate the turn ─────────────────────
 function applyScore(state, category, column, finalScore) {
   const currentPlayer = state.players[state.currentPlayerIndex];
-  const isBalut = category === 'balut' && finalScore > 0;
 
   const newScorecard = {
     ...currentPlayer.scorecard,
@@ -33,7 +38,7 @@ function applyScore(state, category, column, finalScore) {
       rollsLeft:       MAX_ROLLS,
       turnNumber:      state.turnNumber + 1,
       phase:           'gameover',
-      justScoredBalut: isBalut,
+      justScoredBalut: false,
       showHandoff:     false,
       pendingScore:    null,
     };
@@ -53,7 +58,7 @@ function applyScore(state, category, column, finalScore) {
     rollsLeft:          MAX_ROLLS,
     turnNumber:         state.turnNumber + 1,
     phase:              'playing',
-    justScoredBalut:    isBalut,
+    justScoredBalut:    false,
     showHandoff:        state.players.length > 1,
     pendingScore:       null,
   };
@@ -84,21 +89,24 @@ function reducer(state, action) {
         if (committed.phase === 'gameover' || committed.showHandoff) return committed;
 
         // Single player: also perform the first roll of the new turn.
+        const newDice = rollDice(committed.dice);
         return {
           ...committed,
-          dice:      rollDice(committed.dice),
-          rollsLeft: committed.rollsLeft - 1,
+          dice:            newDice,
+          rollsLeft:       committed.rollsLeft - 1,
+          justScoredBalut: isBalutRoll(newDice),
         };
       }
 
       // Normal roll. In online multiplayer, action.dice carries pre-rolled values
       // so all clients see the same result. Single-player passes no dice payload.
       if (state.rollsLeft === 0) return state;
+      const rolledDice = action.dice ?? rollDice(state.dice);
       return {
         ...state,
-        dice:            action.dice ?? rollDice(state.dice),
+        dice:            rolledDice,
         rollsLeft:       state.rollsLeft - 1,
-        justScoredBalut: false,
+        justScoredBalut: isBalutRoll(rolledDice),
       };
     }
 

@@ -70,7 +70,7 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
               const catTotal  = categoryTotals[cat];
               const bigPts    = categoryBigPoints[cat];
               const isComplete = displayScorecard[cat].every(s => s !== null);
-              const isGreat    = cellState === 'valid' && isGreatScore(cat, potential);
+              const isGreat    = cellState === 'valid' && isGreatScore(cat, potential, scorecard[cat]);
 
               return (
                 <tr key={cat} className="srow">
@@ -187,8 +187,23 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
   );
 }
 
-function isGreatScore(category, score) {
+function isGreatScore(category, score, columns) {
   if (!score || score <= 0) return false;
+
+  // Last-column rule: when only one column is left to fill in a sum category
+  // (fours, fives, sixes, choice), green means "this score meets the row's
+  // big-point threshold" — regardless of the usual per-column cutoff. The last
+  // column can need either a higher or a lower score than normal depending on
+  // how the already-filled columns add up.
+  if (columns) {
+    const rule = BIG_POINT_RULES[category];
+    const emptyCount = columns.filter(s => s === null).length;
+    if (rule && rule.type === 'sum' && emptyCount === 1) {
+      const currentSum = columns.reduce((sum, s) => sum + (s ?? 0), 0);
+      return currentSum + score >= rule.threshold;
+    }
+  }
+
   if (category === 'fours')     return score >= 12;
   if (category === 'fives')     return score >= 15;
   if (category === 'sixes')     return score >= 18;

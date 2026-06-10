@@ -268,18 +268,22 @@ function processGuest({ earnedFeats, totalBig, balutCount }) {
 
 const COMPETITIVE_IDS = ['first_blood', 'top_of_the_week', 'top_of_the_month'];
 
-function buildTrackers(stats) {
+function buildTrackers(stats, overall = 0) {
+  // Every tracker aims at the SAME tier the collector is working toward
+  // (overall + 1) — not each metric's own next tier. A metric that already
+  // clears that threshold shows a full bar + checkmark and waits for the
+  // laggards; the bars only advance to the following tier once all three
+  // metrics lift the overall collector tier.
+  const target = overall + 1;
   return PROGRESSION.map(d => {
-    const value = stats[d.metric] ?? 0;
-    let tier = 0;
-    let prev = 0;          // threshold of the current tier (band lower bound)
-    let next = null;       // threshold of the next tier (band upper bound)
-    let nextLabel = null;
-    for (const t of d.tiers) {
-      if (value >= t.threshold) { tier = t.tier; prev = t.threshold; }
-      else if (next === null) { next = t.threshold; nextLabel = t.label; }
-    }
-    return { id: d.id, icon: d.icon, name: d.name, value, tier, prev, next, nextLabel };
+    const value   = stats[d.metric] ?? 0;
+    const curTier = d.tiers.find(t => t.tier === overall);  // undefined at overall 0
+    const tgtTier = d.tiers.find(t => t.tier === target);   // undefined once maxed
+    const prev      = curTier ? curTier.threshold : 0;       // band lower bound
+    const next      = tgtTier ? tgtTier.threshold : null;    // band upper bound
+    const nextLabel = tgtTier ? tgtTier.label : null;
+    const done      = next != null && value >= next;         // met target, waiting on others
+    return { id: d.id, icon: d.icon, name: d.name, value, prev, next, nextLabel, done };
   });
 }
 
@@ -320,11 +324,12 @@ export async function loadProfileAchievements(user, username) {
   }));
 
   const now = new Date();
+  const ot = overallTier(stats);
   return {
     feats,
     competitive,
-    overall: buildOverall(overallTier(stats)),
-    trackers: buildTrackers(stats),
+    overall: buildOverall(ot),
+    trackers: buildTrackers(stats, ot),
     play: playStreak(scores, now),
     leaderboard: streakFromWeekSet(new Set(comp.present), weekIndex(now)),
   };

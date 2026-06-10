@@ -33,21 +33,24 @@ function Tracker({ t }) {
   const span = t.next != null ? t.next - t.prev : 1;
   const pct = t.next != null ? Math.max(0, Math.min(100, Math.round(((t.value - t.prev) / span) * 100))) : 100;
   return (
-    <div className="tracker">
+    <div className={`tracker${t.done ? ' tracker--done' : ''}`}>
       <div className="tracker__top">
         <span className="tracker__icon">{t.icon}</span>
         <span className="tracker__name">{t.name}</span>
         <span className="tracker__value">
           <b>{t.value.toLocaleString()}</b>{t.next != null ? ` / ${t.next.toLocaleString()}` : ''}
+          {t.done && <span className="tracker__check" aria-hidden> ✓</span>}
         </span>
       </div>
       <div className="tracker__bar">
         <div className="tracker__fill" style={{ width: `${pct}%` }} />
       </div>
       <div className="tracker__foot">
-        {t.next != null
-          ? `${(t.next - t.value).toLocaleString()} more to ${t.nextLabel}`
-          : 'Top tier reached ✓'}
+        {t.next == null
+          ? 'Top tier reached ✓'
+          : t.done
+            ? `${t.nextLabel} reached ✓ — waiting on the others`
+            : `${(t.next - t.value).toLocaleString()} more to ${t.nextLabel}`}
       </div>
     </div>
   );

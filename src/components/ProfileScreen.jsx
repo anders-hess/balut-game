@@ -84,8 +84,6 @@ export default function ProfileScreen({ onClose, onSignOut, userId, username }) 
               {best && <p className="profile-section__sub">Your best game was {best.big_points} big · {best.small_points} small on {fmtDate(best.created_at)}.</p>}
             </section>
 
-            <AchievementsPanel userId={userId} username={username} />
-
             <section className="profile-section">
               <h2 className="profile-section__title">Averages</h2>
               <div className="profile-tiles">
@@ -94,6 +92,8 @@ export default function ProfileScreen({ onClose, onSignOut, userId, username }) 
                 <StatTile label="Avg baluts"       value={sc?.avgBaluts} />
               </div>
             </section>
+
+            <AchievementsPanel userId={userId} username={username} />
 
             <section className="profile-section">
               <h2 className="profile-section__title">Scorecard rates</h2>
