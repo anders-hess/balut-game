@@ -57,7 +57,7 @@ const scoreTiles = (s) => (
   <>
     <StatTile label="Avg big points"   value={s.avgBig}    accent />
     <StatTile label="Avg small points" value={s.avgSmall}  />
-    <StatTile label="Avg baluts"       value={s.avgBaluts} />
+    <StatTile label="Avg baluts"       value={s.avgBaluts === null ? null : s.avgBaluts.toFixed(1)} />
   </>
 );
 

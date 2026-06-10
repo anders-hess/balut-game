@@ -89,7 +89,7 @@ export default function ProfileScreen({ onClose, onSignOut, userId, username }) 
               <div className="profile-tiles">
                 <StatTile label="Avg big points"   value={sc?.avgBig}    accent />
                 <StatTile label="Avg small points" value={sc?.avgSmall}  />
-                <StatTile label="Avg baluts"       value={sc?.avgBaluts} />
+                <StatTile label="Avg baluts"       value={sc?.avgBaluts == null ? null : sc.avgBaluts.toFixed(1)} />
               </div>
             </section>
 
