@@ -1,6 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { loadProfileAchievements } from '../services/achievements.js';
 import './AchievementsPanel.css';
+
+function fmtDate(iso) {
+  try {
+    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch { return ''; }
+}
 
 // ── Overall tier rail: four medallions linked by a progression line ──────────
 function TierRail({ overall }) {
@@ -60,6 +66,55 @@ function StreakCard({ variant, glyph, label, current, longest }) {
       <span className="streak-card__foot">
         Longest <b>{longest}</b> {longest === 1 ? 'wk' : 'wks'}
       </span>
+    </div>
+  );
+}
+
+// Tap-to-open description popover per badge (touch-friendly; replaces the
+// native hover title). Only one popover is open at a time.
+function BadgeGrid({ badges }) {
+  const [openId, setOpenId] = useState(null);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (openId === null) return undefined;
+    const onDown = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpenId(null); };
+    const onKey  = (e) => { if (e.key === 'Escape') setOpenId(null); };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [openId]);
+
+  return (
+    <div className="achv-grid" ref={ref}>
+      {badges.map(b => {
+        const open = openId === b.id;
+        return (
+          <div key={b.id} className={`achv-badge${b.earned ? '' : ' achv-badge--locked'}${open ? ' is-open' : ''}`}>
+            <button
+              type="button"
+              className="achv-badge__btn"
+              aria-expanded={open}
+              onClick={() => setOpenId(open ? null : b.id)}
+            >
+              <span className="achv-badge__icon">{b.icon}</span>
+              <span className="achv-badge__name">{b.name}</span>
+            </button>
+            {open && (
+              <div className="achv-pop" role="tooltip">
+                <span className="achv-pop__title">{b.name}</span>
+                <span className="achv-pop__desc">{b.description}</span>
+                <span className={`achv-pop__status${b.earned ? ' is-earned' : ''}`}>
+                  {b.earned ? (b.at ? `Unlocked ${fmtDate(b.at)}` : 'Unlocked') : 'Locked'}
+                </span>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -124,18 +179,8 @@ export default function AchievementsPanel({ userId, username }) {
         <h2 className="profile-section__title">
           Achievements <span className="achv-count">{earnedCount} / {badges.length}</span>
         </h2>
-        <div className="achv-grid">
-          {badges.map(b => (
-            <div
-              key={b.id}
-              className={`achv-badge${b.earned ? '' : ' achv-badge--locked'}`}
-              title={b.description}
-            >
-              <span className="achv-badge__icon">{b.icon}</span>
-              <span className="achv-badge__name">{b.name}</span>
-            </div>
-          ))}
-        </div>
+        <p className="profile-section__sub">Tap a badge to see how to earn it.</p>
+        <BadgeGrid badges={badges} />
       </section>
     </>
   );
