@@ -29,6 +29,7 @@ export default function GameBoard({
   scoreSubmitted, onScoreSubmitted,
   mpSubmittedNames, onMpPlayerSubmitted,
   authUser = null, authUsername = null,
+  soloAchievements = null,
   isOnlineGame = false, onlineGame = null,
 }) {
   const { dice, rollsLeft, oracleEnabled, players, currentPlayerIndex, phase, turnNumber, justScoredBalut, showHandoff, pendingScore } = state;
@@ -129,6 +130,7 @@ export default function GameBoard({
                 scoreSubmitted={scoreSubmitted}
                 authUser={authUser}
                 authUsername={authUsername}
+                soloAchievements={soloAchievements}
               />
             )
           ) : (isMultiplayer && showHandoff) ? (() => {

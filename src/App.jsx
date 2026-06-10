@@ -72,6 +72,8 @@ export default function App() {
   // Achievement unlock toasts (solo play). Queue of { id, kind, def?, ... }.
   const [achievementQueue, setAchievementQueue] = useState([]);
   const toastIdRef = useRef(0);
+  // Earned achievements for the solo game-over screen: { unlocked: [...defs], personalBest }.
+  const [soloAchievements, setSoloAchievements] = useState(null);
 
   // ── Analytics event tracking ──────────────────────────────────────────────
   useEffect(() => { trackEvent('page_view'); }, []);
@@ -126,6 +128,11 @@ export default function App() {
       balutCount: countBaluts(sc),
     })
       .then(res => {
+        setSoloAchievements(
+          res.unlocked.length || res.personalBest
+            ? { unlocked: res.unlocked, personalBest: res.personalBest }
+            : null
+        );
         const items = [];
         if (res.personalBest) items.push({ kind: 'best' });
         for (const u of res.unlocked) {
@@ -190,6 +197,7 @@ export default function App() {
     startGame();
     setScoreSubmitted(false);
     setMpSubmittedNames([]);
+    setSoloAchievements(null);
   }
 
   function handleSetupMultiplayer(names) {
@@ -338,7 +346,7 @@ export default function App() {
       onToggleHold={toggleHold}
       onScore={scoreCategory}
       onToggleOracle={toggleOracle}
-      onGoHome={() => { goHome(); setShowSetup(false); setScoreSubmitted(false); setMpSubmittedNames([]); }}
+      onGoHome={() => { goHome(); setShowSetup(false); setScoreSubmitted(false); setMpSubmittedNames([]); setSoloAchievements(null); }}
       onNewGame={handleNewGame}
       onViewHighscores={() => { setHsContext('game'); setShowHighscores(true); }}
       onDismissHandoff={dismissHandoff}
@@ -349,6 +357,7 @@ export default function App() {
       onMpPlayerSubmitted={(name) => setMpSubmittedNames(prev => [...prev, name])}
       authUser={auth.user}
       authUsername={auth.username}
+      soloAchievements={soloAchievements}
     />
   );
   })();

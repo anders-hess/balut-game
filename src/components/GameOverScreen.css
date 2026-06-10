@@ -126,6 +126,56 @@
   color: var(--color-ink-mute);
 }
 
+/* ── Achievements earned ──────────────────────────────── */
+@keyframes gameoverAchvIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.gameover__achievements {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: gameoverAchvIn 0.3s ease;
+}
+.gameover__achv-label {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-mute);
+}
+.gameover__achv-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.gameover__achv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-accent-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.gameover__achv-icon { font-size: 1.1rem; line-height: 1; }
+.gameover__achv-name {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.gameover__achv-best {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
 /* ── Leaderboard qualify card ─────────────────────────── */
 .gameover__leaderboard {
   display: flex;

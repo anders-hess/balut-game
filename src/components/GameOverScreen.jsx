@@ -6,7 +6,7 @@ import './GameOverScreen.css';
 const PERIOD_LABELS = { weekly: 'This Week', monthly: 'This Month', yearly: 'This Year' };
 const NAME_KEY = 'balut_player_name';
 
-export default function GameOverScreen({ scorecard, onPlayAgain, onViewHighscores, onScoreSubmitted, scoreSubmitted, authUser = null, authUsername = null }) {
+export default function GameOverScreen({ scorecard, onPlayAgain, onViewHighscores, onScoreSubmitted, scoreSubmitted, authUser = null, authUsername = null, soloAchievements = null }) {
   const { totalSmall, totalBig, bonus } = calcTotals(scorecard);
   const balutCount = countBaluts(scorecard);
 
@@ -107,6 +107,29 @@ export default function GameOverScreen({ scorecard, onPlayAgain, onViewHighscore
           <span className="gameover__bar-sub">× 2 big pts</span>
         </div>
       </div>
+
+      {(soloAchievements?.unlocked?.length || soloAchievements?.personalBest) && (
+        <div className="gameover__achievements">
+          {soloAchievements.unlocked.length > 0 && (
+            <>
+              <p className="gameover__achv-label">
+                Achievements earned · {soloAchievements.unlocked.length}
+              </p>
+              <div className="gameover__achv-list">
+                {soloAchievements.unlocked.map(a => (
+                  <span key={a.id} className="gameover__achv-chip">
+                    <span className="gameover__achv-icon">{a.icon}</span>
+                    <span className="gameover__achv-name">{a.name}</span>
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
+          {soloAchievements.personalBest && (
+            <p className="gameover__achv-best">🎉 New personal best!</p>
+          )}
+        </div>
+      )}
 
       <div className="gameover__leaderboard">
         {isLoggedIn ? (
