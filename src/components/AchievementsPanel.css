@@ -260,12 +260,14 @@
 
 .achv-badge__btn {
   width: 100%;
+  min-height: 92px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
-  gap: 6px;
-  padding: 14px 8px;
+  gap: 7px;
+  padding: 12px 8px;
   font: inherit;
   background: var(--color-surface);
   border: 1px solid var(--color-accent-soft);
@@ -288,6 +290,11 @@
   font-weight: 600;
   line-height: 1.2;
   color: var(--color-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .achv-badge--locked .achv-badge__btn {
   background: var(--color-surface-2);
@@ -299,17 +306,18 @@
 
 /* Tap-to-open description popover — dark editorial tooltip with an arrow. */
 @keyframes achvPopIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(-4px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 .achv-pop {
+  --shift: 0px;                /* viewport-edge correction, set in JS */
   position: absolute;
   top: calc(100% + 9px);
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(calc(-50% + var(--shift)));
   z-index: 20;
   width: max-content;
-  max-width: min(230px, 78vw);
+  max-width: min(240px, 80vw);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -320,11 +328,12 @@
   box-shadow: var(--shadow-lg);
   animation: achvPopIn 0.14s ease;
 }
+/* Arrow shifts opposite to the popover so it still points at the badge. */
 .achv-pop::before {
   content: '';
   position: absolute;
   bottom: 100%;
-  left: 50%;
+  left: calc(50% - var(--shift));
   transform: translateX(-50%);
   border: 6px solid transparent;
   border-bottom-color: var(--color-ink);

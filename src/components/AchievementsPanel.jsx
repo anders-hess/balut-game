@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { loadProfileAchievements } from '../services/achievements.js';
 import './AchievementsPanel.css';
 
@@ -75,6 +75,7 @@ function StreakCard({ variant, glyph, label, current, longest }) {
 function BadgeGrid({ badges }) {
   const [openId, setOpenId] = useState(null);
   const ref = useRef(null);
+  const popRef = useRef(null);
 
   useEffect(() => {
     if (openId === null) return undefined;
@@ -86,6 +87,20 @@ function BadgeGrid({ badges }) {
       document.removeEventListener('pointerdown', onDown);
       document.removeEventListener('keydown', onKey);
     };
+  }, [openId]);
+
+  // Keep the popover inside the viewport: measure (before paint) and shift it,
+  // moving the arrow by the opposite amount so it still points at the badge.
+  useLayoutEffect(() => {
+    const pop = popRef.current;
+    if (openId === null || !pop) return;
+    pop.style.setProperty('--shift', '0px');
+    const rect = pop.getBoundingClientRect();
+    const margin = 10;
+    let shift = 0;
+    if (rect.left < margin) shift = margin - rect.left;
+    else if (rect.right > window.innerWidth - margin) shift = window.innerWidth - margin - rect.right;
+    pop.style.setProperty('--shift', `${shift}px`);
   }, [openId]);
 
   return (
@@ -104,7 +119,7 @@ function BadgeGrid({ badges }) {
               <span className="achv-badge__name">{b.name}</span>
             </button>
             {open && (
-              <div className="achv-pop" role="tooltip">
+              <div className="achv-pop" role="tooltip" ref={popRef}>
                 <span className="achv-pop__title">{b.name}</span>
                 <span className="achv-pop__desc">{b.description}</span>
                 <span className={`achv-pop__status${b.earned ? ' is-earned' : ''}`}>
