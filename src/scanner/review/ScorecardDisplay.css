@@ -31,53 +31,123 @@
 
 .scd-scroll { flex: 1; overflow-x: auto; padding: 16px 16px 0; }
 
-.scd-table { width: 100%; border-collapse: collapse; font-family: var(--font-sans); font-size: 0.9rem; }
+/* Table styling mirrors the game scorecard (src/components/Scorecard.css). */
+.scd-table {
+  width: 100%;
+  min-width: 380px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
 
+.scd-th-cat  { width: 36%; }
+.scd-th-entry { width: 9%; }
+.scd-th-sum  { width: 10%; }
+.scd-th-big  { width: 10%; }
+
+/* Header row — muted, no bottom border */
 .scd-th-cat, .scd-th-entry, .scd-th-sum, .scd-th-big {
-  padding: 6px 8px;
-  font-weight: 600;
-  font-size: 0.78rem;
-  color: var(--color-ink-2);
-  border-bottom: 2px solid var(--color-border);
+  padding: 0 0 10px;
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--color-ink-mute);
+  letter-spacing: 0.5px;
+  text-align: center;
   white-space: nowrap;
-  text-align: left;
 }
-.scd-th-entry, .scd-th-sum, .scd-th-big { text-align: center; }
+.scd-th-cat { text-align: left; padding-right: 8px; }
+.scd-th-big { color: var(--color-accent); text-transform: uppercase; letter-spacing: 1.5px; }
 
-.scd-row { border-bottom: 1px solid var(--color-surface-2); }
-.scd-td-cat { padding: 10px 8px; font-weight: 500; white-space: nowrap; font-size: 0.85rem; }
-.scd-td-entry { text-align: center; padding: 8px 4px; min-width: 44px; font-size: 0.95rem; }
-.scd-td-entry--filled { font-weight: 600; color: var(--color-ink); }
-.scd-td-entry--empty  { color: var(--color-surface-2); }
-.scd-td-sum { text-align: center; padding: 8px 4px; font-weight: 600; border-left: 1px solid var(--color-border); }
-.scd-td-big { text-align: center; padding: 8px 6px; font-size: 0.85rem; border-left: 1px solid var(--color-border); }
+/* Body rows — borderless, 40px tall */
+.scd-row td { height: 40px; padding: 0 4px; text-align: center; vertical-align: middle; }
+.scd-td-cat {
+  text-align: left !important;
+  padding-right: 8px !important;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
 
-.scd-big-earned { color: var(--color-ok); font-weight: 700; }
-.scd-big-zero   { color: var(--color-ink-2); }
-.scd-big-target { color: var(--color-ink-2); font-size: 0.75rem; }
+.scd-td-entry {
+  font-weight: 500;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+}
+.scd-td-entry--filled { font-weight: 500; color: var(--color-ink); }
+.scd-td-entry--empty  { color: var(--color-ink-mute); }
 
+.scd-td-sum {
+  font-weight: 500;
+  color: var(--color-ink);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.scd-td-big {
+  font-size: 13px;
+  color: var(--color-ink-mute);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.scd-big-earned { color: var(--color-accent); font-weight: 500; font-size: 13px; }
+.scd-big-zero   { color: var(--color-ink-mute); font-size: 13px; }
+.scd-big-target { color: var(--color-ink-mute); font-size: 12px; opacity: 0.7; }
+
+/* Totals strip — rounded surface-2 grid card, like the game footer */
 .scd-footer {
-  display: flex;
-  border-top: 2px solid var(--color-border);
+  margin: 20px 16px 0;
+  padding: 18px 22px;
   background: var(--color-surface-2);
-  flex-wrap: wrap;
+  border-radius: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
 }
-.scd-total {
-  display: flex;
-  flex-direction: column;
-  padding: 14px 16px;
-  border-right: 1px solid var(--color-border);
-  flex: 1;
-  min-width: 90px;
+.scd-total { display: flex; flex-direction: column; gap: 4px; }
+.scd-total__label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-ink-mute);
+  font-weight: 500;
 }
-.scd-total:last-child { border-right: none; }
-.scd-total__label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-2); margin-bottom: 2px; }
-.scd-total__label-small { font-weight: 400; text-transform: none; letter-spacing: 0; }
-.scd-total__value { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 500; }
-.scd-total__value--big { font-size: 1.9rem; }
-.scd-total__hint { font-size: 0.72rem; color: var(--color-ink-2); margin-top: 2px; }
+.scd-total__label-small { /* "(Big)" suffix — same style as label; hidden on mobile */ }
+.scd-total__value {
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+.scd-total__value--big {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 34px;
+  font-weight: 400;
+  color: var(--color-accent);
+}
+.scd-total__hint { font-size: 11px; color: var(--color-ink-mute); margin-top: 2px; }
 .scd-total__big-row { display: flex; align-items: baseline; gap: 6px; }
-.scd-total__big-sub { font-size: 0.72rem; color: var(--color-ink-2); }
+.scd-total__big-sub { display: none; font-size: 11px; color: var(--color-ink-mute); }
+
+@media (max-width: 800px) {
+  /* Hide "(Big)" suffix, show "big points" sub-text instead — matches the game */
+  .scd-total__label-small { display: none; }
+  .scd-total__big-sub { display: inline; }
+
+  .scd-footer { margin: 16px 12px 0; padding: 14px 14px; gap: 12px; }
+  .scd-total__value { font-size: 18px; }
+  .scd-total__value--big { font-size: 26px; }
+}
+
+@media (max-width: 480px) {
+  .scd-table { min-width: 0; font-size: 12px; }
+  .scd-th-cat { width: 26%; }
+  .scd-td-cat { font-size: 12px; }
+  .scd-row td { height: 36px; padding: 0 2px; }
+}
 
 .scd-actions {
   display: flex;

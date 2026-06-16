@@ -129,7 +129,7 @@ export default function ScannerReview({ scorecard, flaggedCells, rowSums = {}, o
                         />
                       ) : (
                         <>
-                          <span className="rtd-cell__val">{value !== null ? value : '—'}</span>
+                          <span className="rtd-cell__val">{value === null ? '—' : value === 0 ? '–' : value}</span>
                           {reason && !isEditing && (
                             <span className="rtd-cell__flag" aria-label="flagged">
                               {reason === 'invalid' ? '⛔' : '⚠'}

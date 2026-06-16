@@ -1,9 +1,10 @@
 import { CATEGORIES, CATEGORY_LABELS, BIG_POINT_RULES, NUM_COLUMNS } from '../../logic/gameConstants.js';
-import { calcTotals } from '../../logic/scoring.js';
+import { calcTotals, countBaluts } from '../../logic/scoring.js';
 import './ScorecardDisplay.css';
 
 export default function ScorecardDisplay({ scorecard, onDone, onClose }) {
   const { totalSmall, totalBig, bonus, categoryBigPoints, categoryTotals } = calcTotals(scorecard);
+  const balutCount = countBaluts(scorecard);
 
   return (
     <div className="scd-screen">
@@ -41,10 +42,10 @@ export default function ScorecardDisplay({ scorecard, onDone, onClose }) {
                   <td className="scd-td-cat">{CATEGORY_LABELS[cat]}</td>
                   {scorecard[cat].map((score, col) => (
                     <td key={col} className={`scd-td-entry ${score !== null ? 'scd-td-entry--filled' : 'scd-td-entry--empty'}`}>
-                      {score !== null ? score : ''}
+                      {score !== null ? fmtZero(score) : ''}
                     </td>
                   ))}
-                  <td className="scd-td-sum">{catTotal > 0 ? catTotal : ''}</td>
+                  <td className="scd-td-sum">{scorecard[cat].some(s => s !== null) ? catTotal : ''}</td>
                   <td className="scd-td-big">
                     {bigPts > 0
                       ? <span className="scd-big-earned">+{bigPts}</span>
@@ -62,15 +63,13 @@ export default function ScorecardDisplay({ scorecard, onDone, onClose }) {
 
       <div className="scd-footer">
         <div className="scd-total">
-          <span className="scd-total__label">Small</span>
+          <span className="scd-total__label">Small Points</span>
           <span className="scd-total__value">{totalSmall}</span>
-          <span className="scd-total__hint">{bonusHint(totalSmall)}</span>
+          <span className="scd-total__hint">({bonus >= 0 ? `+${bonus}` : bonus} big points)</span>
         </div>
         <div className="scd-total">
-          <span className="scd-total__label">Bonus</span>
-          <span className="scd-total__value" style={{ color: bonus >= 0 ? 'var(--color-ok)' : 'var(--color-danger)' }}>
-            {bonus >= 0 ? `+${bonus}` : bonus}
-          </span>
+          <span className="scd-total__label">Balut</span>
+          <span className="scd-total__value">{balutCount}</span>
         </div>
         <div className="scd-total scd-total--big">
           <span className="scd-total__label">Grand Total <span className="scd-total__label-small">(Big)</span></span>
@@ -98,11 +97,7 @@ function bigPtTarget(rule) {
   return '';
 }
 
-function bonusHint(total) {
-  if (total < 300)  return 'Need 300 for −1';
-  if (total < 350)  return '−1 big · need 350 for ±0';
-  if (total < 400)  return '±0 · need 400 for +1';
-  if (total < 450)  return '+1 big · need 450 for +2';
-  const extra = Math.floor((total - 450) / 50);
-  return `+${2 + extra} big pts bonus`;
+// A scored 0 (scratched / forced-zero cell) reads more clearly as a dash.
+function fmtZero(v) {
+  return v === 0 ? '–' : v;
 }
