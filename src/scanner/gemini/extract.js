@@ -26,6 +26,10 @@ function retryDelayMs(errJson, fallback) {
  * @returns {Promise<{ rows: Array }>}  Parsed structured result
  */
 export async function callGemini({ imageBase64, mimeType = 'image/jpeg', apiKey, model = DEFAULT_MODEL, maxRetries = 2 }) {
+  // Strip a BOM / whitespace / any non-printable-ASCII the key may have picked up
+  // from an env file or CLI pipe — HTTP header values must be a ByteString (0–255),
+  // and a stray U+FEFF (65279) otherwise throws when set as a header.
+  apiKey = (apiKey ?? '').replace(/[^\x20-\x7E]/g, '').trim();
   if (!apiKey) throw new Error('Missing Gemini API key (GEMINI_API_KEY).');
   if (!imageBase64) throw new Error('No image data supplied to callGemini.');
 
