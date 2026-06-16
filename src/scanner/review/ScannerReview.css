@@ -44,6 +44,8 @@
   white-space: nowrap;
   font-size: 0.85rem;
 }
+.rtd-cat--checkfail { color: #9a6400; font-weight: 600; }
+.rtd-cat__check { margin-left: 5px; font-size: 0.78rem; color: #9a6400; cursor: help; }
 
 .rtd-cell {
   position: relative;

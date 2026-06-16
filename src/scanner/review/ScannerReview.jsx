@@ -4,7 +4,7 @@ import { isInvalid } from '../validators.js';
 import CellEditor from './CellEditor.jsx';
 import './ScannerReview.css';
 
-export default function ScannerReview({ scorecard, flaggedCells, onConfirm, onRescan }) {
+export default function ScannerReview({ scorecard, flaggedCells, rowSums = {}, onConfirm, onRescan }) {
   const [edited,  setEdited]  = useState(() => deepCopy(scorecard));
   const [editing, setEditing] = useState(null);
 
@@ -27,13 +27,26 @@ export default function ScannerReview({ scorecard, flaggedCells, onConfirm, onRe
     return null;
   }
 
-  let redCount = 0, flagCount = 0;
+  // Live Øjne checksum: the four score cells in a row should sum to the printed
+  // Øjne total. Re-evaluated from edited values, so fixing the wrong cell clears
+  // the warning. null = can't check (no Øjne read, or a cell still empty).
+  function rowChecksum(cat) {
+    const expected = rowSums[cat];
+    if (expected == null) return null;
+    const vals = edited[cat];
+    if (vals.some(v => v === null)) return null;
+    const sum = vals.reduce((a, v) => a + v, 0);
+    return { ok: sum === expected, sum, expected };
+  }
+
+  let redCount = 0, flagCount = 0, checksumFails = 0;
   CATEGORIES.forEach(cat => {
     for (let col = 0; col < NUM_COLUMNS; col++) {
       const r = liveReason(cat, col);
       if (r) flagCount++;
       if (r === 'invalid') redCount++;
     }
+    if (rowChecksum(cat)?.ok === false) checksumFails++;
   });
   const hasRed      = redCount > 0;
   const filledCount = CATEGORIES.reduce((n, cat) => n + edited[cat].filter(v => v !== null).length, 0);
@@ -44,8 +57,13 @@ export default function ScannerReview({ scorecard, flaggedCells, onConfirm, onRe
         <h1 className="review-title">Review Scan</h1>
         {hasRed
           ? <p className="review-error">{redCount} cell{redCount > 1 ? 's' : ''} have an impossible value — fix the red cells to continue.</p>
-          : flagCount > 0
-            ? <p className="review-warning">{flagCount} cell{flagCount > 1 ? 's' : ''} flagged — check highlighted cells, then confirm.</p>
+          : (flagCount > 0 || checksumFails > 0)
+            ? <p className="review-warning">
+                {[
+                  flagCount > 0 ? `${flagCount} cell${flagCount > 1 ? 's' : ''} flagged` : null,
+                  checksumFails > 0 ? `${checksumFails} row${checksumFails > 1 ? 's' : ''} don't add up to the Øjne total` : null,
+                ].filter(Boolean).join(' · ')} — check the highlighted cells, then confirm.
+              </p>
             : <p className="review-ok">All cells look good. Confirm or tap any cell to edit.</p>
         }
       </header>
@@ -61,9 +79,21 @@ export default function ScannerReview({ scorecard, flaggedCells, onConfirm, onRe
             </tr>
           </thead>
           <tbody>
-            {CATEGORIES.map(cat => (
+            {CATEGORIES.map(cat => {
+              const check = rowChecksum(cat);
+              const rowBad = check?.ok === false;
+              return (
               <tr key={cat} className="review-row">
-                <td className="rtd-cat">{CATEGORY_LABELS[cat]}</td>
+                <td className={`rtd-cat${rowBad ? ' rtd-cat--checkfail' : ''}`}>
+                  {CATEGORY_LABELS[cat]}
+                  {rowBad && (
+                    <span
+                      className="rtd-cat__check"
+                      aria-label="row sum mismatch"
+                      title={`These four cells add up to ${check.sum}, but the Øjne total reads ${check.expected}. Check this row.`}
+                    >⚠</span>
+                  )}
+                </td>
                 {Array.from({ length: NUM_COLUMNS }, (_, col) => {
                   const key       = `${cat}:${col}`;
                   const reason    = liveReason(cat, col);
@@ -111,7 +141,8 @@ export default function ScannerReview({ scorecard, flaggedCells, onConfirm, onRe
                   );
                 })}
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
       </div>

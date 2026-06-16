@@ -54,11 +54,17 @@ export function buildLogEntry({ canvas, ocrResponse, cells, error }) {
       )
     : [];
 
+  // rawText: OCR.space exposed ParsedText; the Gemini reader returns structured
+  // rows instead, so fall back to a JSON dump of those for the debug log.
+  const rawText =
+    ocrResponse?.ParsedResults?.[0]?.ParsedText ??
+    (ocrResponse?.rows ? JSON.stringify(ocrResponse.rows) : null);
+
   return {
     imageSize:   canvas ? { width: canvas.width, height: canvas.height } : null,
     ocrExitCode: ocrResponse?.OCRExitCode ?? null,
     isErrored:   ocrResponse?.IsErroredOnProcessing ?? false,
-    rawText:     ocrResponse?.ParsedResults?.[0]?.ParsedText ?? null,
+    rawText,
     cellResults,
     error:       error?.message ?? null,
   };

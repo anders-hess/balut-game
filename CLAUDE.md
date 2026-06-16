@@ -418,17 +418,48 @@ Scans a handwritten Balut scorecard photo and produces a `{ [category]: [null|nu
 Lives in `src/scanner/`. Opened via the `?scanner` URL param (`App.jsx` → `<ScannerScreen onClose=…>`).
 **Note:** an older standalone copy exists at the repo-sibling `scorecard-scanner/` — it is NOT the live one; always edit `balut-app/src/scanner/`.
 
-### Pipeline
-`ScannerScreen.jsx` step machine: `capture → processing → review → done | error`. On capture it calls
-`recognizeGrid` (OCR.space Engine 2 handwriting, key `VITE_OCR_SPACE_KEY` in `.env.local`) → `mapOcrToGrid` → `cellsToScorecard` + `buildFlaggedCells`. Every scan is logged to `localStorage` (`scorecard_ocr_log`, 20 max) and viewable via the bottom-left **Debug log** toggle (`ErrorLogPanel`).
+### Pipeline (Gemini vision — replaced OCR.space June 2026)
+`ScannerScreen.jsx` step machine: `capture → processing → review → done | error`. On capture it
+POSTs the cropped canvas (JPEG data URL) to **`/api/scan`**, which calls **Google Gemini** (default
+`gemini-2.5-flash`, free tier) with a structured-output JSON schema and returns one object per row
+(`{ category, cells:[{value,scratched,confidence}×4], ojne }`). Client side: `resultToCells` →
+`cellsToScorecard` + `buildFlaggedCells`, and `resultToRowSums` feeds the live Øjne checksum in review.
+Every scan is logged to `localStorage` (`scorecard_ocr_log`, 20 max), viewable via the bottom-left
+**Debug log** toggle (`ErrorLogPanel`).
+
+**Why the switch:** OCR.space Engine 2 misread ~5–8 handwritten digits per real tournament card and
+couldn't handle rotation/skew, slash-scratched cells, or the surrounding Øjne/Point/legend clutter.
+Gemini reads the card at any orientation, understands "slash = scratched = 0", and ignores non-grid
+columns. The old `ocr/ocrSpace.js` + `mapOcrToGrid` are no longer wired in (kept for reference).
+
+### Files (`src/scanner/gemini/`)
+- `prompt.js` — `EXTRACTION_PROMPT` + `RESPONSE_SCHEMA` + `DEFAULT_MODEL`. Shared by the API fn, dev middleware, and bench.
+- `extract.js` — `callGemini({imageBase64, mimeType, apiKey, model})` (pure fetch to the Generative Language REST API) + `stripDataUrl`. **Server-side only** (holds the secret key).
+- `scanClient.js` — browser helper: `scanScorecard(canvas)` POSTs to `/api/scan`.
+- `mapResult.js` — `resultToCells` / `resultToRowSums` (pure, client-safe).
+- `api/scan.js` (repo root `api/`) — Vercel serverless function; reads `GEMINI_API_KEY` (+ optional `GEMINI_MODEL`).
+- `vite.config.js` — dev-only middleware mirrors `/api/scan` on `localhost:5173` (so `npm run dev` works without `vercel dev`).
+
+### Setup / keys
+- `GEMINI_API_KEY` (no `VITE_` prefix → never bundled) in `.env.local` **and** Vercel env vars (Production + Preview). Free key: https://aistudio.google.com/apikey
+- **Øjne checksum**: `ScannerReview` re-sums each row's four cells live and warns (yellow ⚠ on the category label) when they don't match the printed Øjne total. Non-blocking; only impossible per-category values (`validators.js`) block Confirm.
+
+### Bench harness
+`npm.cmd run scan-bench` (or `node scripts/scan-bench.mjs [filter]`) runs the photos in
+`src/scanner/test scorecard photos/` through Gemini and reports the fraction of rows whose four cells
+sum to the printed Øjne — an objective accuracy metric needing no hand-labelling. Set `GEMINI_MODEL`
+to compare models.
 
 ### Capture (`capture/ScannerCamera.jsx`)
-Refactored into `useOverlay` hook + `OverlayBox` + `LiveCamera` + `PhotoEditor`. Entry screen offers two paths:
-- **Take photo** (mobile only — gated on `getUserMedia` + `(pointer: coarse)`): in-app live `getUserMedia` preview with a **landscape-only** ghost overlay (drag + resize) and a shutter button. Captures via `useCamera.capture()`; no rotation.
-- **Upload photo** (all devices): pick an existing file → `PhotoEditor` shows the static image with the 3-way orientation toggle, drag, resize, then Scan.
+Send the **whole card** — no grid overlay, crop, or orientation toggle (the Gemini reader handles
+any rotation, and the Øjne column must stay in frame for the checksum). Components: `LiveCamera` +
+`PhotoPreview`. Entry screen offers two paths:
+- **Take photo** (mobile only — gated on `getUserMedia` + `(pointer: coarse)`): live preview with a loose advisory framing guide (`.scanner-guide`) + shutter; captures the full video frame.
+- **Upload photo** (all devices): pick a file → `PhotoPreview` shows it → Scan sends the full image.
 
-### Orientation & overlay
-Orientations: `landscape | portrait-r | portrait-l`. Overlay labels are arranged so **4s and #1 always meet at the top-left** corner (landscape = categories down the left as 7 rows, players #1–#4 across the top; portrait transposes to 4 rows × 7 cols but keeps 4s/#1 top-left). Portrait crops are rotated upright for OCR (`rotateCCW` for portrait-r, `rotateCW` for portrait-l). `mapOcrToGrid(resp, w, h, orientation)` then undoes the axis the rotation reversed: **portrait-r reverses the category axis**, **portrait-l reverses the player axis**. (If a real scan ever comes out mirrored, swap that axis — it's the two `orientation === 'portrait-*'` lines in `cellMapper.js`.)
+Both paths run `drawScaled()` — the image/frame is downscaled so its long side ≤ `MAX_DIM` (2000px),
+keeping the payload small while digits stay legible. `onCapture(canvas)` (no orientation arg).
+The old `useOverlay`/`OverlayBox`/rotation helpers and `useCamera.capture()` were removed.
 
 ### Cell parsing & flagging (`ocr/cellMapper.js`)
 - Cell shape: `{ value: number|null, rawText, dirty, zero }` — **no `confidence`** (OCR.space Engine 2 returns no reliable per-word confidence; the old hardcoded `0.5` made every cell read "50% / low", so it was removed).

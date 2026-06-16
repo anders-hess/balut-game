@@ -3,8 +3,9 @@ import ScannerCamera    from './capture/ScannerCamera.jsx';
 import ScannerReview   from './review/ScannerReview.jsx';
 import ScorecardDisplay from './review/ScorecardDisplay.jsx';
 import ErrorLogPanel   from './errors/ErrorLogPanel.jsx';
-import { recognizeGrid }   from './ocr/ocrSpace.js';
-import { mapOcrToGrid, cellsToScorecard, buildFlaggedCells } from './ocr/cellMapper.js';
+import { scanScorecard }   from './gemini/scanClient.js';
+import { resultToCells, resultToRowSums } from './gemini/mapResult.js';
+import { cellsToScorecard, buildFlaggedCells } from './ocr/cellMapper.js';
 import { isInvalid }       from './validators.js';
 import { buildLogEntry, appendLog } from './errors/errorLog.js';
 import './ScannerScreen.css';
@@ -16,24 +17,27 @@ export default function ScannerScreen({ onClose }) {
   const [finalCard,  setFinalCard]  = useState(null);
   const [errorMsg,   setErrorMsg]   = useState(null);
 
-  async function handleCapture(capturedCanvas, orientation = 'landscape') {
+  // The Gemini reader handles any orientation natively, so the capture
+  // orientation hint is no longer needed for extraction.
+  async function handleCapture(capturedCanvas) {
     setCanvas(capturedCanvas);
     setStep('processing');
 
-    let ocrResponse = null;
+    let scanResult = null;
     let cells = null;
 
     try {
-      ocrResponse = await recognizeGrid(capturedCanvas);
-      cells = mapOcrToGrid(ocrResponse, capturedCanvas.width, capturedCanvas.height, orientation);
+      scanResult = await scanScorecard(capturedCanvas);
+      cells = resultToCells(scanResult);
       const scorecard    = cellsToScorecard(cells);
       const flaggedCells = buildFlaggedCells(cells, isInvalid);
-      appendLog(buildLogEntry({ canvas: capturedCanvas, ocrResponse, cells, error: null }));
-      setReviewData({ scorecard, flaggedCells });
+      const rowSums      = resultToRowSums(scanResult);
+      appendLog(buildLogEntry({ canvas: capturedCanvas, ocrResponse: scanResult, cells, error: null }));
+      setReviewData({ scorecard, flaggedCells, rowSums });
       setStep('review');
     } catch (err) {
-      appendLog(buildLogEntry({ canvas: capturedCanvas, ocrResponse, cells, error: err }));
-      setErrorMsg(err.message ?? 'Unknown error during OCR.');
+      appendLog(buildLogEntry({ canvas: capturedCanvas, ocrResponse: scanResult, cells, error: err }));
+      setErrorMsg(err.message ?? 'Unknown error during scan.');
       setStep('error');
     }
   }
@@ -65,6 +69,7 @@ export default function ScannerScreen({ onClose }) {
         <ScannerReview
           scorecard={reviewData.scorecard}
           flaggedCells={reviewData.flaggedCells}
+          rowSums={reviewData.rowSums}
           onConfirm={handleConfirm}
           onRescan={handleRescan}
         />

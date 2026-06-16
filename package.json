@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "simulate": "node scripts/monte-carlo.js",
-    "validate": "node scripts/validate.js"
+    "validate": "node scripts/validate.js",
+    "scan-bench": "node scripts/scan-bench.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",
