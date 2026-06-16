@@ -1,5 +1,5 @@
 import { CATEGORIES, CATEGORY_LABELS, BIG_POINT_RULES, NUM_COLUMNS } from '../logic/gameConstants.js';
-import { calculateScore, calcTotals, nextColumn, getTargetColumn } from '../logic/scoring.js';
+import { calculateScore, calcTotals, nextColumn, getTargetColumn, countBaluts } from '../logic/scoring.js';
 import './Scorecard.css';
 
 const MAX_ROLLS_IMPORT = 3;
@@ -27,6 +27,7 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
     : scorecard;
 
   const { totalSmall, totalBig, bonus, categoryBigPoints, categoryTotals } = calcTotals(displayScorecard);
+  const balutCount = countBaluts(displayScorecard);
   function getCellState(category) {
     if (!effectiveRolled) return 'empty';
     if (nextColumn(scorecard, category) === -1) return 'full';
@@ -130,12 +131,12 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
                         onKeyDown={e => isAvailable && e.key === 'Enter' && onScore?.(cat)}
                       >
                         {isPending ? (
-                          <span className="entry-chip">{displayScore}</span>
+                          <span className="entry-chip">{fmtZero(displayScore)}</span>
                         ) : isFilled ? (
-                          score
+                          fmtZero(score)
                         ) : isAvailable ? (
                           <span className="entry-chip">
-                            <span className="ghost-score">{potential}</span>
+                            <span className="ghost-score">{fmtZero(potential)}</span>
                           </span>
                         ) : ''}
                       </td>
@@ -163,15 +164,15 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
 
       <div className="scorecard-footer">
         <div className="running-total running-total--small">
-          <span className="rt-label">Small</span>
+          <span className="rt-label">Small Points</span>
           <span className="rt-value">{totalSmall}</span>
-          <span className="rt-hint">{bonusHint(totalSmall)}</span>
+          <span className="rt-hint">
+            ({bonus >= 0 ? `+${bonus}` : bonus} big points)
+          </span>
         </div>
         <div className="running-total running-total--small">
-          <span className="rt-label">Bonus</span>
-          <span className="rt-value" style={{ color: bonus >= 0 ? 'var(--color-accent)' : 'var(--color-danger)' }}>
-            {bonus >= 0 ? `+${bonus}` : bonus}
-          </span>
+          <span className="rt-label">Balut</span>
+          <span className="rt-value">{balutCount}</span>
         </div>
         <div className="running-total running-total--big">
           <span className="rt-label">
@@ -185,6 +186,11 @@ export default function Scorecard({ scorecard, dice, rollsLeft, onScore, playerN
       </div>
     </div>
   );
+}
+
+// A scored 0 (a scratched / forced-zero cell) reads more clearly as a dash.
+function fmtZero(v) {
+  return v === 0 ? '–' : v;
 }
 
 function isGreatScore(category, score, columns) {
@@ -221,11 +227,3 @@ function bigPtTarget(rule) {
   return '';
 }
 
-function bonusHint(total) {
-  if (total < 300)  return 'Need 300 for −1';
-  if (total < 350)  return '−1 big · need 350 for ±0';
-  if (total < 400)  return '±0 · need 400 for +1';
-  if (total < 450)  return '+1 big · need 450 for +2';
-  const extra = Math.floor((total - 450) / 50);
-  return `+${2 + extra} big pts bonus`;
-}
