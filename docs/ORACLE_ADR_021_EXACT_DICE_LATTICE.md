@@ -1,0 +1,26 @@
+# ADR-021 — Exact dice-probability factorization on a shared histogram lattice (Oracle iteration 26)
+**Date:** 2026-11-02. **Status:** ACCEPTED AS RESEARCH COMPONENT; NOT APPROVED FOR PRODUCTION.
+**Controlling target:** North Star expected FINAL Big Points under globally optimal future decisions across all 28 turns and seven scoring categories. <=7 remaining turns still use exact Bellman without fallback. 20–28 global correctness remains unresolved.
+
+## New exact mathematical operation
+For each scorecard Bellman state, the dice after a reroll are iid and uniformly distributed on six faces. Instead of independently enumerating the full multinomial distribution for each of 210 held-dice histograms (4,116 hold x chance-outcome edges), compute a backwards conditional expectation on the entire histogram lattice.
+Let f(d) be the EXACT continuation value after observing a completed five-dice histogram d (including all future optimal scoring and reroll decisions). Define F_5(d)=f(d), then F_k(h)=(1/6)*sum_{face=1}^6 F_{k+1}(h+e_face) for every unordered histogram h containing k dice, k=4,..,0. All 210 partial histograms need exactly SIX next-face expectations each: **1,260** transitions per reroll stage (69.4% reduction in chance transitions), with exact multinomial equivalence by iterated expectation. The second reroll applies this same operation again after maximizing current holds. The optimal Bellman definition, terminal bonus rules, scoring, and seven-category adaptivity remain unchanged.
+
+## Small additional exact state compression
+Each remaining Choice slot must score at least 5 Small Points. Therefore guaranteed future minimum Small Points is 5*number of unfilled Choice slots. If bonus(currentSmall+futureMin)==bonus(currentSmall+futureMax), terminal bonus is mathematically fixed. Also, where currentSmall+futureMin >=250, bonus(final+50)=bonus(final)+1 permits 50-point state translation beginning at currentSmall >=250-futureMin. A separate terminal-state shortcut returns exact constant Big Points when every category reward and total-small bonus is fixed across all continuations. These changes reduced memo-state count slightly; the large runtime gains are from the lattice.
+
+## Verified real native results vs UNCHANGED V25
+- Full ten-turn category/hold turn table: 461 comparable Q values, max abs difference 2.13e-14 BP. An observed benchmark showed 1.26s → 0.77s (1.63x), with run-to-run variation.
+- Two independent real 12-turn card root calculations were cross-checked: 1.69–1.82x faster and mathematically matching all legal root Q values.
+- Derived 13-turn last-roll card (legal hypothetical precursor): 10.18s → 5.97s, max difference 3.55e-15.
+- **Derived 14-turn, TWO-reroll root:** 29 legal actions, v25 **13.780s / 899,848** W states vs v26 **7.952s / 899,827**, 1.73x speedup, every Q matched within 1.07e-14. Best: hold one six, expected final BP 10.09739658584.
+- **Derived 15-turn, TWO-reroll root:** 29 legal actions, v25 **18.488s / 1,217,525** W states vs v26 **11.546s / 1,217,503**, 1.60x speedup, every Q matched within 1.96e-14. Best: hold one six, expected final BP 10.63873053479.
+- The 14- and 15-turn cards are LEGAL but constructed by undoing zero Straight scores in a scorecard from an earlier full game, NOT observed 14/15-turn trajectories. They are deliberately relatively tractable and do NOT demonstrate 14/15-turn coverage generally.
+- **16-turn root with newly intact Straight:** exceeded 2.3 million W-state budget, NOT exact. Another 14-turn root timed out, NOT exact. No globally optimal 20–28 opening action was proved.
+- Independent multinomial expected-value validation: 75 arbitrary deterministic dice-value arrays × 210 partial histograms × 2 stages = **31,500** comparisons; maximum absolute numeric difference **8.88e-15**. Six legal derived card states × both final-roll and two-reroll root stages reproduced all V25 Q values; other longer tests included above.
+- Numbers are observed Linux C++20 -O3 timings, not iPhone/Safari. All computations use IEEE754 doubles; directed-rounding / formal certificate verification remains absent.
+
+## Decision and next gate
+Keep exact histogram-lattice expectation as the next native solver baseline. This reduces O(number hold x multinomial outcomes) to a shared per-face dynamic program; it does NOT solve the exponential growth of W(scorecard) state count. Next R&D must concentrate on exact CATEGORY-factorized dynamic programming, selective AND/OR root-action proofs with mathematically admissible L/U, and verified numeric margins to approach 20–28. A policy rollout cannot be declared globally optimal. No live application change.
+
+**Self-contained artifact:** `Balut_Oracle_2_Iteration_26_Exact_Chance_Factorization.zip`, SHA256 `dc549ea55eded42b25c99141dda2aa5d1e6978e7a24e65cc3ae782a9b4579b34` in Balut ChatGPT project; contains original V25 C++, V26 C++, two ablations, fixtures, 14/15-turn benchmark JSON, full Danish report, tests and independent ZIP extraction check. The extracted ZIP recompiled and passed the default check script.
