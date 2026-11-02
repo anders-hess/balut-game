@@ -1,0 +1,18 @@
+# Oracle 2.0 research iteration 28 — useful mathematical bounds for 20–28 turns
+**2026-11-02 · RESEARCH, no production changes.** Full run-ready original code and raw results: Balut ChatGPT attachment `Balut_Oracle_2_Iteration_28_Adaptive_Early_Game_Bounds.zip` (304,409 bytes, sha256 `cdae58fc81741dc38149b52d2942d7f75a7eb1db2007d3d84c5aa5d14ab47c55`, 133 ZIP entries). The ZIP is the authoritative self-contained source artifact; GitHub holds permanent research decisions.
+
+## New construction
+Fully legal policy partitions remaining category slots into <=4 waves, one available slot of each category per wave. A 127-mask optimal chance DP chooses score category after any roll and dice holds/rerolls, **adaptively among all seven categories still unused in current wave**. Each wave is conditionally independent of preceding scores because the fixed policy uses only the wave mask and current dice. Exact discrete distributions yield category bonus probabilities and the complete *joint total-small-score sum per wave*, so expected terminal Big Points are integrated deterministically with correct thresholds, 4-of-4 Straight/FullHouse and Balut. Pointwise max of 5 feasible fixed wave policies and previous v15 bound stays lower than global optimal Q*; original v15 upper retained. No learned estimates / no MC in value calculation.
+
+## Exhaustive 28-turn first roll
+252/252 distinct 5-dice outcomes with exact multinomial weighting: old V15 best-action average lower **1.4483 BP**, V28 **4.8435 BP** (+3.3952 BP). Average maximal decision regret upper **20.2439 → 16.8487 BP (−16.77%)**, all 252 roots improved, 0 certified top actions and 0 provably pruned actions. 86 lower-based candidate changes are only *provisional*, NOT proven optimal. ~3.9 seconds Node/Linux for full enumeration after old module precompute (not mobile).
+
+## Actually observed gameplay, ALL early horizons
+4 prespecified seeded complete legal games: exact scorecards and first throws at each turn with remaining 20..28 = **36 independent-position observations** (4 per horizon, within-game correlation). Old average regret upper **16.9789 → 14.1402** BP (−16.72%), all nine horizons improve. No 20–28 globally optimal candidate certified; no action pruned; 9 provisional suggestion changes.
+
+## Correctness
+Against five independently computed V27 exact Bellman root certificates at remaining 10–14 turns, all **92 current-action new lower bounds ≤ exact Q*** (largest `newLower - trueQ` = −1.3859 BP); 747 mask probability, exact wave marginal and independent 2-category convolution checks PASS at 5.7e-14 maximal discrepancy. All 252 openings and 36 actual cases consistent with inherited valid V15 uppers. ZIP integrity verified; extracted ZIP `npm test` passed. A full observed 36-run was completed in original worktree and included; extracted rerun was interrupted after 18 due test execution budget, so do not claim it finished after extraction.
+
+**Honest limits:** This is a mathematically valid policy lower in exact real arithmetic but implemented Float64 (formal outward rounding not yet integrated). Bounds at 28 remain far too wide for ANY global top proof or action pruning. **Next MUST optimize coupled-category admissible upper via information relaxation/duality and a selective AND/OR proof**, not merely fit another game policy. Exact <=7 still mandatory; V27's directed rounding can certify candidate only after sufficient separation. Do not deploy.
+
+[Main ADR-023](https://github.com/anders-hess/balut-game/blob/main/docs/ORACLE_ADR_023_EARLY_ADAPTIVE_WAVE_LOWER.md) for the complete mathematical argument and reproducibility reference.
