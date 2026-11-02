@@ -1,0 +1,59 @@
+{
+  "version": 35,
+  "status": "UNSOLVED",
+  "objective": "Globally optimal present action under all-28-turn adaptive final Big Points; not achieved",
+  "math": "Exact min-plus joint two-row terminal bonus optimization; exact other-category reachable-sum bitset; deterministic pathwise min for V34 nonanticipative policy exchange; exact integer/rational present two-reroll adversarial Bellman",
+  "observed": {
+    "roots": 36,
+    "horizons": "20-28",
+    "scoreCandidatesTested": 36,
+    "competingScoreActionsChecked": 212,
+    "competingHoldActionsChecked": 716,
+    "certifiedTopChoices": 0,
+    "scoreActionsEliminated": 0,
+    "holdActionsEliminated": 0,
+    "regretBoundImprovedRoots": 0,
+    "meanRegretUpperBP": 4.324174593081593,
+    "minRegretUpperBP": 3.186206847279378,
+    "maxRegretUpperBP": 5.611111111111111
+  },
+  "fullCurrentActionScans": {
+    "caseIndices": [
+      0,
+      35
+    ],
+    "scoreCandidates": 14,
+    "certified": 0
+  },
+  "exactPathwiseAudit": {
+    "caseIndices": [
+      0,
+      4,
+      8,
+      13,
+      17,
+      26,
+      35
+    ],
+    "terminalCells": 11592,
+    "cellsStrictlyImprovedOverV34": 0
+  },
+  "independentTests": {
+    "scoreHistograms": 252,
+    "bonusBreakpointQueries": 12000,
+    "exactReachableTotalQueries": 2000,
+    "completeTerminalPayoffComparisons": 900,
+    "exactBellmanActionPairComparisons": 408,
+    "minFloatReferenceSlackBP": 1.2085307317497582,
+    "legalPositiveControl": {
+      "remaining": 2,
+      "v34LowerBP": 0,
+      "v35ExactLowerBP": 1,
+      "bruteForceExactLowerBP": 1
+    }
+  },
+  "numeric": "Integer exact comparison signs, rational denominator 7776^r; Float64 only for displays and immutable Bellman reference",
+  "limitations": "No certified natural 20-28-turn decision; seven exact-pathwise audited observed roots, not all 36; all 36 use interval-other variant; late 1-7-turn Oracle must remain exact Bellman",
+  "artifact": "Balut_Oracle_2_Iteration_35_Exact_Pathwise_Exchange.zip",
+  "sha256": "055fc7aefff299aa32f04e2252b82c2bbf31c726042e90dfc676849f902f9310"
+}
