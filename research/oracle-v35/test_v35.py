@@ -4,7 +4,7 @@ import random,json
 from pathlib import Path
 from joint_swap_v35 import *
 from test_swap_v34 import complete_pair,independently_score,terminal
-import test_exact_q_v34 as reference
+from fixtures import observed
 
 def main():
     rng=random.Random(350026)
@@ -30,7 +30,7 @@ def main():
         A['choice'] += [30,v];B['choice'] += [5,v]
         direct.append(terminal(A)-terminal(B))
     assert (old,exact,min(direct))==(0,1,1)
-    rows=json.loads((Path(__file__).resolve().parents[1]/'oracle-v34'/'observed_early_cases_v28.json').read_text())['cases']
+    rows=observed()
     checked=0
     for i in [0,8,35]:
         card=rows[i]['board'];idx=INDEX[tuple(sorted(rows[i]['dice']))]
