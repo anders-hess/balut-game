@@ -3,6 +3,7 @@
 import argparse,json,time
 from pathlib import Path
 from joint_swap_v35 import *
+from fixtures import observed,BEST
 
 ROOT=Path(__file__).resolve().parents[1]/'oracle-v34'
 
@@ -37,12 +38,11 @@ def main():
     p.add_argument('--exact-pathwise',action='store_true')
     p.add_argument('--out',required=True)
     a=p.parse_args()
-    cases=json.loads((ROOT/'observed_early_cases_v28.json').read_text())['cases']
-    prior=json.loads((ROOT/'v34_summary.json').read_text())['observed']
+    cases=observed()
     output=[];start=time.time()
     for i in range(a.start,min(a.start+a.count,len(cases))):
         row=cases[i]
-        names=[r['candidate'] for r in prior[i]['allLegalScoreCandidateBounds']] if a.all_candidates else [prior[i]['bestImmediateScoreCandidate']]
+        names=['score:'+CATS[c] for c in range(7) if None in row['board'][CATS[c]]] if a.all_candidates else ['score:'+BEST[i]]
         actions=[candidate_bound(row['board'],row['dice'],CATS.index(n.split(':')[1]),a.exact_pathwise) for n in names]
         output.append({'caseIndex':i,'remaining':row['remaining'],'dice':row['dice'],'actions':actions})
         print(i,row['remaining'],'certified',sum(x['certified'] for x in actions),'seconds',round(time.time()-start,2),flush=True)
