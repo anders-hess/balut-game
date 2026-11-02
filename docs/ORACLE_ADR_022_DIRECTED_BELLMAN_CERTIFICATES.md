@@ -1,0 +1,30 @@
+# ADR-022 — Directed-rounding Bellman root-action certificates (Oracle iteration 27)
+**Date:** 2026-11-02. **Status:** ACCEPTED AS RESEARCH PROOF GATE; NOT PRODUCTION-APPROVED.
+**Binding:** North Star expected final Big Points with optimal adaptation over all seven categories and all 28 turns. <=7-turn exact Bellman remains mandatory. All early 20–28-turn globally optimal decisions remain unsolved.
+
+## Proven mathematical interval principle
+Compute action-specific rational-Bellman enclosures by TWO independent full recursive runs of unchanged exact V26 category/hold transition dynamics: one with IEEE-754 `FE_DOWNWARD` and one with `FE_UPWARD` using `g++ -std=c++20 -O3 -frounding-math -fno-fast-math -ffp-contract=off`. Replace the original approximate multinomial root probability weighting by recursively adding one fair die at a time and dividing by exactly 6 on the 462-node histogram lattice (the same exact iid expectation used for reroll holds). No rounded probability constants enter the Bellman arithmetic. Integer scoring constants remain exactly representable. Memoized values are strictly separate by rounding mode and V27-specific cache version. The probability and max operators are monotone, so directed evaluation propagates bounds `L(s,a) <= Q*(s,a) <= U(s,a)` given correct compiler/fenv behavior and the mathematical state quotient.
+
+**Certification rule:** An observed unique top action `a*` is certified only when `L(a*) > max_{b!=a*} U(b)` using exact hex-float encoding and a separately executed verifier. The certificate includes ALL legal action IDs and their independently calculated upper/lower action values, complete input state, C++ source SHA256 and run statistics. This rule confirms the UNIQUE BEST action but not necessarily the COMPLETE ordering of suboptimal actions.
+
+## Actual fresh checks in source package
+- **Five root decision certificates** (92 legally distinct root actions total): 10 turns r=2, 11 turns r=2, two 12 turns r=0, and 14 turns r=2. Five unique top choices, with lower bound of best exceeding every other upper bound by **0.054054516042, 0.079949783775, 0.032884515945, 0.115311656821, 0.013173060854** expected final BP respectively. Max bound width over these five is <7.2e-13 BP.
+- Certified best actions: 10-turn hold two fives; 11-turn hold two sixes; 12-turn score sixes; other 12-turn score Choice; 14-turn hold one six. All legally adaptive future decisions retained.
+- 14-turn r=2: ALL 29 actions covered, best `[10.097396585839958, 10.097396585840428]` BP, gap lower bound **0.013173060854** BP; 899,827 recursive W states in each directed run. Important: scorecard was legally CONSTRUCTED by reversing a scratched Straight score, not a representative observed 14-turn board.
+- 10–12-turn scorecards were taken from independent legal-game simulations; some dice from first roll were evaluated as hypothetical final-roll configurations.
+- An independent Python `fractions.Fraction` one-turn exact arithmetic solver, not using C++ memo or float results, computed ALL 24 actions of a legal one-turn Balut state and confirmed every exact rational action value lies between corresponding directed-rounding outputs (max observed numeric distance <1.7e-14 BP).
+- A fresh root r=2 under BOTH directed modes reproduced every one of 27 V26 independent floating reference Q values. All five certificate files independently verified from hexadecimal bit-exact representation with expected legal action set regenerated from dice/category quotas.
+- Archive source was compiled and tested from an independently extracted ZIP with no tests failing.
+
+## Limitations / trust
+Source-level Bellman monotonicity + fenv controls are mathematically sound, but the C++/compiler/hardware execution has NOT been formally proven by a proof assistant or independently verified interval-arithmetic runtime. `fesetround` and compiler flags are a trusted assumption. IEEE-754 is not exact rational arithmetic; the interval certification depends on correct directed rounding at EVERY operation. Cache snapshots from previous versions must not be loaded. Untrusted certificate files must not be interpreted as proof without validating their generation chain.
+These are SELECTED fully-solvable roots, not blind general-coverage evidence; 14-turn is constructed; a 15-turn two-mode proof attempt did not complete within available execution budget and is NOT counted. No optimal opening 20–28-turn recommendation, no general full 28-turn ranking, no mobile latency validation.
+
+## Explicit negative R&D outcomes
+- Compact custom hash map was slower on two smaller legal states (10-turn 1.595s packed vs V26 1.375s, with greater resident memory), not adopted.
+- When ALL future small bonus outcomes are identical, and a category's own Big Point reward is irrevocably constant, remaining slots in such reward-neutral categories can be merged into a single dummy-slot pool. A synthetic 8-turn case decreased from 31 to 13 W states, but on representative 10–12-turn cases the reduction was negligible and speed was not reliably improved. Experimental source is included, not adopted.
+
+## Research delivery and decision
+Treat directed action certificates as the new proof standard for every exact-computable action. Do not replace product model or deploy. Next research must integrate a genuinely scalable selective admissible L/U AND/OR solver that can selectively certify longer horizons and prove at least one 20–28-turn opening. The new implementation alone DOES NOT improve state-space complexity; it is rigorous verification infrastructure, not the original 28-turn goal.
+
+**Artifact:** `Balut_Oracle_2_Iteration_27_Directed_Bellman_Certificates.zip`, 41,456 bytes, SHA256 `bae7d609b55c2f83415e8b78eecdc4822c9527112d11940da4ffc083f77c2656`. Contains unchanged V26 C++, new V27 C++, five machine-readable full-action certificates, independent Fraction Python, verifier, deterministic fixtures, negative experiment and full Danish report. All checks passed after archive was extracted into a clean directory.
