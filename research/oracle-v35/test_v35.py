@@ -49,7 +49,6 @@ def main():
     print(json.dumps({'scoreHistograms':252,'bonusIntervalChecks':12000,
                       'reachableBonusChecks':2000,'terminalPayoffChecks':checked,
                       'legalPositiveControl':{'old':0,'exact':1},'passed':True}))
-    reference.build_swap_lower=build_exact_pathwise_lower
-    reference.main() # 408 pairwise comparisons against five unchanged exact Q roots
+    # Exact-Q comparisons run in a fresh Python process via run_checks.sh.
 
 if __name__=='__main__':main()
