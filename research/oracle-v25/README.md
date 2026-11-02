@@ -1,0 +1,14 @@
+# Oracle 2.0 — V25 Exact State Quotient (2 November 2026)
+RESEARCH ONLY. No code changed on live production branch. [Architecture ADR-020](https://github.com/anders-hess/balut-game/blob/main/docs/ORACLE_ADR_020_EXACT_STATE_QUOTIENT.md). Global mathematical objective remains optimal expected FINAL Big Points for all seven categories and all future decisions across 28 turns; <=7 uses exact solver.
+
+**Structural exact breakthrough:** Stronger Bellman quotient groups already-secured and permanently-dead Big Point threshold states under same canonical key, with their +2 reward difference in a pathwise additive offset; similarly factors already completed Straight/Full House +4/+3; extends exact 50-point bonus translational symmetry from old threshold 450 down to **250**. Terminal score, dice probabilities, legal holds, and Bellman search are unchanged; canonical cache version/magic bumped to prevent invalid reuse.
+
+**Measured original V21 vs V25 SAME native C++ compiler flags and legal scorecards:** seven 10-turn comparisons produce 49.6–67.3% fewer W states, mean 58.3%, 2.01–3.20x speedup, 509 full Q values matched within 2.5e-14. Additional extended suite matched 575 Q values and three synthetic exact constant-offset checks.
+
+**11-turn with TWO rerolls:** 1,489,864 states / 22.38s (original) → 471,764 states / 7.03s (V25). **68.3% state reduction**, ~3.18x faster. All 28 legal current action Qs agree at 8.9e-15 BP. Best action hold 5 and 6, optimal expected final score 9.5238386427. A score-only 11-turn case similarly shrank 1,321,603→412,698 states and 18.5→6.2s; the original previously failed 1m-state limit.
+
+A new 12-turn case exceeded its 900k state budget. NO 20–28-turn globally optimal action has been proven. No outward-rounded Float64 certificates or iPhone performance.
+
+**Artifact:** Full standalone C++ source including untouched V21 reference, new solver, ablation variants, 36-case legal scorecards, scripts, raw results and detailed Danish report in project attachment `Balut_Oracle_2_Iteration_25_Exact_State_Quotient.zip`; SHA256 `47720447f56c458ce976f6a462eb3a590dae09607a4813364d104cd6e498453a`. ZIP extracted and smoke test independently rerun; all 3 checks passed. The longer comprehensive check passed in development source but some repeated long checks hit compute limits and are not claimed finished.
+
+**Next:** use the dramatically smaller exact state quotient as foundation for factored exact Bellman and proof-directed AND/OR action search at 12–16 turns, then 20–28. Certification and action regret, not average policy simulation score, are success criteria.
