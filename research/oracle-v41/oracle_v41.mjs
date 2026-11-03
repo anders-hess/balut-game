@@ -8,7 +8,7 @@ export function small(c,d){
  const n=Array(7).fill(0);for(const v of d)n[v]++;
  const sum=d.reduce((a,b)=>a+b,0);
  if(c<3)return (c+4)*n[c+4];
- if(c===3)return n.slice(1).every((v,i)=>v===(i===0||i===5?0:1))?20:
+ if(c===3)return n.slice(1).every((v,i)=>v===(i===5?0:1))?20:
     n.slice(1).every((v,i)=>v===(i===5?0:1))?15:null;
  if(c===4)return n.includes(3)&&n.includes(2)?sum:null;
  if(c===5)return sum;
