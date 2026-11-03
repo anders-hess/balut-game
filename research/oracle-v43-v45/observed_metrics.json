@@ -1,0 +1,915 @@
+{
+  "summary": {
+    "observed_roots": 36,
+    "certified_early_top": 0,
+    "actions_pruned": 0,
+    "legal_action_intervals": 964,
+    "mean_proof_gap_bp": 28.06527427951829,
+    "min_proof_gap_bp": 22.5864689533179,
+    "max_proof_gap_bp": 32.65721297794496,
+    "sum_root_cpu_seconds": 61.901875372999484,
+    "max_rss_kb": 97936
+  },
+  "roots": [
+    {
+      "candidate": "hold:000200",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 32.621777045846194,
+      "best_lower_bp": -0.6217770458461934,
+      "max_rival_upper_bp": 32.0,
+      "exact_integer_witness": {
+        "best_low_num": "-37596480286896",
+        "max_rival_high_num": "1934917632000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 0,
+      "remaining": 28,
+      "dice": [
+        4,
+        1,
+        3,
+        4,
+        5
+      ],
+      "seconds": 3.8557012890000806,
+      "rss_kb": 97676
+    },
+    {
+      "candidate": "hold:000030",
+      "certified": false,
+      "legal_actions": 22,
+      "pruned": 0,
+      "gap_bp": 32.296051612654324,
+      "best_lower_bp": -0.296051612654321,
+      "max_rival_upper_bp": 32.0,
+      "exact_integer_witness": {
+        "best_low_num": "-17901108915840",
+        "max_rival_high_num": "1934917632000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 1,
+      "remaining": 27,
+      "dice": [
+        5,
+        5,
+        4,
+        6,
+        5
+      ],
+      "seconds": 2.024126400999876,
+      "rss_kb": 97676
+    },
+    {
+      "candidate": "hold:000030",
+      "certified": false,
+      "legal_actions": 22,
+      "pruned": 0,
+      "gap_bp": 31.537127479166667,
+      "best_lower_bp": 0.22676140972222222,
+      "max_rival_upper_bp": 31.76388888888889,
+      "exact_integer_witness": {
+        "best_low_num": "13711395310272",
+        "max_rival_high_num": "1920640896000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 2,
+      "remaining": 26,
+      "dice": [
+        5,
+        4,
+        5,
+        2,
+        5
+      ],
+      "seconds": 1.865752139000051,
+      "rss_kb": 97676
+    },
+    {
+      "candidate": "hold:000002",
+      "certified": false,
+      "legal_actions": 24,
+      "pruned": 0,
+      "gap_bp": 30.949998738490226,
+      "best_lower_bp": 0.050001261509773666,
+      "max_rival_upper_bp": 31.0,
+      "exact_integer_witness": {
+        "best_low_num": "3023385078672",
+        "max_rival_high_num": "1874451456000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 3,
+      "remaining": 25,
+      "dice": [
+        2,
+        6,
+        4,
+        2,
+        6
+      ],
+      "seconds": 1.6274374990000524,
+      "rss_kb": 97676
+    },
+    {
+      "candidate": "score:straight:20",
+      "certified": false,
+      "legal_actions": 38,
+      "pruned": 0,
+      "gap_bp": 27.093392,
+      "best_lower_bp": -0.093392,
+      "max_rival_upper_bp": 27.0,
+      "exact_integer_witness": {
+        "best_low_num": "-5647057108992",
+        "max_rival_high_num": "1632586752000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 4,
+      "remaining": 24,
+      "dice": [
+        2,
+        6,
+        4,
+        5,
+        3
+      ],
+      "seconds": 1.4287913989999197,
+      "rss_kb": 97804
+    },
+    {
+      "candidate": "hold:000300",
+      "certified": false,
+      "legal_actions": 22,
+      "pruned": 0,
+      "gap_bp": 25.683933173696843,
+      "best_lower_bp": 1.316066826303155,
+      "max_rival_upper_bp": 27.0,
+      "exact_integer_witness": {
+        "best_low_num": "79577528347008",
+        "max_rival_high_num": "1632586752000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 5,
+      "remaining": 23,
+      "dice": [
+        4,
+        4,
+        1,
+        4,
+        6
+      ],
+      "seconds": 1.3452903380000407,
+      "rss_kb": 97932
+    },
+    {
+      "candidate": "hold:000003",
+      "certified": false,
+      "legal_actions": 22,
+      "pruned": 0,
+      "gap_bp": 25.17357288464506,
+      "best_lower_bp": 1.8264271153549383,
+      "max_rival_upper_bp": 27.0,
+      "exact_integer_witness": {
+        "best_low_num": "110437063408224",
+        "max_rival_high_num": "1632586752000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 6,
+      "remaining": 22,
+      "dice": [
+        6,
+        3,
+        5,
+        6,
+        6
+      ],
+      "seconds": 1.182637935999992,
+      "rss_kb": 97932
+    },
+    {
+      "candidate": "hold:000010",
+      "certified": false,
+      "legal_actions": 22,
+      "pruned": 0,
+      "gap_bp": 24.992787914337562,
+      "best_lower_bp": 2.0068691501343165,
+      "max_rival_upper_bp": 26.99965706447188,
+      "exact_integer_witness": {
+        "best_low_num": "121347703240992",
+        "max_rival_high_num": "1632566016000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 7,
+      "remaining": 21,
+      "dice": [
+        1,
+        1,
+        5,
+        6,
+        1
+      ],
+      "seconds": 0.9683712470000501,
+      "rss_kb": 97932
+    },
+    {
+      "candidate": "hold:000100",
+      "certified": false,
+      "legal_actions": 21,
+      "pruned": 0,
+      "gap_bp": 23.705566194894548,
+      "best_lower_bp": 2.2944338051054527,
+      "max_rival_upper_bp": 26.0,
+      "exact_integer_witness": {
+        "best_low_num": "138735638279856",
+        "max_rival_high_num": "1572120576000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 8,
+      "remaining": 20,
+      "dice": [
+        2,
+        5,
+        2,
+        4,
+        2
+      ],
+      "seconds": 1.9839955810000447,
+      "rss_kb": 97424
+    },
+    {
+      "candidate": "hold:000011",
+      "certified": false,
+      "legal_actions": 38,
+      "pruned": 0,
+      "gap_bp": 32.65721297794496,
+      "best_lower_bp": -0.6572129779449588,
+      "max_rival_upper_bp": 32.0,
+      "exact_integer_witness": {
+        "best_low_num": "-39739155593904",
+        "max_rival_high_num": "1934917632000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 9,
+      "remaining": 28,
+      "dice": [
+        4,
+        3,
+        1,
+        5,
+        6
+      ],
+      "seconds": 2.1333646059999865,
+      "rss_kb": 97680
+    },
+    {
+      "candidate": "hold:000300",
+      "certified": false,
+      "legal_actions": 18,
+      "pruned": 0,
+      "gap_bp": 32.28646444675926,
+      "best_lower_bp": -0.28646444675925925,
+      "max_rival_upper_bp": 32.0,
+      "exact_integer_witness": {
+        "best_low_num": "-17321409655488",
+        "max_rival_high_num": "1934917632000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 10,
+      "remaining": 27,
+      "dice": [
+        6,
+        4,
+        4,
+        4,
+        6
+      ],
+      "seconds": 1.666356968999935,
+      "rss_kb": 97680
+    },
+    {
+      "candidate": "hold:000021",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 32.18363649601338,
+      "best_lower_bp": -0.18363649601337448,
+      "max_rival_upper_bp": 32.0,
+      "exact_integer_witness": {
+        "best_low_num": "-11103796687968",
+        "max_rival_high_num": "1934917632000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 11,
+      "remaining": 26,
+      "dice": [
+        4,
+        5,
+        1,
+        6,
+        5
+      ],
+      "seconds": 1.5182355370000096,
+      "rss_kb": 97808
+    },
+    {
+      "candidate": "hold:030000",
+      "certified": false,
+      "legal_actions": 22,
+      "pruned": 0,
+      "gap_bp": 31.199244026225042,
+      "best_lower_bp": 0.4964474294410151,
+      "max_rival_upper_bp": 31.695691455666058,
+      "exact_integer_witness": {
+        "best_low_num": "30018277643328",
+        "max_rival_high_num": "1916517258000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 12,
+      "remaining": 25,
+      "dice": [
+        2,
+        1,
+        2,
+        3,
+        2
+      ],
+      "seconds": 1.3836234770001283,
+      "rss_kb": 97808
+    },
+    {
+      "candidate": "hold:000020",
+      "certified": false,
+      "legal_actions": 24,
+      "pruned": 0,
+      "gap_bp": 26.50042656886574,
+      "best_lower_bp": 0.4995734311342593,
+      "max_rival_upper_bp": 27.0,
+      "exact_integer_witness": {
+        "best_low_num": "30207295011888",
+        "max_rival_high_num": "1632586752000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 13,
+      "remaining": 24,
+      "dice": [
+        2,
+        1,
+        5,
+        1,
+        5
+      ],
+      "seconds": 1.2071120400000837,
+      "rss_kb": 97936
+    },
+    {
+      "candidate": "hold:000012",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 26.2262625,
+      "best_lower_bp": 0.7737375,
+      "max_rival_upper_bp": 27.0,
+      "exact_integer_witness": {
+        "best_low_num": "46784947852800",
+        "max_rival_high_num": "1632586752000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 14,
+      "remaining": 23,
+      "dice": [
+        1,
+        6,
+        6,
+        5,
+        3
+      ],
+      "seconds": 1.072027480000088,
+      "rss_kb": 97936
+    },
+    {
+      "candidate": "hold:000011",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 25.768198763117283,
+      "best_lower_bp": 1.231801236882716,
+      "max_rival_upper_bp": 27.0,
+      "exact_integer_witness": {
+        "best_low_num": "74482310386368",
+        "max_rival_high_num": "1632586752000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 15,
+      "remaining": 22,
+      "dice": [
+        2,
+        5,
+        6,
+        1,
+        2
+      ],
+      "seconds": 0.993169011999953,
+      "rss_kb": 97936
+    },
+    {
+      "candidate": "hold:000100",
+      "certified": false,
+      "legal_actions": 37,
+      "pruned": 0,
+      "gap_bp": 25.603689614554757,
+      "best_lower_bp": 1.3963103854452446,
+      "max_rival_upper_bp": 27.0,
+      "exact_integer_witness": {
+        "best_low_num": "84429549516960",
+        "max_rival_high_num": "1632586752000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 16,
+      "remaining": 21,
+      "dice": [
+        2,
+        5,
+        1,
+        4,
+        6
+      ],
+      "seconds": 1.5287662880000426,
+      "rss_kb": 97296
+    },
+    {
+      "candidate": "hold:000200",
+      "certified": false,
+      "legal_actions": 23,
+      "pruned": 0,
+      "gap_bp": 24.522866163708848,
+      "best_lower_bp": 1.4771338362911524,
+      "max_rival_upper_bp": 26.0,
+      "exact_integer_witness": {
+        "best_low_num": "89316634520736",
+        "max_rival_high_num": "1572120576000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 17,
+      "remaining": 20,
+      "dice": [
+        4,
+        2,
+        1,
+        1,
+        4
+      ],
+      "seconds": 0.4833057569999255,
+      "rss_kb": 97296
+    },
+    {
+      "candidate": "hold:000030",
+      "certified": false,
+      "legal_actions": 22,
+      "pruned": 0,
+      "gap_bp": 32.368383033179015,
+      "best_lower_bp": -0.36838303317901233,
+      "max_rival_upper_bp": 32.0,
+      "exact_integer_witness": {
+        "best_low_num": "-22274713319616",
+        "max_rival_high_num": "1934917632000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 18,
+      "remaining": 28,
+      "dice": [
+        5,
+        5,
+        5,
+        6,
+        1
+      ],
+      "seconds": 2.326927969999815,
+      "rss_kb": 97680
+    },
+    {
+      "candidate": "hold:030000",
+      "certified": false,
+      "legal_actions": 22,
+      "pruned": 0,
+      "gap_bp": 32.33168443518519,
+      "best_lower_bp": -0.5214510246913581,
+      "max_rival_upper_bp": 31.810233410493826,
+      "exact_integer_witness": {
+        "best_low_num": "-31530149434368",
+        "max_rival_high_num": "1923443172000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 19,
+      "remaining": 27,
+      "dice": [
+        2,
+        3,
+        4,
+        2,
+        2
+      ],
+      "seconds": 1.737254865000068,
+      "rss_kb": 97680
+    },
+    {
+      "candidate": "hold:000001",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 31.492387683484797,
+      "best_lower_bp": -0.4923876834847965,
+      "max_rival_upper_bp": 31.0,
+      "exact_integer_witness": {
+        "best_low_num": "-29772800329824",
+        "max_rival_high_num": "1874451456000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 20,
+      "remaining": 26,
+      "dice": [
+        2,
+        1,
+        2,
+        3,
+        6
+      ],
+      "seconds": 3.0998113319999447,
+      "rss_kb": 97548
+    },
+    {
+      "candidate": "hold:000200",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 30.994154699331276,
+      "best_lower_bp": 0.00584530066872428,
+      "max_rival_upper_bp": 31.0,
+      "exact_integer_witness": {
+        "best_low_num": "353442979008",
+        "max_rival_high_num": "1874451456000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 21,
+      "remaining": 25,
+      "dice": [
+        1,
+        3,
+        6,
+        4,
+        4
+      ],
+      "seconds": 2.9241448059999584,
+      "rss_kb": 97552
+    },
+    {
+      "candidate": "hold:000010",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 31.039112666680957,
+      "best_lower_bp": -0.03911266668095565,
+      "max_rival_upper_bp": 31.0,
+      "exact_integer_witness": {
+        "best_low_num": "-2364993387360",
+        "max_rival_high_num": "1874451456000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 22,
+      "remaining": 24,
+      "dice": [
+        1,
+        3,
+        5,
+        2,
+        1
+      ],
+      "seconds": 2.958396146000041,
+      "rss_kb": 97544
+    },
+    {
+      "candidate": "hold:000020",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 27.514435385802468,
+      "best_lower_bp": 2.4855646141975307,
+      "max_rival_upper_bp": 30.0,
+      "exact_integer_witness": {
+        "best_low_num": "150292587421440",
+        "max_rival_high_num": "1813985280000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 23,
+      "remaining": 23,
+      "dice": [
+        5,
+        2,
+        5,
+        6,
+        1
+      ],
+      "seconds": 2.493868582999994,
+      "rss_kb": 97672
+    },
+    {
+      "candidate": "hold:000000",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 26.50102050389345,
+      "best_lower_bp": 3.4989794961065503,
+      "max_rival_upper_bp": 30.0,
+      "exact_integer_witness": {
+        "best_low_num": "211569910031970",
+        "max_rival_high_num": "1813985280000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 24,
+      "remaining": 22,
+      "dice": [
+        4,
+        1,
+        2,
+        3,
+        4
+      ],
+      "seconds": 2.5350151879999885,
+      "rss_kb": 97544
+    },
+    {
+      "candidate": "hold:000010",
+      "certified": false,
+      "legal_actions": 24,
+      "pruned": 0,
+      "gap_bp": 26.053621711369743,
+      "best_lower_bp": 3.9463782886302585,
+      "max_rival_upper_bp": 30.0,
+      "exact_integer_witness": {
+        "best_low_num": "238622404162896",
+        "max_rival_high_num": "1813985280000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 25,
+      "remaining": 21,
+      "dice": [
+        4,
+        3,
+        4,
+        3,
+        5
+      ],
+      "seconds": 0.9637928580000334,
+      "rss_kb": 97544
+    },
+    {
+      "candidate": "hold:000040",
+      "certified": false,
+      "legal_actions": 15,
+      "pruned": 0,
+      "gap_bp": 25.133805638888887,
+      "best_lower_bp": 4.866194361111111,
+      "max_rival_upper_bp": 30.0,
+      "exact_integer_witness": {
+        "best_low_num": "294240164689152",
+        "max_rival_high_num": "1813985280000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 26,
+      "remaining": 20,
+      "dice": [
+        5,
+        4,
+        5,
+        5,
+        5
+      ],
+      "seconds": 0.7925968370000191,
+      "rss_kb": 97544
+    },
+    {
+      "candidate": "hold:000011",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 32.65721297794496,
+      "best_lower_bp": -0.6572129779449588,
+      "max_rival_upper_bp": 32.0,
+      "exact_integer_witness": {
+        "best_low_num": "-39739155593904",
+        "max_rival_high_num": "1934917632000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 27,
+      "remaining": 28,
+      "dice": [
+        5,
+        6,
+        3,
+        2,
+        2
+      ],
+      "seconds": 1.9839096499999869,
+      "rss_kb": 97672
+    },
+    {
+      "candidate": "hold:000200",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 27.99728399086934,
+      "best_lower_bp": -0.691728435313786,
+      "max_rival_upper_bp": 27.305555555555557,
+      "exact_integer_witness": {
+        "best_low_num": "-41826173313888",
+        "max_rival_high_num": "1651062528000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 28,
+      "remaining": 27,
+      "dice": [
+        3,
+        2,
+        4,
+        6,
+        4
+      ],
+      "seconds": 1.8753486890000204,
+      "rss_kb": 97800
+    },
+    {
+      "candidate": "hold:000002",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 27.537630811471193,
+      "best_lower_bp": -0.5376308114711934,
+      "max_rival_upper_bp": 27.0,
+      "exact_integer_witness": {
+        "best_low_num": "-32508479269440",
+        "max_rival_high_num": "1632586752000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 29,
+      "remaining": 26,
+      "dice": [
+        1,
+        3,
+        4,
+        6,
+        6
+      ],
+      "seconds": 1.6492165099998601,
+      "rss_kb": 97800
+    },
+    {
+      "candidate": "hold:000200",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 27.415368237397118,
+      "best_lower_bp": -0.41536823739711937,
+      "max_rival_upper_bp": 27.0,
+      "exact_integer_witness": {
+        "best_low_num": "-25115728947264",
+        "max_rival_high_num": "1632586752000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 30,
+      "remaining": 25,
+      "dice": [
+        1,
+        5,
+        4,
+        4,
+        6
+      ],
+      "seconds": 2.8952204849999816,
+      "rss_kb": 97544
+    },
+    {
+      "candidate": "hold:000001",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 27.18617488790295,
+      "best_lower_bp": -0.5586671718535665,
+      "max_rival_upper_bp": 26.627507716049383,
+      "exact_integer_witness": {
+        "best_low_num": "-33780467538720",
+        "max_rival_high_num": "1610063568000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 31,
+      "remaining": 24,
+      "dice": [
+        1,
+        4,
+        6,
+        3,
+        3
+      ],
+      "seconds": 1.2366346029998567,
+      "rss_kb": 97544
+    },
+    {
+      "candidate": "hold:000300",
+      "certified": false,
+      "legal_actions": 22,
+      "pruned": 0,
+      "gap_bp": 23.996950712962963,
+      "best_lower_bp": 2.512308546296296,
+      "max_rival_upper_bp": 26.50925925925926,
+      "exact_integer_witness": {
+        "best_low_num": "151909690726656",
+        "max_rival_high_num": "1602913536000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 32,
+      "remaining": 23,
+      "dice": [
+        2,
+        4,
+        4,
+        1,
+        4
+      ],
+      "seconds": 1.1676985779999995,
+      "rss_kb": 97672
+    },
+    {
+      "candidate": "hold:000202",
+      "certified": false,
+      "legal_actions": 24,
+      "pruned": 0,
+      "gap_bp": 23.59677661111111,
+      "best_lower_bp": 2.4032233888888888,
+      "max_rival_upper_bp": 26.0,
+      "exact_integer_witness": {
+        "best_low_num": "145313728399872",
+        "max_rival_high_num": "1572120576000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 33,
+      "remaining": 22,
+      "dice": [
+        6,
+        3,
+        4,
+        4,
+        6
+      ],
+      "seconds": 1.0837529949999407,
+      "rss_kb": 97800
+    },
+    {
+      "candidate": "hold:000000",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 22.94519252094447,
+      "best_lower_bp": 3.05480747905553,
+      "max_rival_upper_bp": 26.0,
+      "exact_integer_witness": {
+        "best_low_num": "184712526674688",
+        "max_rival_high_num": "1572120576000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 34,
+      "remaining": 21,
+      "dice": [
+        5,
+        1,
+        6,
+        1,
+        3
+      ],
+      "seconds": 1.0310655219998353,
+      "rss_kb": 97800
+    },
+    {
+      "candidate": "hold:000100",
+      "certified": false,
+      "legal_actions": 30,
+      "pruned": 0,
+      "gap_bp": 22.5864689533179,
+      "best_lower_bp": 3.413531046682099,
+      "max_rival_upper_bp": 26.0,
+      "exact_integer_witness": {
+        "best_low_num": "206403169050144",
+        "max_rival_high_num": "1572120576000000",
+        "common_denominator": "60466176000000"
+      },
+      "case_index": 35,
+      "remaining": 20,
+      "dice": [
+        6,
+        1,
+        4,
+        2,
+        1
+      ],
+      "seconds": 0.8791547609998815,
+      "rss_kb": 97928
+    }
+  ]
+}
