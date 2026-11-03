@@ -13,6 +13,7 @@ Path('reference_exact_q_v27.json').write_text(json.dumps(exact_q()))
 print('restored unchanged compressed v27/v28 frozen fixtures')
 PY
 OPENBLAS_NUM_THREADS=1 python test_v37.py 5
+OPENBLAS_NUM_THREADS=1 python test_all408_v37.py
 python - <<'PY'
 import json
 x=json.load(open('summary_v37.json'))
