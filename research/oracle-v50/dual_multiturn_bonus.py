@@ -42,13 +42,13 @@ def last_conditional_numerator(stop,indices):
 def bonus_board(n):
  # n=3 => 3 active Fours/Fives/Choice
  board={
-  'fours':[12,16,16,None], 'fives':[15,20,20,None],
-  'sixes':[18,18,24,24], 'straight':[15,20,15,20],
+  'fours':[12,None,16,16], 'fives':[15,None,20,20],
+  'sixes':[18,18,24,24], 'straight':[15,15,20,20],
   'fullHouse':[20,18,22,22], 'choice':[26,26,30,None],
   'balut':[0,0,0,0],
  }
  if n==4:
-  board['sixes']=[18,18,24,None]
+  board['sixes']=[18,18,None,24]
  return board
 
 class CoupledRewardDual:
