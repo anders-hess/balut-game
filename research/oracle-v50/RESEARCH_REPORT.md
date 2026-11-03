@@ -8,8 +8,8 @@ We continue to target `Q*(s,a) = E[FINAL Big Points | current a, globally optima
 
 ### Valid constructed 4-turn board
 
-- Fours `[12,16,16,null]` (44 accumulated), Fives `[15,20,20,null]` (55), Sixes `[18,18,24,null]` (60), Choice `[26,26,30,null]` (82).
-- Straight `[15,20,15,20]`, Full House `[20,18,22,22]`, Balut `[0,0,0,0]`. (All historical nonzero cells attainable with genuine fair dice; the Choice values are 26/26/30, **not** impossible 32.)
+- Fours `[12,null,16,16]` (44 accumulated), Fives `[15,null,20,20]` (55), Sixes `[18,18,null,24]` (60), Choice `[26,26,30,null]` (82).
+- Straight `[15,15,20,20]`, Full House `[20,18,22,22]`, Balut `[0,0,0,0]`. (All historical nonzero cells attainable with genuine fair dice and the production rule placing high Fours/Fives/Sixes/Straights from right; the Choice values are 26/26/30, **not** impossible 32.)
 - Current dice `[4,4,5,5,6]`, no rerolls. Four positive legal scores: Fours=8, Fives=10, Sixes=6, Choice=24. Three turns remain after scoring.
 
 The 3-turn board has the Sixes fourth historical score 24 and current dice `[4,4,4,5,5]`, with Fours12, Fives10, Choice22 positive.
