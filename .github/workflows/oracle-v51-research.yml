@@ -1,0 +1,14 @@
+name: Oracle v51 research regression
+on:
+  push:
+    branches:
+      - research/oracle-v51-bonus-automata-2026-11-03
+  workflow_dispatch:
+jobs:
+  oracle-v51:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and verify 92 reference Q actions and 30 opening bounds
+        run: bash research/oracle-v51/run_checks.sh
