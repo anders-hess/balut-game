@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")"
-export PYTHONPATH="$PWD:$PWD/../oracle_v47"
+ORACLE_V47="$PWD/../oracle_v47"
+[[ -d "$ORACLE_V47" ]] || ORACLE_V47="$PWD/../oracle-v47"
+export PYTHONPATH="$PWD:$ORACLE_V47"
 cp gate3_result6.json gate3_frozen_backup.json
 trap 'mv -f gate3_frozen_backup.json gate3_result6.json' EXIT
 ulimit -v 1800000
