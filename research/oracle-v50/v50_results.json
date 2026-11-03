@@ -1,0 +1,172 @@
+{
+  "status": "EXACT_SHORT_HORIZON_ONLY",
+  "entries": [
+    {
+      "horizon": 3,
+      "category_count": 3,
+      "all_positive": true,
+      "action_intervals": [
+        {
+          "id": "score:0:12",
+          "score": 12,
+          "low": 3682103899083363760780668,
+          "upper": 3682426336696092142037772,
+          "exact": 16.65553270026016,
+          "future_oracle": 16.656991206144234
+        },
+        {
+          "id": "score:1:10",
+          "score": 10,
+          "low": 3680605529654463191679072,
+          "upper": 3680605944290711531667552,
+          "exact": 16.64875501508231,
+          "future_oracle": 16.648756890637095
+        },
+        {
+          "id": "score:5:22",
+          "score": 22,
+          "low": 3571579875824989421348864,
+          "upper": 3574370074862637761348864,
+          "exact": 16.155591217348057,
+          "future_oracle": 16.168212330870507
+        }
+      ],
+      "independent_float64_Bellman_action_comparisons": 3,
+      "certificate": {
+        "globally_optimal_current_score": "score:0:12",
+        "candidate_exact_rational_L_numerator": "3682103899083363760780668",
+        "largest_competitor_dual_U_numerator": "3680605944290711531667552",
+        "common_denominator": "221073919720733357899776",
+        "strict_positive_integer_margin": "1497954792652229113116",
+        "margin_BP": 0.006775809623064026,
+        "competing_action_with_highest_U": "score:1:10",
+        "positive_current_competitors_pruned": 2,
+        "valid_only_for_this_short_horizon": true
+      },
+      "clairvoyant_info_dual": {
+        "unpenalized": "2843120950970824005797/170581728179578208256",
+        "perfect_current_stage_penalty": "34096540154593445759609/2046980738154938499072",
+        "unremoved_future_stage_information_gap_BP": 0.0014585058840757576,
+        "penalty_experiments": {
+          "0/1": {
+            "value": "2843120950970824005797/170581728179578208256",
+            "value_bp": 16.66720686507383,
+            "slack_above_true_Q_bp": 0.011674164813671171
+          },
+          "1/4": {
+            "value": "795710941026007662548963467/47751966659678405306351616",
+            "value_bp": 16.66341716765151,
+            "slack_above_true_Q_bp": 0.007884467391350491
+          },
+          "1/2": {
+            "value": "397764987760523368105568971/23875983329839202653175808",
+            "value_bp": 16.65962747022919,
+            "slack_above_true_Q_bp": 0.00409476996902981
+          },
+          "3/4": {
+            "value": "34096540154593445759609/2046980738154938499072",
+            "value_bp": 16.656991206144234,
+            "slack_above_true_Q_bp": 0.0014585058840757576
+          },
+          "1/1": {
+            "value": "34096540154593445759609/2046980738154938499072",
+            "value_bp": 16.656991206144234,
+            "slack_above_true_Q_bp": 0.0014585058840757576
+          }
+        }
+      },
+      "memory_states": 216,
+      "hold_operations": 109662336,
+      "elapsed_native_s": 0.200986
+    },
+    {
+      "horizon": 4,
+      "category_count": 4,
+      "all_positive": true,
+      "action_intervals": [
+        {
+          "id": "score:0:8",
+          "score": 8,
+          "low": 1623943521984520379493512139239064576,
+          "upper": 1624339790761503744752102306587099008,
+          "exact": 15.623007954062281,
+          "future_oracle": 15.626820223498346
+        },
+        {
+          "id": "score:1:10",
+          "score": 10,
+          "low": 1623516648027724363339648333107956736,
+          "upper": 1623931929659747886792064197827097600,
+          "exact": 15.618901250145475,
+          "future_oracle": 15.622896431106172
+        },
+        {
+          "id": "score:5:24",
+          "score": 24,
+          "low": 1584465696222211918480400991419772672,
+          "upper": 1585320998184800428293435661699547232,
+          "exact": 15.243214951692394,
+          "future_oracle": 15.251443310119734
+        },
+        {
+          "id": "score:2:6",
+          "score": 6,
+          "low": 1437199957368441583326257955126248232,
+          "upper": 1437475874415603650143776403711313544,
+          "exact": 13.826457670218879,
+          "future_oracle": 13.829112106265526
+        }
+      ],
+      "independent_float64_Bellman_action_comparisons": 4,
+      "certificate": {
+        "globally_optimal_current_score": "score:0:8",
+        "candidate_exact_rational_L_numerator": "1623943521984520379493512139239064576",
+        "largest_competitor_dual_U_numerator": "1623931929659747886792064197827097600",
+        "common_denominator": "103945637534048876111514866313854976",
+        "strict_positive_integer_margin": "11592324772492701447941411966976",
+        "margin_BP": 0.00011152295610958633,
+        "competing_action_with_highest_U": "score:1:10",
+        "positive_current_competitors_pruned": 3,
+        "valid_only_for_this_short_horizon": true
+      },
+      "clairvoyant_info_dual": {
+        "unpenalized": "235144102297599951081215644265975/15038431356199200826318701723648",
+        "perfect_current_stage_penalty": "52222858499276740764920984651077/3341873634710933516959711494144",
+        "unremoved_future_stage_information_gap_BP": 0.003812269436065191,
+        "penalty_experiments": {
+          "0/1": {
+            "value": "235144102297599951081215644265975/15038431356199200826318701723648",
+            "value_bp": 15.636212097391923,
+            "slack_above_true_Q_bp": 0.013204143329640901
+          },
+          "1/4": {
+            "value": "3656274217571490028936392564962082061/233877684451609971250908449206173696",
+            "value_bp": 15.633275257297942,
+            "slack_above_true_Q_bp": 0.010267303235662101
+          },
+          "1/2": {
+            "value": "1827793678105352809328859715149860461/116938842225804985625454224603086848",
+            "value_bp": 15.630338417203964,
+            "slack_above_true_Q_bp": 0.007330463141683302
+          },
+          "3/4": {
+            "value": "1218300164949973736126348765212453261/77959228150536657083636149735391232",
+            "value_bp": 15.627401577109985,
+            "slack_above_true_Q_bp": 0.004393623047704503
+          },
+          "1/1": {
+            "value": "52222858499276740764920984651077/3341873634710933516959711494144",
+            "value_bp": 15.626820223498346,
+            "slack_above_true_Q_bp": 0.003812269436065191
+          }
+        }
+      },
+      "memory_states": 2940,
+      "hold_operations": 1492626240,
+      "elapsed_native_s": 2.37187
+    }
+  ],
+  "early_28_turn_top_certificates": 0,
+  "early_28_turn_pruned_actions_from_this_dual": 0,
+  "reason": "This multi-turn full-reward dual is not computed for 28 turns; v48/v49 bounds are unchanged."
+}
