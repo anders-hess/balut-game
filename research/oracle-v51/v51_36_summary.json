@@ -1,0 +1,23 @@
+{
+  "n_observed_roots": 36,
+  "n_legal_actions": 964,
+  "strictly_tighter_upper_actions": 964,
+  "certified_top_actions": 0,
+  "pruned_actions": 0,
+  "baseline_v47_mean_proof_gap_bp": 16.09529053355907,
+  "v51_mean_proof_gap_bp": 15.45194635311871,
+  "mean_gap_improvement_bp": 0.643344180440359,
+  "percent_improvement": 3.9970957908399996,
+  "opening_v48_lower_bp": 4.251443430555556,
+  "opening_v51_max_rival_upper_bp": 17.258203,
+  "opening_v51_gap_bp": 13.006759569444444,
+  "opening_top_certified": false,
+  "opening_pruned_actions": 0,
+  "opening_rival_upper_micro": 17258203,
+  "opening_candidate": "hold:000200",
+  "opening_largest_competitor": "hold:001110",
+  "opening_common_denominator": "60466176000000",
+  "opening_candidate_lower_numerator": "257068526726016",
+  "opening_largest_rival_upper_numerator": "1043537540041728",
+  "total_v51_state_evaluations_across_36_roots_three_alphas": 8390184
+}
