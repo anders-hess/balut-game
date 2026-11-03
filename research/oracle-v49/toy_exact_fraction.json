@@ -1,0 +1,57 @@
+{
+  "classification": "independent synthetic 2-turn toy, not Balut scoring",
+  "outcomes": {
+    "0": {
+      "zero": {
+        "primal": "14",
+        "perfect_information": "14",
+        "dual_upper": "14"
+      },
+      "immediate_small": {
+        "primal": "14",
+        "perfect_information": "14",
+        "dual_upper": "14"
+      },
+      "exact_terminal": {
+        "primal": "14",
+        "perfect_information": "14",
+        "dual_upper": "14"
+      }
+    },
+    "1": {
+      "zero": {
+        "primal": "8",
+        "perfect_information": "38/3",
+        "dual_upper": "38/3"
+      },
+      "immediate_small": {
+        "primal": "8",
+        "perfect_information": "38/3",
+        "dual_upper": "10"
+      },
+      "exact_terminal": {
+        "primal": "8",
+        "perfect_information": "38/3",
+        "dual_upper": "8"
+      }
+    },
+    "2": {
+      "zero": {
+        "primal": "14",
+        "perfect_information": "14",
+        "dual_upper": "14"
+      },
+      "immediate_small": {
+        "primal": "14",
+        "perfect_information": "14",
+        "dual_upper": "14"
+      },
+      "exact_terminal": {
+        "primal": "14",
+        "perfect_information": "14",
+        "dual_upper": "14"
+      }
+    }
+  },
+  "passed": "exact rational weak duality, strict clairvoyance gap, strong duality with exact terminal potential"
+}
