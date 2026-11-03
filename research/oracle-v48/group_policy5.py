@@ -7,7 +7,8 @@ The resulting expectation of the TRUE final Big Points is an admissible lower fo
 """
 from pathlib import Path
 import sys
-sys.path.insert(0,str(Path(__file__).resolve().parent.parent / "oracle_v47"))
+base=Path(__file__).resolve().parent.parent
+sys.path.insert(0,str(base / ("oracle_v47" if (base / "oracle_v47").is_dir() else "oracle-v47")))
 from collections import defaultdict
 from functools import lru_cache
 from math import factorial
