@@ -1,0 +1,355 @@
+{
+  "experiment": "Oracle_v49_information_relaxation_one_reroll",
+  "frozen_opening": [
+    1,
+    3,
+    4,
+    4,
+    5
+  ],
+  "remaining_turns": 28,
+  "rerolls": 2,
+  "current_legal_actions": 30,
+  "hold_actions": 23,
+  "score_actions": 7,
+  "policy_potential": "true feasible-policy continuation leaf lower from v48",
+  "stop_table_leaf_count": 252,
+  "category_score_leaves": 75,
+  "last_roll_nodes_tested_in_cpp": 252,
+  "node_gap_counts": {
+    "zero": 251,
+    "policy_lower": 221,
+    "mixed": 191,
+    "perfect_tail": 0
+  },
+  "all_23_independent_integer_bellman_checks": "PASS",
+  "independent_fraction_dual_three_states": "PASS",
+  "all_30_current_actions_included": "PASS",
+  "previous_best_action": "hold:000200",
+  "previous_best_L_num": "306103927",
+  "previous_best_L_den": "72000000",
+  "largest_competing_U_num": "47232056257",
+  "largest_competing_U_den": "2592000000",
+  "gap_BP": 13.970800495756173,
+  "certified_early_actions": 0,
+  "newly_pruned_actions": 0,
+  "improvement_over_v48_root_upper_micro": 0,
+  "dual_bounds_never_below_regular_bellman": "PROVED_AND_TESTED",
+  "hold_bounds": [
+    {
+      "action": "hold:000000",
+      "ordinary_upper_micro_ceil": "18149809",
+      "old_upper": "635098109029/34992000000",
+      "zero_dual_micro_ceil": "18476311",
+      "lower_potential_dual_micro_ceil": "18259773",
+      "mixed_dual_micro_ceil": "18190570",
+      "perfect_dual_micro_ceil": "18149809"
+    },
+    {
+      "action": "hold:000010",
+      "ordinary_upper_micro_ceil": "18186088",
+      "old_upper": "1018188124069/55987200000",
+      "zero_dual_micro_ceil": "18512175",
+      "lower_potential_dual_micro_ceil": "18300681",
+      "mixed_dual_micro_ceil": "18227256",
+      "perfect_dual_micro_ceil": "18186088"
+    },
+    {
+      "action": "hold:000100",
+      "ordinary_upper_micro_ceil": "18177154",
+      "old_upper": "5088439777259/279936000000",
+      "zero_dual_micro_ceil": "18503894",
+      "lower_potential_dual_micro_ceil": "18293582",
+      "mixed_dual_micro_ceil": "18219505",
+      "perfect_dual_micro_ceil": "18177154"
+    },
+    {
+      "action": "hold:000110",
+      "ordinary_upper_micro_ceil": "18199124",
+      "old_upper": "849098294719/46656000000",
+      "zero_dual_micro_ceil": "18546118",
+      "lower_potential_dual_micro_ceil": "18319497",
+      "mixed_dual_micro_ceil": "18241127",
+      "perfect_dual_micro_ceil": "18199124"
+    },
+    {
+      "action": "hold:000200",
+      "ordinary_upper_micro_ceil": "18247493",
+      "old_upper": "11824374877/648000000",
+      "zero_dual_micro_ceil": "18515062",
+      "lower_potential_dual_micro_ceil": "18361711",
+      "mixed_dual_micro_ceil": "18288516",
+      "perfect_dual_micro_ceil": "18247493"
+    },
+    {
+      "action": "hold:000210",
+      "ordinary_upper_micro_ceil": "18209838",
+      "old_upper": "5899987237/324000000",
+      "zero_dual_micro_ceil": "18524798",
+      "lower_potential_dual_micro_ceil": "18334800",
+      "mixed_dual_micro_ceil": "18254312",
+      "perfect_dual_micro_ceil": "18209838"
+    },
+    {
+      "action": "hold:001000",
+      "ordinary_upper_micro_ceil": "18131525",
+      "old_upper": "25378332899/1399680000",
+      "zero_dual_micro_ceil": "18482635",
+      "lower_potential_dual_micro_ceil": "18239967",
+      "mixed_dual_micro_ceil": "18172115",
+      "perfect_dual_micro_ceil": "18131525"
+    },
+    {
+      "action": "hold:001010",
+      "ordinary_upper_micro_ceil": "18170465",
+      "old_upper": "127164181457/6998400000",
+      "zero_dual_micro_ceil": "18530201",
+      "lower_potential_dual_micro_ceil": "18284327",
+      "mixed_dual_micro_ceil": "18210894",
+      "perfect_dual_micro_ceil": "18170465"
+    },
+    {
+      "action": "hold:001100",
+      "ordinary_upper_micro_ceil": "18162657",
+      "old_upper": "2542190717017/139968000000",
+      "zero_dual_micro_ceil": "18522142",
+      "lower_potential_dual_micro_ceil": "18278599",
+      "mixed_dual_micro_ceil": "18204347",
+      "perfect_dual_micro_ceil": "18162657"
+    },
+    {
+      "action": "hold:001110",
+      "ordinary_upper_micro_ceil": "18222244",
+      "old_upper": "47232056257/2592000000",
+      "zero_dual_micro_ceil": "18603942",
+      "lower_potential_dual_micro_ceil": "18335169",
+      "mixed_dual_micro_ceil": "18258001",
+      "perfect_dual_micro_ceil": "18222244"
+    },
+    {
+      "action": "hold:001200",
+      "ordinary_upper_micro_ceil": "18196231",
+      "old_upper": "11791157549/648000000",
+      "zero_dual_micro_ceil": "18506676",
+      "lower_potential_dual_micro_ceil": "18318859",
+      "mixed_dual_micro_ceil": "18239941",
+      "perfect_dual_micro_ceil": "18196231"
+    },
+    {
+      "action": "hold:001210",
+      "ordinary_upper_micro_ceil": "18163032",
+      "old_upper": "1961607439/108000000",
+      "zero_dual_micro_ceil": "18557352",
+      "lower_potential_dual_micro_ceil": "18299428",
+      "mixed_dual_micro_ceil": "18209123",
+      "perfect_dual_micro_ceil": "18163032"
+    },
+    {
+      "action": "hold:100000",
+      "ordinary_upper_micro_ceil": "18102063",
+      "old_upper": "938410903/51840000",
+      "zero_dual_micro_ceil": "18415098",
+      "lower_potential_dual_micro_ceil": "18207395",
+      "mixed_dual_micro_ceil": "18142988",
+      "perfect_dual_micro_ceil": "18102063"
+    },
+    {
+      "action": "hold:100010",
+      "ordinary_upper_micro_ceil": "18128649",
+      "old_upper": "1268715341279/69984000000",
+      "zero_dual_micro_ceil": "18446824",
+      "lower_potential_dual_micro_ceil": "18242744",
+      "mixed_dual_micro_ceil": "18171994",
+      "perfect_dual_micro_ceil": "18128649"
+    },
+    {
+      "action": "hold:100100",
+      "ordinary_upper_micro_ceil": "18120638",
+      "old_upper": "1268154686849/69984000000",
+      "zero_dual_micro_ceil": "18438737",
+      "lower_potential_dual_micro_ceil": "18237157",
+      "mixed_dual_micro_ceil": "18165549",
+      "perfect_dual_micro_ceil": "18120638"
+    },
+    {
+      "action": "hold:100110",
+      "ordinary_upper_micro_ceil": "18142381",
+      "old_upper": "35268787571/1944000000",
+      "zero_dual_micro_ceil": "18487458",
+      "lower_potential_dual_micro_ceil": "18266866",
+      "mixed_dual_micro_ceil": "18189451",
+      "perfect_dual_micro_ceil": "18142381"
+    },
+    {
+      "action": "hold:100200",
+      "ordinary_upper_micro_ceil": "18181426",
+      "old_upper": "23563126849/1296000000",
+      "zero_dual_micro_ceil": "18437108",
+      "lower_potential_dual_micro_ceil": "18302155",
+      "mixed_dual_micro_ceil": "18226622",
+      "perfect_dual_micro_ceil": "18181426"
+    },
+    {
+      "action": "hold:100210",
+      "ordinary_upper_micro_ceil": "18135927",
+      "old_upper": "3917360141/216000000",
+      "zero_dual_micro_ceil": "18456180",
+      "lower_potential_dual_micro_ceil": "18274881",
+      "mixed_dual_micro_ceil": "18189028",
+      "perfect_dual_micro_ceil": "18135927"
+    },
+    {
+      "action": "hold:101000",
+      "ordinary_upper_micro_ceil": "18081670",
+      "old_upper": "210904597399/11664000000",
+      "zero_dual_micro_ceil": "18418240",
+      "lower_potential_dual_micro_ceil": "18187838",
+      "mixed_dual_micro_ceil": "18123800",
+      "perfect_dual_micro_ceil": "18081670"
+    },
+    {
+      "action": "hold:101010",
+      "ordinary_upper_micro_ceil": "18117279",
+      "old_upper": "422639879159/23328000000",
+      "zero_dual_micro_ceil": "18471419",
+      "lower_potential_dual_micro_ceil": "18233637",
+      "mixed_dual_micro_ceil": "18162360",
+      "perfect_dual_micro_ceil": "18117279"
+    },
+    {
+      "action": "hold:101100",
+      "ordinary_upper_micro_ceil": "18110806",
+      "old_upper": "211244439391/11664000000",
+      "zero_dual_micro_ceil": "18463787",
+      "lower_potential_dual_micro_ceil": "18229545",
+      "mixed_dual_micro_ceil": "18157385",
+      "perfect_dual_micro_ceil": "18110806"
+    },
+    {
+      "action": "hold:101110",
+      "ordinary_upper_micro_ceil": "18207185",
+      "old_upper": "873944843/48000000",
+      "zero_dual_micro_ceil": "18575988",
+      "lower_potential_dual_micro_ceil": "18323351",
+      "mixed_dual_micro_ceil": "18250977",
+      "perfect_dual_micro_ceil": "18207185"
+    },
+    {
+      "action": "hold:101200",
+      "ordinary_upper_micro_ceil": "18129046",
+      "old_upper": "3915873917/216000000",
+      "zero_dual_micro_ceil": "18438900",
+      "lower_potential_dual_micro_ceil": "18262216",
+      "mixed_dual_micro_ceil": "18179677",
+      "perfect_dual_micro_ceil": "18129046"
+    }
+  ],
+  "toy_reroll_exhaustive_fraction_results": [
+    {
+      "dice": [
+        1,
+        3,
+        4,
+        4,
+        5
+      ],
+      "exact_duals": {
+        "zero": {
+          "dual_num": "36016914179",
+          "dual_den": "1944",
+          "bellman_num": "217106179",
+          "bellman_den": "12"
+        },
+        "lower": {
+          "dual_num": "718266917891",
+          "dual_den": "39366",
+          "bellman_num": "217106179",
+          "bellman_den": "12"
+        },
+        "mid": {
+          "dual_num": "137201422060259",
+          "dual_den": "7558272",
+          "bellman_num": "217106179",
+          "bellman_den": "12"
+        },
+        "upper": {
+          "dual_num": "217106179",
+          "dual_den": "12",
+          "bellman_num": "217106179",
+          "bellman_den": "12"
+        }
+      }
+    },
+    {
+      "dice": [
+        1,
+        1,
+        1,
+        3,
+        6
+      ],
+      "exact_duals": {
+        "zero": {
+          "dual_num": "71179676635",
+          "dual_den": "3888",
+          "bellman_num": "2918062511",
+          "bellman_den": "162"
+        },
+        "lower": {
+          "dual_num": "182289085990217",
+          "dual_den": "10077696",
+          "bellman_num": "2918062511",
+          "bellman_den": "162"
+        },
+        "mid": {
+          "dual_num": "90913054722587",
+          "dual_den": "5038848",
+          "bellman_num": "2918062511",
+          "bellman_den": "162"
+        },
+        "upper": {
+          "dual_num": "2918062511",
+          "dual_den": "162",
+          "bellman_num": "2918062511",
+          "bellman_den": "162"
+        }
+      }
+    },
+    {
+      "dice": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "exact_duals": {
+        "zero": {
+          "dual_num": "146927399077",
+          "dual_den": "7776",
+          "bellman_num": "18888915",
+          "bellman_den": "1"
+        },
+        "lower": {
+          "dual_num": "18888915",
+          "dual_den": "1",
+          "bellman_num": "18888915",
+          "bellman_den": "1"
+        },
+        "mid": {
+          "dual_num": "18888915",
+          "dual_den": "1",
+          "bellman_num": "18888915",
+          "bellman_den": "1"
+        },
+        "upper": {
+          "dual_num": "18888915",
+          "dual_den": "1",
+          "bellman_num": "18888915",
+          "bellman_den": "1"
+        }
+      }
+    }
+  ],
+  "source_table_sha256": "5c143c32a9b3c603fe0e7abbc083269cc0ca34d12d09379a22699d3c508f4b53"
+}
