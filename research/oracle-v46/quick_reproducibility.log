@@ -1,0 +1,31 @@
+{"status":"PASS","legal_raw_shaped_transitions":70000,"nonzero_reward_events":22882,"dead_threshold_canonicalizations":38251,"dead_small_bonus_canonicalizations":3658,"periodic_bonus_checks":51000}
+test_10000_quotient_updates (__main__.TestSolver.test_10000_quotient_updates) ... ok
+test_10000_raw_terminal_scores (__main__.TestSolver.test_10000_raw_terminal_scores) ... ok
+test_all_1764_category_scores_vs_independent_and_cxx (__main__.TestSolver.test_all_1764_category_scores_vs_independent_and_cxx) ... ok
+test_exact_native_few_short_horizons (__main__.TestSolver.test_exact_native_few_short_horizons) ... ok
+test_exact_policy_integer_and_terminal (__main__.TestSolver.test_exact_policy_integer_and_terminal) ... ok
+test_frozen_92_exact_q_enclosed (__main__.TestSolver.test_frozen_92_exact_q_enclosed) ... ok
+test_selective_expansion_improves_and_is_valid (__main__.TestSolver.test_selective_expansion_improves_and_is_valid) ... ok
+test_transition_multiplicities (__main__.TestSolver.test_transition_multiplicities) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 4.487s
+
+OK
+{
+  "one_turn_all_actions_checked": 16,
+  "two_turn_positive_score_actions_checked": 2,
+  "exact_rational_failures": 0
+}
+Q-check 1 0 actions 32 error 7.105427357601002e-15
+Q-check 1 1 actions 12 error 0.0
+Q-check 2 0 actions 33 error 2.1316282072803006e-14
+Q-check 3 0 actions 34 error 4.263256414560601e-14
+Q-check 4 0 actions 35 error 2.4868995751603507e-14
+two-turn independent Fraction positive actions 2
+{
+  "q_action_tests": 146,
+  "q_states": 5,
+  "max_abs_error": 4.263256414560601e-14,
+  "fraction_positive_score_actions": 2
+}
