@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-03",
+  "platform": "Linux x86_64; AMD EPYC 9V74 virtual machine; g++ 14.2.0 -O3 C++20; Python 3.13.5",
+  "study_kind": "small fixed constructed-but-legal late-game states, not population statistics",
+  "results": [
+    {"remaining":3,"v44_states":419,"v46_states":138,"v44_seconds":0.197318164,"v46_seconds":0.0505959,"status":"both exact Float64"},
+    {"remaining":4,"v44_states":3644,"v46_states":386,"v44_seconds":1.756786217,"v46_seconds":0.189962636,"status":"both exact Float64"},
+    {"remaining":5,"v44_states":28970,"v46_states":2225,"v44_seconds":13.914643562,"v46_seconds":0.900956976,"status":"both exact Float64"},
+    {"remaining":6,"v44_status":"resource cap 30000 exceeded", "v46_states":3777,"v46_seconds":1.696468647,"status":"new exact Float64"},
+    {"remaining":7,"v44_status":"resource cap 30000 exceeded", "v46_states":27452,"v46_seconds":13.247100679,"v46_rss_kib":3428,"status":"new exact Float64"},
+    {"remaining":8,"v44_status":"not tested", "v46_states":37464,"v46_seconds":18.109821183,"v46_rss_kib":3948,"status":"new exact Float64"},
+    {"remaining":9,"v44_status":"not tested", "v46_status":"timeout at 17 seconds", "status":"unresolved"},
+    {"remaining":7,"fixture":"bonus-active 7 with k=1 in each of 7 categories, threshold progress [48,60,72,90], three valid Straight and Full House, totalSmall438", "v44_status":"resource cap 30000 exceeded ~14.54 seconds", "v46_status":"timeout at 12 seconds", "status":"unresolved"}
+  ],
+  "new_method_verification": {"raw_legal_transitions":70000,"periodic_bonus_checks":51000,"differential_action_Q_values":394,"differential_short_horizon_states":16,"max_abs_Q_error":4.263256414560601e-14,"positive_actions_independent_fraction":2,"failed_checks":0},
+  "certified_20_to_28_remaining_top_actions":0,
+  "action_pruned_20_to_28":0,
+  "numeric_proof_of_global_early_top":false
+}
