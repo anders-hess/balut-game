@@ -1,0 +1,76 @@
+leaf fours outcomes 6 seconds 44.117 total 44.117
+leaf fives outcomes 6 seconds 8.634 total 52.751
+leaf sixes outcomes 6 seconds 2.145 total 54.896
+leaf straight outcomes 3 seconds 0.502 total 55.398
+leaf fullHouse outcomes 21 seconds 0.25 total 55.649
+leaf choice outcomes 26 seconds 0.184 total 55.833
+leaf balut outcomes 7 seconds 0.038 total 55.872
+SUMMARY {"status": "BOUNDED_NOT_CERTIFIED", "seconds": 55.90434035599992, "maxrss_kib": 972688, "future_score_leaves_exactly_evaluated": 75}
+CERT {
+  "candidate": "hold:000200",
+  "certified": false,
+  "legal_actions": 30,
+  "pruned": 0,
+  "gap_bp": 13.970800495756173,
+  "best_lower_bp": 4.251443430555556,
+  "max_rival_upper_bp": 18.222243926311727,
+  "exact_integer_witness": {
+    "best_low_num": "257068526726016",
+    "max_rival_high_num": "1101829408363296",
+    "common_denominator": "60466176000000"
+  }
+}
+	Command being timed: "timeout 100s python -u gate3_policy6.py"
+	User time (seconds): 55.51
+	System time (seconds): 2.26
+	Percent of CPU this job got: 100%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:57.41
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 972688
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 245181
+	Voluntary context switches: 16
+	Involuntary context switches: 605
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 232
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+{
+  "independent_check": "PASS",
+  "case": 0,
+  "turns": 28,
+  "dice": [
+    4,
+    1,
+    3,
+    4,
+    5
+  ],
+  "score_count": 7,
+  "hold_count": 23,
+  "positive_score_actions": [
+    "score:fours:8",
+    "score:fives:5",
+    "score:choice:17"
+  ],
+  "checked_policy_score_leaf_floors": 75,
+  "action_count": 30,
+  "candidate": "hold:000200",
+  "candidate_L_micro_num": "257068526726016",
+  "largest_rival_U_micro_num": "1101829408363296",
+  "common_denominator": "60466176000000",
+  "strict_certificate": false,
+  "pruned_actions": 0,
+  "gap_bp": 13.970800495756173,
+  "root_input_sha256": "b75c47c3ddd7b5a46f442994020a437b5751206038c3e47af7d03a386c941598",
+  "result_sha256": "e308321b95737451eb28aa10fc2b7ae1368bd2a780e9ee8f9e89f982394e40c5"
+}
+PASS: full 6-category exact policy re-evaluation reproduces all 75 leaf and 30 action bounds
