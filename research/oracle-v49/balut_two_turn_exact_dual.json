@@ -1,0 +1,36 @@
+{
+  "model": "genuine Balut terminal scoring, constructed legal 2-turn board",
+  "current_dice": [
+    4,
+    4,
+    4,
+    5,
+    5
+  ],
+  "remaining_turns": 2,
+  "rerolls_left": 0,
+  "category_actions": [
+    "Fours 12",
+    "Choice 22"
+  ],
+  "current_action_Q_exact": {
+    "fours": "897515755/918330048",
+    "choice": "-18264944933/156728328192"
+  },
+  "global_best": "fours",
+  "exact_global_Q": "897515755/918330048",
+  "clairvoyant_U": "1196776979/1224440064",
+  "dual_immediate_terminal_potential_U": "477198761225/470184984576",
+  "dual_exact_conditional_value_potential_U": "897515755/918330048",
+  "dual_one_reroll_potential_U": "897515755/918330048",
+  "best_proxy_dual_U": "897515755/918330048",
+  "best_proxy_weights": [
+    1,
+    0
+  ],
+  "clairvoyance_gap_BP": 7.293592335987682e-05,
+  "immediate_potential_improvement_BP": -0.0375094949169932,
+  "fraction_exact": true,
+  "all_five_dice_histograms": 252,
+  "all_possible_current_score_actions": 2
+}
