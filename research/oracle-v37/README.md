@@ -30,10 +30,10 @@ All **36 unchanged actually visited first-roll roots**, 20–28 turns remaining.
 
 ## Verification
 
-- **199/199** current action Q-difference upper comparisons versus **five unchanged 10–14-turn exact Bellman reference roots** for ten available Fours/Fives/Sixes candidate scores: **zero violations**, minimum slack +1.20139058 BP. 142/199 rival-action upper bounds improved over v36, maximum individual reduction 1.35607845 BP. The stored exact-Q reference numbers are Float64, so these are regression checks, **not** formal interval certificates of Q*.
+- **199/199** current action Q-difference upper comparisons versus **five unchanged 10–14-turn exact Bellman reference roots** for ten available Fours/Fives/Sixes candidate scores: **zero violations**, minimum slack +1.20139058 BP. 142/199 rival-action upper bounds improved over v36, maximum individual reduction 1.35607845 BP. An additional **408/408** action-difference regression covers every legal candidate on all five unchanged exact Bellman reference roots, using v37 multi-use for Fours/Fives/Sixes and the valid v36 first-use for Choice/Straight/House/Balut; minimum slack +1.00581984 BP, zero violations. See [full reference audit](test_all408_v37.py). The stored exact-Q reference numbers are Float64, so these are regression checks, **not** formal interval certificates of Q*.
 - Independent arbitrary-precision `fractions.Fraction` two-reroll solver checks the one-turn kernel and the genuinely **two-turn/two-quota** k-stopping DP, not using the sparse-matrix implementation. Fixed-point floors enclose both exact rational results.
 - All 4,116 legal histogram/hold states and 253,848 weighted transitions checked, each fair-dice transition row totaling 7,776.
-- A fresh-extracted standalone ZIP ran `bash run_checks_v37.sh` successfully; the **GitHub copy was not separately run in GitHub CI**. SHA256 ZIP: `8edcb39d26f7a4d4b556b56f7f003237a2cc5661d2cb03f9f14046d1670ed750`.
+- The final standalone ZIP was freshly extracted. Both test commands passed separately; a combined shell invocation timed out after the first test, so it is not claimed to have passed as one command. The **GitHub copy was not separately run in GitHub CI**. SHA256 ZIP: `0132e6c9f27eb334d24ff0c99d5eeb343f9b3883b55b0d2717ee5d3418abbc49`.
 
 ## Code and reproduction
 
