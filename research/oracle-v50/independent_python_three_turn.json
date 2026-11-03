@@ -3,15 +3,15 @@
   "board": {
     "fours": [
       12,
+      null,
       16,
-      16,
-      null
+      16
     ],
     "fives": [
       15,
+      null,
       20,
-      20,
-      null
+      20
     ],
     "sixes": [
       18,
@@ -21,8 +21,8 @@
     ],
     "straight": [
       15,
-      20,
       15,
+      20,
       20
     ],
     "fullHouse": [
@@ -122,5 +122,5 @@
     "conditional": 6,
     "original": 3
   },
-  "seconds": 5.736582405999798
+  "seconds": 5.114020521999919
 }
