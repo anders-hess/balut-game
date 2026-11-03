@@ -1,0 +1,32 @@
+{"stop_dice_outcomes": 252, "category_score_leaves": 75, "min_U_micro": 17401017, "max_U_micro": 20558142, "min_L_micro": 2274220, "max_L_micro": 6879114, "sha256": "5c143c32a9b3c603fe0e7abbc083269cc0ca34d12d09379a22699d3c508f4b53"}
+{
+  "current_legal_actions": 30,
+  "all_23_independent_integer_bellman_checks": "PASS",
+  "independent_fraction_dual_three_states": "PASS",
+  "gap_BP": 13.970800495756173,
+  "certified_early_actions": 0,
+  "newly_pruned_actions": 0,
+  "improvement_over_v48_root_upper_micro": 0,
+  "node_gap_counts": {
+    "zero": 251,
+    "policy_lower": 221,
+    "mixed": 191,
+    "perfect_tail": 0
+  }
+}
+PASS v49 frozen reproducibility SHA256 4e1c39569079145ff0811641cd9d15c5bfc1d27e2d5642e417a60daeb4ea25be
+test_all_210_hold_distributions_independent_ordered_rolls (test_quota.QuotaAudit.test_all_210_hold_distributions_independent_ordered_rolls) ... ok
+test_every_score_against_independent_scorer (test_quota.QuotaAudit.test_every_score_against_independent_scorer) ... ok
+test_exact_reference_all_92_unchanged (test_quota.QuotaAudit.test_exact_reference_all_92_unchanged) ... ok
+test_fraction_surrogate_all_actions_tiny_2_quota (test_quota.QuotaAudit.test_fraction_surrogate_all_actions_tiny_2_quota) ... ok
+test_true_1_2_3_turn_q_all_positive_actions (test_quota.QuotaAudit.test_true_1_2_3_turn_q_all_positive_actions) ... ok
+test_frozen_score_actions_all_reference_positions (test_conditional.ConditionalTest.test_frozen_score_actions_all_reference_positions) ... ok
+test_all_seven_slots_route_to_exact (test_route.RouteTest.test_all_seven_slots_route_to_exact) ... ok
+test_no_fallback_even_if_cap_one (test_route.RouteTest.test_no_fallback_even_if_cap_one) ... ok
+test_not_relabel_bounded_as_exact (test_route.RouteTest.test_not_relabel_bounded_as_exact) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 5.604s
+
+OK
+PASS v49: 30 current actions, 252 rollout histograms, 23 independent integer bounds, fraction dual and inherited 92 Q refs
