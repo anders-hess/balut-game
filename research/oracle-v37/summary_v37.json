@@ -23,5 +23,7 @@
   "peakRSS_MiB": 157.984375,
   "sumMeasuredRuntimeSeconds": 271.76256704330444,
   "fullFrozenPerRootAndExactQResults": "Balut_Oracle_2_Iteration_37_Multiuse_Quota_Stopping.zip",
-  "standaloneZipSHA256": "8edcb39d26f7a4d4b556b56f7f003237a2cc5661d2cb03f9f14046d1670ed750"
+  "standaloneZipSHA256": "0132e6c9f27eb334d24ff0c99d5eeb343f9b3883b55b0d2717ee5d3418abbc49",
+  "exhaustiveReferenceActionComparisons": 408,
+  "exhaustiveReferenceMinimumSlackBP": 1.0058198445508844
 }
