@@ -1,0 +1,22 @@
+leaf fours outcomes 6 seconds 46.04 total 46.04
+leaf fives outcomes 6 seconds 9.328 total 55.369
+leaf sixes outcomes 6 seconds 2.693 total 58.062
+leaf straight outcomes 3 seconds 0.58 total 58.642
+leaf fullHouse outcomes 21 seconds 0.275 total 58.917
+leaf choice outcomes 26 seconds 0.223 total 59.14
+leaf balut outcomes 7 seconds 0.041 total 59.182
+SUMMARY {"status": "BOUNDED_NOT_CERTIFIED", "seconds": 59.21622065700001, "maxrss_kib": 972548, "future_score_leaves_exactly_evaluated": 75}
+CERT {
+  "candidate": "hold:000200",
+  "certified": false,
+  "legal_actions": 30,
+  "pruned": 0,
+  "gap_bp": 13.970800495756173,
+  "best_lower_bp": 4.251443430555556,
+  "max_rival_upper_bp": 18.222243926311727,
+  "exact_integer_witness": {
+    "best_low_num": "257068526726016",
+    "max_rival_high_num": "1101829408363296",
+    "common_denominator": "60466176000000"
+  }
+}
