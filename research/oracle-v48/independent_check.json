@@ -1,0 +1,30 @@
+{
+  "independent_check": "PASS",
+  "case": 0,
+  "turns": 28,
+  "dice": [
+    4,
+    1,
+    3,
+    4,
+    5
+  ],
+  "score_count": 7,
+  "hold_count": 23,
+  "positive_score_actions": [
+    "score:fours:8",
+    "score:fives:5",
+    "score:choice:17"
+  ],
+  "checked_policy_score_leaf_floors": 75,
+  "action_count": 30,
+  "candidate": "hold:000200",
+  "candidate_L_micro_num": "257068526726016",
+  "largest_rival_U_micro_num": "1101829408363296",
+  "common_denominator": "60466176000000",
+  "strict_certificate": false,
+  "pruned_actions": 0,
+  "gap_bp": 13.970800495756173,
+  "root_input_sha256": "b75c47c3ddd7b5a46f442994020a437b5751206038c3e47af7d03a386c941598",
+  "result_sha256": "584805a7544ad74bb5388881269b3f0523cc6f40114d05a83794916c967391c0"
+}
