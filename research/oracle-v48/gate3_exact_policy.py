@@ -3,7 +3,8 @@
 No Monte Carlo; exact numerator/denominator with positive category outcomes preserved.
 """
 import sys
-sys.path.insert(0,str(__import__("pathlib").Path(__file__).resolve().parent.parent / "oracle_v47"))
+base=__import__("pathlib").Path(__file__).resolve().parent.parent
+sys.path.insert(0,str(base / ("oracle_v47" if (base / "oracle_v47").is_dir() else "oracle-v47")))
 import json, time, hashlib, resource
 from pathlib import Path
 from bounds_andor import compress,advance,CATS,SCORES
