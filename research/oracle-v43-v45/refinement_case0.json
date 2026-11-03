@@ -1,0 +1,100 @@
+{
+  "case": 0,
+  "dice": [
+    4,
+    1,
+    3,
+    4,
+    5
+  ],
+  "remaining": 28,
+  "before": {
+    "candidate": "hold:000200",
+    "certified": false,
+    "legal_actions": 30,
+    "pruned": 0,
+    "gap_bp": 32.621777045846194,
+    "best_lower_bp": -0.6217770458461934,
+    "max_rival_upper_bp": 32.0,
+    "exact_integer_witness": {
+      "best_low_num": "-37596480286896",
+      "max_rival_high_num": "1934917632000000",
+      "common_denominator": "60466176000000"
+    }
+  },
+  "after": {
+    "candidate": "hold:000200",
+    "certified": false,
+    "legal_actions": 30,
+    "pruned": 0,
+    "gap_bp": 32.621777045846194,
+    "best_lower_bp": -0.6217770458461934,
+    "max_rival_upper_bp": 32.0,
+    "exact_integer_witness": {
+      "best_low_num": "-37596480286896",
+      "max_rival_high_num": "1934917632000000",
+      "common_denominator": "60466176000000"
+    }
+  },
+  "refinements": [
+    {
+      "action": "score:fours:8",
+      "score": 8,
+      "old_low_bp": -0.823608,
+      "new_low_bp": -0.622188,
+      "old_high_bp": 32.0,
+      "new_high_bp": 31.838211
+    },
+    {
+      "action": "score:fives:5",
+      "score": 5,
+      "old_low_bp": -0.890691,
+      "new_low_bp": -0.695622,
+      "old_high_bp": 32.0,
+      "new_high_bp": 31.199269
+    },
+    {
+      "action": "score:sixes:0",
+      "score": 0,
+      "old_low_bp": -0.947942,
+      "new_low_bp": -0.754978,
+      "old_high_bp": 31.0,
+      "new_high_bp": 31.0
+    },
+    {
+      "action": "score:straight:0",
+      "score": 0,
+      "old_low_bp": -0.844347,
+      "new_low_bp": -0.643778,
+      "old_high_bp": 28.0,
+      "new_high_bp": 27.199269
+    },
+    {
+      "action": "score:fullHouse:0",
+      "score": 0,
+      "old_low_bp": -0.894588,
+      "new_low_bp": -0.702796,
+      "old_high_bp": 28.0,
+      "new_high_bp": 28.0
+    },
+    {
+      "action": "score:choice:17",
+      "score": 17,
+      "old_low_bp": -1.15825,
+      "new_low_bp": -0.984629,
+      "old_high_bp": 32.0,
+      "new_high_bp": 31.711449
+    },
+    {
+      "action": "score:balut:0",
+      "score": 0,
+      "old_low_bp": -0.896182,
+      "new_low_bp": -0.692287,
+      "old_high_bp": 29.0,
+      "new_high_bp": 29.0
+    }
+  ],
+  "seconds": 12.580403308000086,
+  "peak_rss_kb": 98060,
+  "certified_early": 0
+}
