@@ -1,0 +1,9 @@
+# Oracle v52 — threshold automaton feasibility microkernel (00:30 run, 2026-11-04)
+
+**Status: partial research, not an integrated Oracle iteration.** Based on v51 research branch and issue #1. This branch adds an independent exact-rational threshold reward DP and exhaustive reference checker. It is a feasibility probe for Fours/Choice threshold progress; it does **not** include Balut scoring rules, dice rerolls, all seven categories, the v51 quota DP or the locked opening. It cannot be substituted for an admissible original-game upper bound.
+
+Mathematics: for remaining category set M and capped progress p, T(M,p)=max_{i in M} sum_x P_i(x) T(M\\{i},min(K,p+x)); T(empty,p)=R*1[p>=K]. This computes a nonlinear terminal threshold reward exactly with Fraction. The distribution-only model is order-invariant in its current form; therefore its adaptive choice is not a meaningful tightening yet. This is a **negative structural finding**: adding a scalar threshold counter alone without state-dependent dice/category distributions will not tighten a seven-category U.
+
+Local tests actually run: 4 independent exact exhaustive distribution checks plus 1 nonlinear expectation counterexample, all PASS. No unchanged original Q reference suite was run for v52; inherited v51 evidence is not a new test. 0 ordinary 20–28-turn global top proofs, 0 pruned competitors; 30-action locked opening NOT rerun; proof gap remains last verified v51 13.0067595694 BP, not a new measurement. No resource benchmark for full solver. The microkernel visits 2–9 memo states in these fixtures. No main/live changes.
+
+Next: integrate an actual score-state-dependent threshold automaton into v51 native 7-category quota DP with directed integer rounding; first run frozen Q fixtures, then all 30 opening actions. If no meaningful action-pruning improvement, pivot to multistage original-reward dual or exact state quotient rather than more scalar automata.
