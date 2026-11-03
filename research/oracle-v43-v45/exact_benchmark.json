@@ -1,0 +1,33 @@
+[
+  {
+    "fixture": "1-turn",
+    "status": "EXACT_FLOAT64",
+    "states": 0,
+    "seconds": 0.000252014,
+    "legal_actions": 32,
+    "best_action": "hold:000000"
+  },
+  {
+    "fixture": "2-turn",
+    "status": "EXACT_FLOAT64",
+    "states": 33,
+    "seconds": 0.016958707,
+    "legal_actions": 33,
+    "best_action": "hold:000010"
+  },
+  {
+    "fixture": "4-turn",
+    "status": "EXACT_FLOAT64",
+    "states": 3644,
+    "seconds": 1.799891618,
+    "legal_actions": 35,
+    "best_action": "hold:000010"
+  },
+  {
+    "fixture": "7-turn-diverse",
+    "status": "EXACT_RESOURCE_LIMIT_NO_FALLBACK",
+    "reason": "Exact state budget exceeded; NO FALLBACK",
+    "seconds": 13.88367410800015,
+    "state_cap": 30000
+  }
+]
