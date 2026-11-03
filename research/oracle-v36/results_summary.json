@@ -1,0 +1,283 @@
+{
+  "method": "v36 exact integer finite-horizon first-future-category stopping bound",
+  "scope": "36 previously observed 20-28 first-roll roots, one v34-preregistered immediate score candidate per root",
+  "meanOldRegretUpperBP": 4.324174593081593,
+  "meanNewRegretUpperBP": 4.295403740386111,
+  "meanImprovementBP": 0.02877085269548217,
+  "rootsImprovedOver1eMinus6BP": 25,
+  "maxImprovementBP": 0.23160961506790123,
+  "globallyCertifiedUniqueNormalEarlyRoots": 0,
+  "eliminatedPresentScoreActions": 0,
+  "eliminatedPresentHoldActions": 0,
+  "presentScoreActionComparisons": 212,
+  "presentHoldActionComparisons": 716,
+  "allCandidateRoots": [
+    0,
+    35
+  ],
+  "allCandidateScoreCandidates": 14,
+  "allCandidateCertificates": 0,
+  "independentChecks": {
+    "orderedFirstRolls": 7776,
+    "holdStates": 4116,
+    "holdTransitionEntries": 253848,
+    "exactQReferenceActionComparisons": 408,
+    "exactQMinSlackBP": 1.0058197026508844,
+    "stochasticCellsAudited": 7056,
+    "strictlyImprovedStochasticCells": 3928
+  },
+  "perRoot": [
+    {
+      "i": 0,
+      "remaining": 28,
+      "candidate": "fours",
+      "v34": 5.6111111111,
+      "v36": 5.6106373598
+    },
+    {
+      "i": 1,
+      "remaining": 27,
+      "candidate": "fives",
+      "v34": 5.4306841564,
+      "v36": 5.2051830058
+    },
+    {
+      "i": 2,
+      "remaining": 26,
+      "candidate": "fives",
+      "v34": 5.5679012346,
+      "v36": 5.3362916195
+    },
+    {
+      "i": 3,
+      "remaining": 25,
+      "candidate": "sixes",
+      "v34": 5.429526749,
+      "v36": 5.4283066468
+    },
+    {
+      "i": 4,
+      "remaining": 24,
+      "candidate": "straight",
+      "v34": 3.1862068473,
+      "v36": 3.1821782368
+    },
+    {
+      "i": 5,
+      "remaining": 23,
+      "candidate": "straight",
+      "v34": 3.3055555556,
+      "v36": 3.3055555556
+    },
+    {
+      "i": 6,
+      "remaining": 22,
+      "candidate": "straight",
+      "v34": 3.3055555556,
+      "v36": 3.3055555556
+    },
+    {
+      "i": 7,
+      "remaining": 21,
+      "candidate": "straight",
+      "v34": 3.3055555556,
+      "v36": 3.3055555556
+    },
+    {
+      "i": 8,
+      "remaining": 20,
+      "candidate": "straight",
+      "v34": 3.3055555556,
+      "v36": 3.3055555556
+    },
+    {
+      "i": 9,
+      "remaining": 28,
+      "candidate": "fours",
+      "v34": 5.6111111111,
+      "v36": 5.6111111107
+    },
+    {
+      "i": 10,
+      "remaining": 27,
+      "candidate": "fullHouse",
+      "v34": 3.2914809099,
+      "v36": 3.2863784086
+    },
+    {
+      "i": 11,
+      "remaining": 26,
+      "candidate": "fives",
+      "v34": 5.4306841564,
+      "v36": 5.4298501575
+    },
+    {
+      "i": 12,
+      "remaining": 25,
+      "candidate": "fours",
+      "v34": 5.3138324474,
+      "v36": 5.3138285885
+    },
+    {
+      "i": 13,
+      "remaining": 24,
+      "candidate": "straight",
+      "v34": 3.5555555556,
+      "v36": 3.5555555556
+    },
+    {
+      "i": 14,
+      "remaining": 23,
+      "candidate": "straight",
+      "v34": 3.274691358,
+      "v36": 3.2746774336
+    },
+    {
+      "i": 15,
+      "remaining": 22,
+      "candidate": "straight",
+      "v34": 3.25,
+      "v36": 3.2500000001
+    },
+    {
+      "i": 16,
+      "remaining": 21,
+      "candidate": "straight",
+      "v34": 3.1883144719,
+      "v36": 3.1883049235
+    },
+    {
+      "i": 17,
+      "remaining": 20,
+      "candidate": "straight",
+      "v34": 3.5555555556,
+      "v36": 3.5555555556
+    },
+    {
+      "i": 18,
+      "remaining": 28,
+      "candidate": "fives",
+      "v34": 5.3121141975,
+      "v36": 5.1167544714
+    },
+    {
+      "i": 19,
+      "remaining": 27,
+      "candidate": "fours",
+      "v34": 5.5277777778,
+      "v36": 5.5157814961
+    },
+    {
+      "i": 20,
+      "remaining": 26,
+      "candidate": "sixes",
+      "v34": 5.3800154321,
+      "v36": 5.3737901374
+    },
+    {
+      "i": 21,
+      "remaining": 25,
+      "candidate": "fours",
+      "v34": 5.3688271605,
+      "v36": 5.3594520432
+    },
+    {
+      "i": 22,
+      "remaining": 24,
+      "candidate": "fives",
+      "v34": 5.4992283951,
+      "v36": 5.4899797699
+    },
+    {
+      "i": 23,
+      "remaining": 23,
+      "candidate": "fives",
+      "v34": 5.3564814815,
+      "v36": 5.3551515219
+    },
+    {
+      "i": 24,
+      "remaining": 22,
+      "candidate": "fours",
+      "v34": 5.4204389575,
+      "v36": 5.3610831522
+    },
+    {
+      "i": 25,
+      "remaining": 21,
+      "candidate": "fours",
+      "v34": 5.5555555556,
+      "v36": 5.5011938546
+    },
+    {
+      "i": 26,
+      "remaining": 20,
+      "candidate": "choice",
+      "v34": 5.2460919639,
+      "v36": 5.0265168419
+    },
+    {
+      "i": 27,
+      "remaining": 28,
+      "candidate": "fours",
+      "v34": 5.6111111111,
+      "v36": 5.6111111112
+    },
+    {
+      "i": 28,
+      "remaining": 27,
+      "candidate": "straight",
+      "v34": 3.274691358,
+      "v36": 3.2746872073
+    },
+    {
+      "i": 29,
+      "remaining": 26,
+      "candidate": "straight",
+      "v34": 3.274691358,
+      "v36": 3.2746857406
+    },
+    {
+      "i": 30,
+      "remaining": 25,
+      "candidate": "straight",
+      "v34": 3.274691358,
+      "v36": 3.2746837556
+    },
+    {
+      "i": 31,
+      "remaining": 24,
+      "candidate": "straight",
+      "v34": 3.274691358,
+      "v36": 3.2746257968
+    },
+    {
+      "i": 32,
+      "remaining": 23,
+      "candidate": "straight",
+      "v34": 3.3055555556,
+      "v36": 3.3055555556
+    },
+    {
+      "i": 33,
+      "remaining": 22,
+      "candidate": "straight",
+      "v34": 3.5555555556,
+      "v36": 3.5555555556
+    },
+    {
+      "i": 34,
+      "remaining": 21,
+      "candidate": "straight",
+      "v34": 3.2569444444,
+      "v36": 3.2569266384
+    },
+    {
+      "i": 35,
+      "remaining": 20,
+      "candidate": "straight",
+      "v34": 3.2569444444,
+      "v36": 3.2569191794
+    }
+  ]
+}
