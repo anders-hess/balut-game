@@ -5,6 +5,7 @@ from fractions import Fraction as F
 from pathlib import Path
 from math import factorial
 from collections import Counter
+from itertools import permutations
 ROOT=Path(__file__).resolve().parent
 sys.path.insert(0,str(ROOT/'legacy'))
 from bounds_andor import CATS,HISTS,SCORES,compress,terminal,bonus
@@ -23,6 +24,22 @@ class V50Tests(unittest.TestCase):
    self.assertEqual(sum(compress(b)[0]),n)
    self.assertIn('choice',b)
    self.assertEqual(b['choice'],[26,26,30,None])
+
+   # Production chooses rightmost free column for high 4s/5s/6s/high-straight,
+   # leftmost for all other scores. Prove each row is physically reachable.
+   for c,name in enumerate(CATS):
+    target=b[name]; values=[x for x in target if x is not None]
+    def high(x):
+     return (c==0 and x>=16) or (c==1 and x>=20) or (c==2 and x>=24) or (c==3 and x==20)
+    reachable=False
+    for perm in set(permutations(values)):
+     cols=[None]*4
+     for x in perm:
+      open_slots=[j for j,y in enumerate(cols) if y is None]
+      place=(open_slots[-1] if high(x) else open_slots[0])
+      cols[place]=x
+     if cols==target:reachable=True;break
+    self.assertTrue(reachable,(n,name,target))
  def test_rule_bonus_continues_above_450(self):
   self.assertEqual([bonus(n) for n in (299,300,349,350,399,400,449,450,499,500,550)],[-2,-1,-1,0,0,1,1,2,2,3,4])
  def test_all_252_histograms_and_210_holds(self):
