@@ -1,0 +1,10 @@
+# Oracle v38 — coupled two-category quota DP (research only)
+**Global optimal 20–28 turn normal roots proved: 0. Current actions pruned: 0.** No live/main changes.
+
+A genuinely new nonanticipative Bellman model optimizes the allocation of two category quotas across T turns, with one scoring action per turn, two adaptive rerolls and fair multinomial dice. Other categories are relaxed to free skips. For additive per-category cost f_A(d),f_B(d), W(t,i,j) minimizes expected cost subject to i,j remaining scores. This is exact for the **additive surrogate**, not original terminal nonlinear Big Points. Independently scheduling each category yields a weaker lower cost bound; joint scheduling enforces one score per turn. All chance operations floor to integer fixed-point.
+
+**Executed independent validation:** Python Fraction exact 2-turn, one-use-per-category optimal reroll benchmark -1622071907/408146688, enclosed by downward-rounded -3.974237600 (1e8 scale). The frozen 36 observed early roots include 34 with both Fours/Fives open. With surrogate f=-SmallPoints and real category quotas, 34/34 have positive joint-vs-independent coupling, mean +3.042114 Small Points, min +0.778036, max +4.580085, wall 5.55s. Empty board T=28, four slots each: joint -126.46571 vs independent -131.04611, gain +4.58040 Small Points. These are **not Big Points, root Q* bounds, or optimality certificates**. No new root action comparisons were made.
+
+Complete runnable package with v37 dependencies, 36 fixtures, independent exact reference tests, frozen benchmark and full report: `Balut_Oracle_2_Iteration_38_Two_Category_Coupled_DP.zip`, SHA256 `42833b80c7e141f556949ee80a8e5a7519bf6abcd868321f399014cfe3579e86` in current ChatGPT conversation. This branch includes the newly written source and independent Fraction test; run them in the bundled package's oracle_v37 directory.
+
+**Next:** derive a valid terminal-Big-Point bonus exchange difference lower decomposition across two categories, and then apply this coupled stochastic DP to every current rival score/hold action with exact-Q regression and directed rounding. Until then, the global user objective remains unsolved.
