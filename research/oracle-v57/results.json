@@ -1,0 +1,29 @@
+{
+  "tests_passed": 178541,
+  "opening_distinct_hold_multisets": 24,
+  "opening_positive_scoring_actions": [
+    [
+      "fours",
+      8
+    ],
+    [
+      "fives",
+      5
+    ],
+    [
+      "choice",
+      17
+    ]
+  ],
+  "opening_action_intervals_computed": 27,
+  "root_L": "-2",
+  "root_U": "32",
+  "opening_certified_top": 0,
+  "opening_pruned_rivals": 0,
+  "elapsed_seconds": 0.8218,
+  "peak_rss_kb": 96276,
+  "original_Q_fixtures": "NOT RUN",
+  "locked_30_action_Q": "NOT RUN",
+  "exact_Bellman_1_to_7": "NOT RUN",
+  "note": "Local executed output; full per-action intervals reproducible by python3 research/oracle-v57/experiment.py; 27 deduplicated actions != required original 30 indexed actions."
+}
