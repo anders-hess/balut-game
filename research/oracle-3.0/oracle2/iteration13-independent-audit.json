@@ -1,0 +1,44 @@
+{
+  "iteration": 13,
+  "status": "PASS",
+  "auditMethod": "Independent Python recomputation of the archived full 180-root dataset; direct scoring, legal action-space, Q maximum, split/labels and neural value predictions; independent of Oracle 3.0 runtime",
+  "auditExecution": "Executed in separate analysis container after downloading actual GitHub Actions artifact",
+  "sourceRun": "https://github.com/anders-hess/balut-game/actions/runs/41881936877",
+  "sourceArtifact": "https://github.com/anders-hess/balut-game/actions/runs/41881936877/artifacts/13349458382",
+  "nIndependentGames": 60,
+  "nExactBoundaryRoots": 180,
+  "nExactPresentRollRoots": 180,
+  "nLegalActionQValues": 3984,
+  "nIndependentTestRoots": 36,
+  "maxNativeQValueMinusMaxLegalActionQAbsError": 0,
+  "maxProductionActionQRegretAbsError": 0,
+  "maxNativeOptimalContinuationTargetAbsError": 0,
+  "independentlyRecomputedHoldoutValuePrediction": {
+    "stage": {
+      "maeBP": 0.6478402731746642,
+      "rmseBP": 0.7755970929805222
+    },
+    "linear": {
+      "maeBP": 0.6538659570861424,
+      "rmseBP": 0.8010746917414187
+    },
+    "neural": {
+      "maeBP": 0.7171779958488247,
+      "rmseBP": 0.8292434527408103
+    }
+  },
+  "independentlyRecomputedMeanPresentQRegret": {
+    "production": 0.03732012425344587,
+    "stage": 0.26678117787176436,
+    "linear": 0.20005595918361693,
+    "neural": 0.03329680601097492
+  },
+  "wholeGameSplit": "36/12/12, all mutually disjoint",
+  "allThreeHorizonsEachSplit": true,
+  "limitations": [
+    "Python independently checks exact native C++ outputs but does not independently implement full Bellman recursion",
+    "Independent audit is a separate post-CI data inspection, not an additional GitHub Actions success claim",
+    "Only last 1-3 turns sampled from production-generated scorecards",
+    "No evidence of significant improved final Big Points or global optimality"
+  ]
+}
