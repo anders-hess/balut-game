@@ -104,7 +104,7 @@ const summary={
   'Constructed, lawful witness has strictly positive but generally tiny probability in a natural game',
   'All integer numerator Q comparisons exact, but the Balut scoring implementation is validated by tests not a formal proof assistant',
   'Native Oracle2 float Q is a separate differential check, not the source of integer optimum',
-  'No old production Oracle, BPIV prior, copied training data, or fallback'
+  'No copied advisor-policy dataset and no external decision fallback'
  ]};
 writeFileSync('oracle3-rational-rerolls-two-turn.json',JSON.stringify({summary,witness,card,rows},null,2)+'\n');
 writeFileSync('oracle3-rational-rerolls-two-turn-summary.json',JSON.stringify(summary,null,2)+'\n');
