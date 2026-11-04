@@ -1,0 +1,76 @@
+// Clean Oracle 3.0 data pipeline, driven ONLY by independent legal math-based
+// simulation and Oracle 2.0 native exact finite-horizon Bellman labels.
+import assert from 'node:assert/strict';
+import {writeFileSync} from 'node:fs';
+import {performance} from 'node:perf_hooks';
+import {totals} from '../phase1/simulator.mjs';
+import {exactAtBoundary,exactAtRoll,encodeCard,ORACLE2_SOURCE_BLOB} from '../oracle2/adapter.mjs';
+import {exactFeatures,FEATURE_VERSION,assertSeedPartition} from '../oracle2/features.mjs';
+import {mathSampler} from './sampler.mjs';
+
+const n=Number(process.argv[2]??120),seedBase=Number(process.argv[3]??950100000);
+const prefix=process.argv[4]??'oracle3-math-pure';
+assert.equal(n,120,'pre-registered game count');
+assert.equal(seedBase,950100000,'pre-registered game seeds');
+const start=performance.now(),rows=[],failures=[];
+const kinds=['uniform','scoreaware','scratch'],stats={};
+const caps={cap:250000,timeoutMs:12000};
+for(let i=0;i<n;i++){
+ const seed=seedBase+i,split=i<72?'train':i<96?'validation':'test';
+ const kind=kinds[i%3],played=mathSampler(seed,{kind});
+ for(const root of played.rows){
+  assert.equal(encodeCard(root.card).remaining,root.remaining);
+  const score=totals(root.card).big;
+  const isBoundaryRoot=root.source==='observed';
+  const bound=isBoundaryRoot?exactAtBoundary(root.card,caps):null;
+  const q=exactAtRoll(root,caps);
+  if(bound&&bound.status!=='EXACT_FLOAT64')
+   failures.push({seed,remaining:root.remaining,source:root.source,type:'boundary',reason:bound.reason,status:bound.status});
+  if(q.status!=='EXACT_FLOAT64')
+   failures.push({seed,remaining:root.remaining,source:root.source,type:'atRoll',reason:q.reason,status:q.status});
+  rows.push({...root,split,finalGameBigPointsUnderSampler:played.finalBP,
+   samplerForcedScratchCount:played.forcedScratches,samplerZeroScores:played.zeroScoreEntries,
+   currentBP:score,features:exactFeatures(root.card),
+   boundary:!isBoundaryRoot?{status:'DESIGNED_DICE_DUPLICATE_CARD_NOT_TRAIN_LABEL'}:
+    bound.status==='EXACT_FLOAT64'?{
+     status:'EXACT_FLOAT64',optimalFinalBP:bound.value,optimalRemainingBP:bound.value-score,
+     states:bound.states,wallMs:bound.wallMs,dpSeconds:bound.seconds}:bound,
+   qReference:q.status==='EXACT_FLOAT64'?{
+    status:'EXACT_FLOAT64',optimalFinalBP:q.value,actions:q.actions,
+    states:q.states,wallMs:q.wallMs,dpSeconds:q.seconds}:q});
+  const key=[split,kind,root.remaining,root.source].join('_');
+  stats[key]??={attempted:0,solvedQ:0,solvedBoundary:0};
+  stats[key].attempted++;
+  stats[key].solvedQ+=+(q.status==='EXACT_FLOAT64');
+  stats[key].solvedBoundary+=+(bound?.status==='EXACT_FLOAT64');
+ }
+}
+const gameSplit=assertSeedPartition(rows,seedBase,n);
+const boundarySolved=rows.filter(r=>r.boundary.status==='EXACT_FLOAT64').length;
+const qSolved=rows.filter(r=>r.qReference.status==='EXACT_FLOAT64').length;
+const summary={
+ status:'EXACT_LABELS_FROM_INDEPENDENT_LEGAL_MATH_STATES_ONLY',
+ sourceBlobSha:ORACLE2_SOURCE_BLOB,featureVersion:FEATURE_VERSION,
+ simulation:"independent legal stochastic mathematical uniform, score-aware, and scratch samplers",
+ seedBase,nGames:n,seeds:[seedBase,seedBase+n-1],
+ gameSplit,nRoots:rows.length,boundaryAttempted:n*3,qAttempted:n*4,
+ solvedBoundary:boundarySolved,solvedQ:qSolved,
+ actionQLabels:rows.reduce((v,r)=>v+(r.qReference.actions?Object.keys(r.qReference.actions).length:0),0),
+ zeroScoreActionAlternatives:rows.reduce((v,r)=>v+(r.qReference.actions?Object.keys(r.qReference.actions).filter(k=>k.startsWith('score:')&&k.endsWith(':0')).length:0),0),
+ failedLabels:failures.length,kindCounts:{uniform:40,scoreaware:40,scratch:40},bySplitKindHorizon:stats,
+ forcedScratchGames:[...new Set(rows.filter(r=>r.samplerForcedScratchCount>0).map(r=>r.seed))].length,
+ wallMs:performance.now()-start,parentPeakRssBytes:process.memoryUsage().rss,
+ node:process.version,
+ limitations:[
+  'Traces and scorecards generated without any production Oracle or BPIV policy',
+  'Designed possible dice rolls are not frequency weighted; evaluate separately from observed rolls',
+  'Oracle2 numerically complete Float64 Bellman for last 1-3 remaining turns; no certified 28-turn global optimum',
+  'Native child peak RSS excluded; parent process peak measured',
+  'Exact resource/time cap failures are explicit and never imputed',
+  'There are 4 present-roll Q roots but only 3 unique pre-first-roll scorecard values per game'
+ ]};
+writeFileSync(prefix+'.json',JSON.stringify({summary,rows,failures})+'\n');
+writeFileSync(prefix+'.collection.json',JSON.stringify(summary,null,2)+'\n');
+console.log('ORACLE3_PURE_COLLECTION='+JSON.stringify(summary));
+assert.ok(qSolved>=Math.floor(rows.length*.9),'too few native exact Q roots');
+assert.ok(boundarySolved>=Math.floor(n*3*.9),'too few native boundary labels');

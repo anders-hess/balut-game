@@ -1,0 +1,72 @@
+{
+  "iteration": 15,
+  "architecture": "PURE_MATH_ORACLE2_TEACHER_NO_LEGACY_ADVISOR",
+  "date": "2026-11-04",
+  "timezone": "Europe/Copenhagen",
+  "branch": "research/oracle-3.0-phase5-pure-math-bellman-ai-2026-11-04",
+  "parentCommit": "5c73382a431986f29418b95506f2a21c60ae4ff1",
+  "forbidden": [
+    "production Oracle policy",
+    "BPIV prior",
+    "production guided scorecards",
+    "old learned weights",
+    "legacy fallback",
+    "imports of production advisor"
+  ],
+  "nativeOracle2Blob": "4ce623ed663edffc4b1c9291f975aba778622227",
+  "seededSampler": {
+    "seedBase": 950100000,
+    "nGames": 120,
+    "kinds": [
+      "uniform",
+      "scoreaware",
+      "scratch"
+    ],
+    "qRootsPerGame": 4,
+    "preRollBoundaryRootsPerGame": 3,
+    "seedSplits": {
+      "train": [
+        950100000,
+        950100071
+      ],
+      "validation": [
+        950100072,
+        950100095
+      ],
+      "test": [
+        950100096,
+        950100119
+      ]
+    }
+  },
+  "caps": {
+    "nativeStates": 250000,
+    "nativeTimeoutMs": 12000,
+    "exactTeacherHorizon": 3
+  },
+  "modelCandidates": [
+    "myopic_math",
+    "mathematical_stage_mean",
+    "mathematical_linear",
+    "mathematical_neural_17x20x1"
+  ],
+  "selection": "validation exact Oracle2 per-action Q regret",
+  "testPrimary": "locked 24-game exact Q regret and 95% game-bootstrap CI",
+  "testSecondary": [
+    "value continuation MAE/RMSE",
+    "action agreement",
+    "natural vs designed dice",
+    "score zero",
+    "scratch",
+    "stage horizon",
+    "runtime memory"
+  ],
+  "noProductionBenchmarkUsed": true,
+  "requiresMathDependencyGuard": true,
+  "successGate": "CI SUCCESS with independent legal state generation; model allowed to lose to myopic and must be reported honestly",
+  "globalOptimalityProof": false,
+  "mathematicalProofDetail": "EXACT_FLOAT64 finite horizon DP is not exact rational/arithmetic certification",
+  "resultsStatus": "NOT_EXECUTED_YET",
+  "noImprovedFinalBPClaim": true,
+  "noMainOrLiveChange": true
+}

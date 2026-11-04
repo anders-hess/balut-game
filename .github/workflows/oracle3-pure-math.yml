@@ -1,0 +1,92 @@
+name: Oracle 3.0 pure mathematical AI Bellman research
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase5-pure-math-*'
+    paths:
+      - 'research/oracle-3.0/pure/**'
+      - '.github/workflows/oracle3-pure-math.yml'
+  workflow_dispatch:
+concurrency:
+  group: oracle3-pure-math-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mathematical-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile original immutable Oracle 2.0 mathematical teachers
+        run: |
+          g++ --version | head -1
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-state.cpp -o research/oracle-3.0/oracle2/oracle2-state
+      - name: Fail closed if any active 3.0 modules use production-advisor code
+        run: node research/oracle-3.0/pure/guard.mjs
+      - name: Independent multinomial mathematics, legal scratch sampler and native-Q parity
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/test.mjs | tee pure-math-parity.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: oracle3-pure-math-unit-tests
+          path: pure-math-parity.log
+          if-no-files-found: ignore
+  exact-independent-supervision:
+    needs: mathematical-parity
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Recompile pinned Oracle 2.0 mathematical Bellman and state-boundary teacher
+        run: |
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-state.cpp -o research/oracle-3.0/oracle2/oracle2-state
+      - name: Reassert zero forbidden legacy-advisor dependencies
+        run: node research/oracle-3.0/pure/guard.mjs
+      - name: Generate 120 independent legal games and Oracle2 exact teacher Q and V labels
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/collect.mjs 120 950100000 oracle3-math-pure | tee oracle3-pure-collection.log
+      - name: Independently validate all 480 roots, legal actions, seed disjointness, and exact Q maps
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/audit.mjs oracle3-math-pure | tee oracle3-pure-audit.log
+      - name: Train fresh mathematically optimal V-star with train-only normalization
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/train-supervised.mjs oracle3-math-pure oracle3-math-pure | tee oracle3-pure-training.log
+      - name: Freeze model on validation Q regret and evaluate 24 independent test games
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/evaluate.mjs oracle3-math-pure | tee oracle3-pure-heldout.log
+      - name: Numeric-exact teacher vs learned endgame policy and early-horizon refusal
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/test-policy.mjs oracle3-math-pure | tee oracle3-pure-policy.log
+      - name: Archive full source-derived native Bellman Q labels and frozen model evaluation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-pure-math-bellman-ai-results
+          path: |
+            oracle3-pure-*.log
+            oracle3-math-pure.json
+            oracle3-math-pure.collection.json
+            oracle3-math-pure.weights.json
+            oracle3-math-pure.train.json
+            oracle3-math-pure.frozen-selection.json
+            oracle3-math-pure.pure-summary.json
+            oracle3-math-pure.pure-test.json
+          if-no-files-found: ignore
