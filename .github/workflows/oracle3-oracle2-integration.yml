@@ -83,3 +83,5 @@ jobs:
             oracle3-phase4-supervised-training.log
             oracle3-phase4-supervised-evaluation.log
           if-no-files-found: ignore
+
+# Iteration 13 execution: 60 independent games, exact labels, validation lock, test Q regret.
