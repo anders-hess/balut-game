@@ -1,0 +1,26 @@
+{
+  "iteration": 18,
+  "date": "2026-11-04",
+  "parent": "research/oracle-3.0-phase6-exact-rational-endgame-2026-11-04",
+  "branch": "research/oracle-3.0-phase6-rational-two-turn-2026-11-04",
+  "proofDomain": "Two category slots remaining, no rerolls on current roll; certify whether to score in category A or B now and optimise entire last turn",
+  "nativeOracle2Blob": "4ce623ed663edffc4b1c9291f975aba778622227",
+  "certifiedChoiceFormula": "Q(c)=(sum over 252 initial next-turn roll multisets [multinomialCoefficient(d) * exactLastTurnNumerator(after scoring c,d,r=2)])/6^15",
+  "arithmetic": "BigInt exact rational all chance weights and score Q comparisons",
+  "fixedSearchSeeds": [
+    980400000,
+    980400071
+  ],
+  "expectedCertifiedRoots": 3,
+  "expectedTwoChoicesEach": 2,
+  "expectedLastTurnSubcertificates": 1512,
+  "proofDoesNotCover": [
+    "current reroll decisions",
+    "three-or-more turns",
+    "formal theorem-prover verification",
+    "globally optimal 28-turn policy"
+  ],
+  "noProductionOracle": true,
+  "noOldPolicyFallback": true,
+  "preResultsStatus": "NOT_EXECUTED"
+}

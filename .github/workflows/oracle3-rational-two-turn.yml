@@ -1,0 +1,45 @@
+name: Oracle 3.0 exact rational two-turn category-choice proof
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase6-rational-two-turn-*'
+    paths:
+      - 'research/oracle-3.0/pure/rational-two*.mjs'
+      - '.github/workflows/oracle3-rational-two-turn.yml'
+  workflow_dispatch:
+concurrency:
+  group: oracle3-rational-two-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  two-turn-certified-category-choice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build immutable Oracle 2.0 native float reference for differential check only
+        run: |
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+      - name: Enforce pure Oracle 3.0 mathematical module isolation
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/guard.mjs | tee oracle3-rational-two-guard.log
+      - name: Certify 1512 future exact rational branches for three two-turn score choices
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/rational-two-test.mjs | tee oracle3-rational-two-proof.log
+      - name: Archive all category-by-category exact rational Q contributions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-rational-two-turn-category-certificates
+          path: |
+            oracle3-rational-two-guard.log
+            oracle3-rational-two-proof.log
+            oracle3-rational-two-turn-choice.json
+            oracle3-rational-two-turn-summary.json
+          if-no-files-found: ignore
