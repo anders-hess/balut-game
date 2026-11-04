@@ -1,0 +1,40 @@
+name: Oracle 3.0 independent locked exact-Q diagnostics
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase7-q-regret-diagnostics-*'
+    paths:
+      - 'research/oracle-3.0/pure/locked-q-diagnostics.mjs'
+      - '.github/workflows/oracle3-locked-q-diagnostics.yml'
+  workflow_dispatch:
+jobs:
+  locked-q-diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enforce pure mathematical architecture
+        run: node research/oracle-3.0/pure/guard.mjs
+      - name: Download unchanged iteration22 independent exact-rational reference
+        uses: actions/download-artifact@v4
+        with:
+          name: oracle3-48-math-cards-exact-rational-neural-fidelity
+          run-id: 41915546340
+          repository: anders-hess/balut-game
+          github-token: ${{ github.token }}
+          path: reference
+      - name: Validate 2168 action-Q values and audit frozen policy mistakes
+        run: node research/oracle-3.0/pure/locked-q-diagnostics.mjs
+      - name: Archive post-hoc diagnostic data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-locked-q-diagnostics
+          path: oracle3-q-regret-diagnostics.json
+          if-no-files-found: ignore
