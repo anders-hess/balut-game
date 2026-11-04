@@ -1,0 +1,72 @@
+{
+  "iteration": 13,
+  "name": "Exact Oracle 2.0 Bellman optimal-value supervision for Oracle 3.0",
+  "parentBranch": "research/oracle-3.0-phase4-oracle2-exact-supervision-2026-11-04",
+  "sourceBellmanSha": "4ce623ed663edffc4b1c9291f975aba778622227",
+  "researchOnly": true,
+  "seedBase": 910100000,
+  "nIndependentGames": 60,
+  "horizonsRemaining": [
+    3,
+    2,
+    1
+  ],
+  "exactRootAttempts": 180,
+  "splitByEntireGame": {
+    "train": {
+      "games": 36,
+      "seeds": [
+        910100000,
+        910100035
+      ]
+    },
+    "validation": {
+      "games": 12,
+      "seeds": [
+        910100036,
+        910100047
+      ]
+    },
+    "test": {
+      "games": 12,
+      "seeds": [
+        910100048,
+        910100059
+      ]
+    }
+  },
+  "nativeSolverCaps": {
+    "states": 250000,
+    "timeoutMsPerCall": 12000
+  },
+  "expectedTargets": [
+    "V_star_before_initial_roll_minus_current_BP",
+    "Q_star_at_visible_roll_all_legal_actions"
+  ],
+  "candidateModels": [
+    "stage_mean",
+    "linear_17",
+    "neural_17_20_1"
+  ],
+  "selectionMetric": "validation_rmse_BP_only",
+  "finalHoldoutMetrics": [
+    "test_value_rmse_BP",
+    "test_value_mae_BP",
+    "all_action_exact_Q_regret",
+    "95percent_game_cluster_bootstrap_CI"
+  ],
+  "commitsContainTestResults": false,
+  "implementationRunStatus": "PENDING_CI",
+  "improvedFinalBigPointsClaim": false,
+  "stopConditions": [
+    "<70% exact label coverage",
+    "data leak or broken Q action mapping",
+    "failed native-vs-JS test"
+  ],
+  "safeguards": [
+    "Do not change main, live Oracle or Oracle2 branches",
+    "No global optimality claim",
+    "No claim from predictive fit alone",
+    "No final-BP performance claim without actual paired simulation"
+  ]
+}

@@ -1,20 +1,20 @@
-name: Oracle 3.0 / Oracle 2.0 exact integration gate
+name: Oracle 3.0 exact Bellman and supervised holdout
 on:
   push:
     branches:
-      - 'research/oracle-3.0-phase4-oracle2-*'
+      - 'research/oracle-3.0-phase4-*'
     paths:
       - 'research/oracle-3.0/oracle2/**/*.mjs'
       - 'research/oracle-3.0/oracle2/**/*.cpp'
       - '.github/workflows/oracle3-oracle2-integration.yml'
   workflow_dispatch:
 concurrency:
-  group: oracle3-phase4-oracle2-exact
+  group: oracle3-phase4-${{ github.ref_name }}
   cancel-in-progress: true
 jobs:
   exact-bellman-integration:
     runs-on: ubuntu-latest
-    timeout-minutes: 14
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
@@ -51,4 +51,35 @@ jobs:
             oracle3-phase4-exact-reference.json
             oracle3-phase4-exact-summary.json
             oracle3-phase4-hybrid.json
+          if-no-files-found: ignore
+
+      - name: Validate exact Bellman state encoder, holdout partitions and frozen inference
+        run: node research/oracle-3.0/oracle2/test-exact-learning.mjs
+      - name: Generate 60-game split of exact Bellman optimal values and all-action Q labels
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/collect-supervised.mjs 60 910100000 oracle3-phase4-supervised | tee oracle3-phase4-supervised-collection.log
+      - name: Train stage, linear and neural value models using only train plus validation
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/train-supervised.mjs oracle3-phase4-supervised oracle3-phase4-supervised | tee oracle3-phase4-supervised-training.log
+      - name: Locked whole-game holdout Q-regret versus Oracle 2.0 exact reference
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/evaluate-supervised.mjs oracle3-phase4-supervised oracle3-phase4-supervised | tee oracle3-phase4-supervised-evaluation.log
+      - name: Archive all supervised training, full exact Q reference and independent test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-phase4-exact-supervised
+          path: |
+            oracle3-phase4-supervised.json
+            oracle3-phase4-supervised.collection.json
+            oracle3-phase4-supervised.weights.json
+            oracle3-phase4-supervised.train.json
+            oracle3-phase4-supervised.evaluation.json
+            oracle3-phase4-supervised.heldout-details.json
+            oracle3-phase4-supervised-collection.log
+            oracle3-phase4-supervised-training.log
+            oracle3-phase4-supervised-evaluation.log
           if-no-files-found: ignore
