@@ -2,7 +2,9 @@ name: Oracle 3.0 research parity and baseline
 on:
   push:
     branches:
-      - 'research/oracle-3.0-*'
+      - 'research/oracle-3.0-phase1-*'
+      - 'research/oracle-3.0-phase2-*'
+      - 'research/oracle-3.0-phase3-*'
   workflow_dispatch:
 jobs:
   verify:
