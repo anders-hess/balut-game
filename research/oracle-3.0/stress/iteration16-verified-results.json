@@ -1,0 +1,58 @@
+{
+  "status": "VERIFIED_NATIVE_EXACT_STRESS_TEACHER",
+  "architecture": "independent legal constructed scorecards; possible dice, not frequency weighted",
+  "gameSeeds": [
+    970600000,
+    970600119
+  ],
+  "games": 120,
+  "roots": 360,
+  "split": {
+    "train": 72,
+    "validation": 24,
+    "test": 24
+  },
+  "scenarios": {
+    "0": 90,
+    "1": 90,
+    "2": 90,
+    "3": 90
+  },
+  "solvedExactQ": 360,
+  "fullQActions": 2271,
+  "zeroScoreActionAlternatives": 238,
+  "crossings": 114,
+  "upperThresholdsAlreadyCrossed": 167,
+  "ambiguousSmallMargins": 172,
+  "highRegretNaive": 45,
+  "meanSmallPoints": 531.8916666666667,
+  "exactTeacherTimeMs": 10.644788963888898,
+  "wallMs": 3876.79727,
+  "peakParentRssBytes": 61284352,
+  "limitations": [
+    "Designed category scores and dice are physically possible but deliberately not probability weighted",
+    "Not a final-Big-Points game-level policy benchmark",
+    "Native Float64 completed DP does not prove formal optimality",
+    "Native subprocess peak RSS not captured",
+    "No AI student trained or selected on this stress set"
+  ],
+  "holdout": {
+    "nGames": 24,
+    "nRoots": 72,
+    "naiveExactQRegret": {
+      "games": 24,
+      "mean": 0.06355406158235247,
+      "ci95": [
+        0.026160068862419245,
+        0.1060044816612527
+      ]
+    },
+    "highRegretNaive": 12,
+    "thresholdOpportunity": 22,
+    "existingThreshold": 32
+  },
+  "verifiedRunUrl": "https://github.com/anders-hess/balut-game/actions/runs/41897254486",
+  "verifiedCommit": "6e9ad36c135360342659eae4e6ad8cc34149ec3f",
+  "global28TurnOptimalityProven": false,
+  "improvementOverFullGameProductionBenchmarkProven": false
+}
