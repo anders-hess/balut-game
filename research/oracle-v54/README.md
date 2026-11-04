@@ -1,0 +1,7 @@
+# Oracle v54 — 02:30 research (4 Nov 2026)
+
+Built on committed v53 branch, reviewed v50/v51, issue #1 and North Star. A new exact rational **seven-category quota threshold microgame** uses actual 7,776 ordered five-dice outcomes (252 multisets), one scoring category per turn, adaptive category choice, seven category quotas, and a nonlinear terminal threshold indicator. This is a **one-roll restricted microgame**: no hold/reroll, no four slots per category, no original terminal Big Points; its numerical values are **not valid bounds on original Balut**. It is a structural experiment toward a state-dependent bonus automaton, not a global Oracle solution.
+
+Independent suffix enumeration validates 21 one-category and 63 two-category cases (84/84). Local Python run 27.93 s, 2,152 cached states, 96,656 KB process peak RSS (shared runtime, not incremental). Root [1,3,4,4,5] has 7 category actions; **not** the required 30 hold/score actions. No original frozen Q validation; no opening gap improvement. Last verified opening certificate gap still 13.0067595694 BP from v51. 0 global early top certificates; 0 rivals pruned. Reproduce: `python3 research/oracle-v54/threshold_quota.py`. Results in results.json. No changes to main/live.
+
+**Next:** prove a pathwise upper relationship or construct a genuine feasible continuation policy with actual hold/rerolls, four cells and exact terminal Big Points, then integrate into v51 seven-quota upper; only then run unchanged Q fixtures and all 30 opening actions. Do not use microgame Q as original-game bound.
