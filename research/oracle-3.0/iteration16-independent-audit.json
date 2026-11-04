@@ -1,0 +1,41 @@
+{
+  "iteration": 16,
+  "status": "INDEPENDENT_PYTHON_AUDIT_PASS",
+  "analysisProvenance": "Locally re-read actual archived GitHub Actions artifact, implemented independent Python Balut scoring, target-column rules and totals, and independently recomputed exact Q legal-action coverage and policy regret.",
+  "runUrl": "https://github.com/anders-hess/balut-game/actions/runs/41897820339",
+  "artifactUrl": "https://github.com/anders-hess/balut-game/actions/runs/41897820339/artifacts/13357431453",
+  "independentReplayedGames": 120,
+  "independentlyReplayedWitnessScores": 3360,
+  "allScoreValuesValidated": true,
+  "allAutomaticColumnPlacementsValidated": true,
+  "allFinalBigAndSmallPointsTotalsValidated": true,
+  "allAtThreeTurnsScorecardReconstructed": true,
+  "allFiveDieOutcomesHavePositiveProbability": true,
+  "completeNativeQRootCount": 480,
+  "independentlyCheckedLegalActionQKeys": 8881,
+  "nativeMaxActionQMatchesOptimalValue": true,
+  "lockedTestRootCount": 96,
+  "independentlyRecomputedLockedModelActionsAndRegret": 384,
+  "frozenSelected": "neural",
+  "heldoutQRegret": {
+    "myopic": 0.040347025709729784,
+    "stage": 0.040347025709729784,
+    "linear": 0.021568645465246505,
+    "neural": 0.017299624781005368
+  },
+  "mathematicallyOptimalActions": {
+    "myopic": 64,
+    "linear": 71,
+    "neural": 72,
+    "teacher": 96
+  },
+  "gameClusterBootstrap95SelectedMinusMyopic": [
+    -0.054948779850866936,
+    -0.0014215806068845944
+  ],
+  "finalExpectedBigPointsImprovementProven": false,
+  "global28TurnOptimalityProven": false,
+  "exactNumericalTeacherCaveat": "Native C++ Float64 Bellman was trusted as independent reference; Python audit did not reimplement native full finite-horizon dynamic programming, so it cannot certify error-free rational proof.",
+  "distributionCaveat": "Some positive-probability scorecard witnesses and dice inputs were deliberately biased toward rare/high-scoring outcomes. This is Q fidelity on designed cases, not a naturally frequency-weighted statistic.",
+  "legacyOraclePolicyCalls": 0
+}
