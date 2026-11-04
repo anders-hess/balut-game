@@ -1,0 +1,948 @@
+{
+  "iteration": 14,
+  "status": "VERIFIED_GITHUB_ACTIONS_SUCCESS",
+  "objective": "Direct Oracle2 exact per-action Q student training, validation and heldout testing",
+  "sourceCommit": "2273b73649be80206ea6aa8c7c5dcba9e2372e55",
+  "branch": "research/oracle-3.0-phase4-action-q-distillation-2026-11-04",
+  "runUrl": "https://github.com/anders-hess/balut-game/actions/runs/41888927522",
+  "artifactUrl": "https://github.com/anders-hess/balut-game/actions/runs/41888927522/artifacts/13354085725",
+  "originOracle2SourceBlob": "4ce623ed663edffc4b1c9291f975aba778622227",
+  "unitTests": {
+    "status": "PASS",
+    "featureDim": 43,
+    "scoreOnlyActions": 7,
+    "exactTwoTurnActions": 33,
+    "zeroScoreOptions": 1,
+    "probedRerolls": [
+      0,
+      1,
+      2
+    ],
+    "actionQExactParity": true,
+    "scorecardImmutable": true
+  },
+  "newExactQCollection": {
+    "status": "EXACT_Q_REFERENCES_NOT_POLICY_EVALUATION",
+    "sourceBlobSha": "4ce623ed663edffc4b1c9291f975aba778622227",
+    "nGames": 96,
+    "seeds": [
+      920200000,
+      920200095
+    ],
+    "partition": {
+      "train": {
+        "seeds": [
+          920200000,
+          920200023
+        ],
+        "games": 24
+      },
+      "validation": {
+        "seeds": [
+          920200024,
+          920200047
+        ],
+        "games": 24
+      },
+      "test": {
+        "seeds": [
+          920200048,
+          920200095
+        ],
+        "games": 48
+      }
+    },
+    "attempted": 384,
+    "solved": 384,
+    "failed": 0,
+    "actionQCount": 6499,
+    "counts": {
+      "train_scratch_3_observed": {
+        "attempted": 24,
+        "solved": 24
+      },
+      "train_scratch_3_possible_counterfactual_dice": {
+        "attempted": 24,
+        "solved": 24
+      },
+      "train_scratch_2_observed": {
+        "attempted": 24,
+        "solved": 24
+      },
+      "train_scratch_1_observed": {
+        "attempted": 24,
+        "solved": 24
+      },
+      "validation_natural_3_observed": {
+        "attempted": 12,
+        "solved": 12
+      },
+      "validation_natural_3_possible_counterfactual_dice": {
+        "attempted": 12,
+        "solved": 12
+      },
+      "validation_natural_2_observed": {
+        "attempted": 12,
+        "solved": 12
+      },
+      "validation_natural_1_observed": {
+        "attempted": 12,
+        "solved": 12
+      },
+      "validation_scratch_3_observed": {
+        "attempted": 12,
+        "solved": 12
+      },
+      "validation_scratch_3_possible_counterfactual_dice": {
+        "attempted": 12,
+        "solved": 12
+      },
+      "validation_scratch_2_observed": {
+        "attempted": 12,
+        "solved": 12
+      },
+      "validation_scratch_1_observed": {
+        "attempted": 12,
+        "solved": 12
+      },
+      "test_natural_3_observed": {
+        "attempted": 24,
+        "solved": 24
+      },
+      "test_natural_3_possible_counterfactual_dice": {
+        "attempted": 24,
+        "solved": 24
+      },
+      "test_natural_2_observed": {
+        "attempted": 24,
+        "solved": 24
+      },
+      "test_natural_1_observed": {
+        "attempted": 24,
+        "solved": 24
+      },
+      "test_scratch_3_observed": {
+        "attempted": 24,
+        "solved": 24
+      },
+      "test_scratch_3_possible_counterfactual_dice": {
+        "attempted": 24,
+        "solved": 24
+      },
+      "test_scratch_2_observed": {
+        "attempted": 24,
+        "solved": 24
+      },
+      "test_scratch_1_observed": {
+        "attempted": 24,
+        "solved": 24
+      }
+    },
+    "naturalGames": 36,
+    "scratchGames": 60,
+    "forcedScratchGames": 60,
+    "wallMs": 446754.42291200004,
+    "parentPeakRssBytes": 133709824,
+    "node": "v22.23.4",
+    "limitations": [
+      "Oracle 2.0 exact finite-horizon float64 Q for only 1–3 remaining turns",
+      "Scratch trajectories apply actual legal zero-score action before roll outcomes; no synthetic invalid scorecards",
+      "Counterfactual dice are possible observed rolls, not a sampled frequency distribution; report source subgroups separately",
+      "New scratch training, validation, and locked test games disjoint from previous 60 training games; split was fixed before outcomes",
+      "No claim of improved final-BP game policy from exact current-Q regret",
+      "Parent RSS excludes native child memory"
+    ]
+  },
+  "qActionPreparation": {
+    "status": "EXACT_Q_ACTION_TRAINING_TABLE",
+    "datasetSource": [
+      "iteration13 verified GitHub Actions artifact 13349458382",
+      "fresh 96-game exact Oracle2 action-Q evaluation"
+    ],
+    "featureVersion": "oracle3-q-action-43-v1",
+    "featureDim": 43,
+    "rootCount": 564,
+    "solvedQRoots": 564,
+    "omittedRoots": 0,
+    "independentGames": {
+      "train": 84,
+      "validation": 24,
+      "test": 48
+    },
+    "splitRootCounts": {
+      "train": 276,
+      "validation": 96,
+      "test": 192
+    },
+    "exactActionQLabels": 10483,
+    "actionLabelsBySplit": {
+      "train": 5713,
+      "validation": 1642,
+      "test": 3128
+    },
+    "zeroScoreActionLabels": 240,
+    "scratchTrajectoryRoots": 240,
+    "trainScratchTrajectoryRoots": 96,
+    "validationObservedRoots": 72,
+    "testObservedRoots": 144,
+    "testSyntheticRoots": 48,
+    "preparationWallMs": 44311.231585999994,
+    "parentRssBytes": 124166144,
+    "node": "v22.23.4",
+    "limitations": [
+      "Prior iteration13 holdout may be used as training in this NEW experiment; it is never used as this experiments validation/test",
+      "Only Oracle2 Float64 Bellman values with <=3 turns left; direct Q labels include all legal holds and score/scratch choices",
+      "Synthetic dice roots are physically possible but not frequency-weighted; stratify and report separately",
+      "BPIV feature comes from frozen actual production scoring and is not a ground truth Q",
+      "A table of supervised Q values does not imply 28-turn optimal policy or higher final game score"
+    ]
+  },
+  "dataAudit": {
+    "status": "PASS",
+    "rootCount": 564,
+    "actionQLabels": 10483,
+    "zeroScoreAlternatives": 240,
+    "gameSplit": {
+      "train": 84,
+      "validation": 24,
+      "test": 48
+    },
+    "scratchTestRoots": 96,
+    "omitted": 0
+  },
+  "validationSelectionAndTraining": {
+    "status": "TRAINED_NO_TEST_USED_FOR_SELECTION",
+    "trainRoots": 276,
+    "trainActionQRows": 5713,
+    "trainGames": 84,
+    "validationRoots": 96,
+    "validationGames": 24,
+    "validationProductionMeanRegretBP": 0.015865508355061408,
+    "validationBpivAllActions": {
+      "meanRegretBP": 0.015865508355061408,
+      "optimalRoots": 85,
+      "roots": 96,
+      "meanByKind": {
+        "natural": 0.001632858127605515,
+        "scratch": 0.030098158582517298
+      },
+      "meanByHorizon": {
+        "1": 0,
+        "2": 0.006152909900483339,
+        "3": 0.028654561759881143
+      }
+    },
+    "validationLinear": {
+      "meanRegretBP": 0.0026365208789210968,
+      "optimalRoots": 92,
+      "roots": 96,
+      "meanByKind": {
+        "natural": 0.00009696013222663484,
+        "scratch": 0.005176081625615558
+      },
+      "meanByHorizon": {
+        "1": 0,
+        "2": 0.0065403739643303815,
+        "3": 0.0020028547756770023
+      }
+    },
+    "validationNeural": {
+      "meanRegretBP": 0.0026554078155339444,
+      "optimalRoots": 91,
+      "roots": 96,
+      "meanByKind": {
+        "natural": 0.00009696013222663484,
+        "scratch": 0.005213855498841254
+      },
+      "meanByHorizon": {
+        "1": 0.00007554774645139133,
+        "2": 0.0065403739643303815,
+        "3": 0.0020028547756770023
+      }
+    },
+    "options": [
+      {
+        "name": "production",
+        "loss": 0.015865508355061408,
+        "alpha": 0
+      },
+      {
+        "name": "bpiv_all_actions",
+        "loss": 0.015865508355061408,
+        "alpha": 0
+      },
+      {
+        "name": "linear_residual",
+        "loss": 0.0026365208789210968,
+        "alpha": 0.5,
+        "epoch": 35
+      },
+      {
+        "name": "neural_residual",
+        "loss": 0.0026554078155339444,
+        "alpha": 0.75,
+        "epoch": 20
+      }
+    ],
+    "selected": {
+      "name": "linear_residual",
+      "alpha": 0.5
+    },
+    "bestEpoch": {
+      "linear": 35,
+      "neural": 20
+    },
+    "trainingWallMs": 2413.795266,
+    "parentRssBytes": 122826752,
+    "node": "v22.23.4",
+    "limitations": [
+      "Model learns exact finite-horizon Oracle2 Q residual at last 1–3 turns; cannot extrapolate to earlier turns",
+      "Scorecard/dice/action train labels are correlated within a game; split by seed game prevents holdout leakage",
+      "Validation Q regret chosen both shrinkage and epoch: locked test must not tune model",
+      "Scratch action labels include zero-score alternatives and legally reached scratch scorecards",
+      "Lower validation Q regret does not demonstrate better game-final BP"
+    ]
+  },
+  "heldoutExactQ": {
+    "status": "HELDOUT_EXACT_Q_REGRET_NO_FINAL_GAME_POLICY_CLAIM",
+    "independentGames": 48,
+    "roots": 192,
+    "exactActionLabels": 3128,
+    "zeroScoreActionLabels": 95,
+    "teacherOptimalScratchRoots": 10,
+    "lockedSeeds": [
+      920200048,
+      920200095
+    ],
+    "selectedByValidationOnly": {
+      "name": "linear_residual",
+      "alpha": 0.5
+    },
+    "main": {
+      "production": {
+        "roots": 192,
+        "games": 48,
+        "meanRegretBP": 0.004363005230799524,
+        "exactlyOptimal": 182,
+        "scratchSelections": 10,
+        "pairedMeanExtraRegretBP": 0,
+        "pairedGameBootstrapCI95": [
+          0,
+          0
+        ],
+        "regretGameBootstrapCI95": [
+          0.0006275771233468669,
+          0.010747196749279209
+        ],
+        "p95InferenceOnlyMs": 0.0038700000000062573
+      },
+      "bpiv_all_actions": {
+        "roots": 192,
+        "games": 48,
+        "meanRegretBP": 0.004363005230799524,
+        "exactlyOptimal": 182,
+        "scratchSelections": 10,
+        "pairedMeanExtraRegretBP": 0,
+        "pairedGameBootstrapCI95": [
+          0,
+          0
+        ],
+        "regretGameBootstrapCI95": [
+          0.0006259008425472112,
+          0.010522015157686184
+        ],
+        "p95InferenceOnlyMs": 0.007053000000013299
+      },
+      "linear_residual": {
+        "roots": 192,
+        "games": 48,
+        "meanRegretBP": 0.006567779128903849,
+        "exactlyOptimal": 171,
+        "scratchSelections": 10,
+        "pairedMeanExtraRegretBP": 0.002204773898104325,
+        "pairedGameBootstrapCI95": [
+          -0.005692840896638786,
+          0.00885557220961651
+        ],
+        "regretGameBootstrapCI95": [
+          0.0023252001293103536,
+          0.012130589030860317
+        ],
+        "p95InferenceOnlyMs": 0.032582000000004996
+      },
+      "neural_residual": {
+        "roots": 192,
+        "games": 48,
+        "meanRegretBP": 0.007391063568026837,
+        "exactlyOptimal": 169,
+        "scratchSelections": 9,
+        "pairedMeanExtraRegretBP": 0.0030280583372273135,
+        "pairedGameBootstrapCI95": [
+          -0.0042037035856751686,
+          0.009326834453565072
+        ],
+        "regretGameBootstrapCI95": [
+          0.0031718559539705613,
+          0.01253739795066531
+        ],
+        "p95InferenceOnlyMs": 0.09323799999999949
+      }
+    },
+    "subsets": {
+      "natural": {
+        "production": {
+          "roots": 96,
+          "games": 24,
+          "meanRegretBP": 0.0016973501584851836,
+          "exactlyOptimal": 94,
+          "scratchSelections": 4,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0,
+            0.004609481801442263
+          ],
+          "p95InferenceOnlyMs": 0.006988000000006878
+        },
+        "bpiv_all_actions": {
+          "roots": 96,
+          "games": 24,
+          "meanRegretBP": 0.0016973501584851836,
+          "exactlyOptimal": 94,
+          "scratchSelections": 4,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0,
+            0.004609481801442263
+          ],
+          "p95InferenceOnlyMs": 0.007904999999993834
+        },
+        "linear_residual": {
+          "roots": 96,
+          "games": 24,
+          "meanRegretBP": 0.002196012703101167,
+          "exactlyOptimal": 90,
+          "scratchSelections": 4,
+          "pairedMeanExtraRegretBP": 0.0004986625446159835,
+          "pairedGameBootstrapCI95": [
+            0.00007730288707077926,
+            0.0010156570320289566
+          ],
+          "regretGameBootstrapCI95": [
+            0.00032529719943975394,
+            0.004953974419600428
+          ],
+          "p95InferenceOnlyMs": 0.03764199999999107
+        },
+        "neural_residual": {
+          "roots": 96,
+          "games": 24,
+          "meanRegretBP": 0.004660302437485821,
+          "exactlyOptimal": 89,
+          "scratchSelections": 4,
+          "pairedMeanExtraRegretBP": 0.0029629522790006377,
+          "pairedGameBootstrapCI95": [
+            0.00007730288707077926,
+            0.007559420235811447
+          ],
+          "regretGameBootstrapCI95": [
+            0.000905403023767228,
+            0.009579617261397064
+          ],
+          "p95InferenceOnlyMs": 0.10795299999999486
+        }
+      },
+      "scratch": {
+        "production": {
+          "roots": 96,
+          "games": 24,
+          "meanRegretBP": 0.007028660303113864,
+          "exactlyOptimal": 88,
+          "scratchSelections": 6,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0.0004916366124755323,
+            0.018801287972461347
+          ],
+          "p95InferenceOnlyMs": 0.00337000000000387
+        },
+        "bpiv_all_actions": {
+          "roots": 96,
+          "games": 24,
+          "meanRegretBP": 0.007028660303113864,
+          "exactlyOptimal": 88,
+          "scratchSelections": 6,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0.0005423958471241219,
+            0.01874251121360551
+          ],
+          "p95InferenceOnlyMs": 0.00484000000000151
+        },
+        "linear_residual": {
+          "roots": 96,
+          "games": 24,
+          "meanRegretBP": 0.010939545554706531,
+          "exactlyOptimal": 81,
+          "scratchSelections": 6,
+          "pairedMeanExtraRegretBP": 0.003910885251592666,
+          "pairedGameBootstrapCI95": [
+            -0.012070588949025208,
+            0.017047587777343744
+          ],
+          "regretGameBootstrapCI95": [
+            0.0029801025504999725,
+            0.021067912020646968
+          ],
+          "p95InferenceOnlyMs": 0.010540000000005989
+        },
+        "neural_residual": {
+          "roots": 96,
+          "games": 24,
+          "meanRegretBP": 0.010121824698567853,
+          "exactlyOptimal": 80,
+          "scratchSelections": 5,
+          "pairedMeanExtraRegretBP": 0.0030931643954539892,
+          "pairedGameBootstrapCI95": [
+            -0.010986687268926187,
+            0.014910031386589806
+          ],
+          "regretGameBootstrapCI95": [
+            0.003240239349461734,
+            0.018978316627345698
+          ],
+          "p95InferenceOnlyMs": 0.07811300000000188
+        }
+      },
+      "remaining_1": {
+        "production": {
+          "roots": 48,
+          "games": 48,
+          "meanRegretBP": 0,
+          "exactlyOptimal": 48,
+          "scratchSelections": 10,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "p95InferenceOnlyMs": 0.0016840000000115651
+        },
+        "bpiv_all_actions": {
+          "roots": 48,
+          "games": 48,
+          "meanRegretBP": 0,
+          "exactlyOptimal": 48,
+          "scratchSelections": 10,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "p95InferenceOnlyMs": 0.0031380000000069685
+        },
+        "linear_residual": {
+          "roots": 48,
+          "games": 48,
+          "meanRegretBP": 0,
+          "exactlyOptimal": 48,
+          "scratchSelections": 10,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "p95InferenceOnlyMs": 0.006012000000012563
+        },
+        "neural_residual": {
+          "roots": 48,
+          "games": 48,
+          "meanRegretBP": 0,
+          "exactlyOptimal": 48,
+          "scratchSelections": 9,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "p95InferenceOnlyMs": 0.05782499999999402
+        }
+      },
+      "remaining_2": {
+        "production": {
+          "roots": 48,
+          "games": 48,
+          "meanRegretBP": 0.0013077169035342895,
+          "exactlyOptimal": 46,
+          "scratchSelections": 0,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0,
+            0.003572468787140376
+          ],
+          "p95InferenceOnlyMs": 0.0034459999999967295
+        },
+        "bpiv_all_actions": {
+          "roots": 48,
+          "games": 48,
+          "meanRegretBP": 0.0013077169035342895,
+          "exactlyOptimal": 46,
+          "scratchSelections": 0,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0,
+            0.003572468787140376
+          ],
+          "p95InferenceOnlyMs": 0.008127000000001772
+        },
+        "linear_residual": {
+          "roots": 48,
+          "games": 48,
+          "meanRegretBP": 0.011282933922243998,
+          "exactlyOptimal": 41,
+          "scratchSelections": 0,
+          "pairedMeanExtraRegretBP": 0.009975217018709709,
+          "pairedGameBootstrapCI95": [
+            -0.000020067492390094904,
+            0.026329177926336416
+          ],
+          "regretGameBootstrapCI95": [
+            0.0013900350908782517,
+            0.02762697487145881
+          ],
+          "p95InferenceOnlyMs": 0.047623999999999
+        },
+        "neural_residual": {
+          "roots": 48,
+          "games": 48,
+          "meanRegretBP": 0.011947394546526055,
+          "exactlyOptimal": 40,
+          "scratchSelections": 0,
+          "pairedMeanExtraRegretBP": 0.010639677642991766,
+          "pairedGameBootstrapCI95": [
+            0.0011267096293230694,
+            0.02632108085350295
+          ],
+          "regretGameBootstrapCI95": [
+            0.0021015532671447013,
+            0.028020742443566032
+          ],
+          "p95InferenceOnlyMs": 0.07953999999999439
+        }
+      },
+      "remaining_3": {
+        "production": {
+          "roots": 96,
+          "games": 48,
+          "meanRegretBP": 0.008072152009831903,
+          "exactlyOptimal": 88,
+          "scratchSelections": 0,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0.001100684461238598,
+            0.019608477845264673
+          ],
+          "p95InferenceOnlyMs": 0.0049259999999975435
+        },
+        "bpiv_all_actions": {
+          "roots": 96,
+          "games": 48,
+          "meanRegretBP": 0.008072152009831903,
+          "exactlyOptimal": 88,
+          "scratchSelections": 0,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0.0011182545637807018,
+            0.019821218365946778
+          ],
+          "p95InferenceOnlyMs": 0.006310999999996625
+        },
+        "linear_residual": {
+          "roots": 96,
+          "games": 48,
+          "meanRegretBP": 0.007494091296685698,
+          "exactlyOptimal": 82,
+          "scratchSelections": 0,
+          "pairedMeanExtraRegretBP": -0.0005780607131462048,
+          "pairedGameBootstrapCI95": [
+            -0.01382037198802027,
+            0.008548958279145818
+          ],
+          "regretGameBootstrapCI95": [
+            0.002459183425532261,
+            0.014004326275151269
+          ],
+          "p95InferenceOnlyMs": 0.03533799999999587
+        },
+        "neural_residual": {
+          "roots": 96,
+          "games": 48,
+          "meanRegretBP": 0.008808429862790646,
+          "exactlyOptimal": 81,
+          "scratchSelections": 0,
+          "pairedMeanExtraRegretBP": 0.0007362778529587435,
+          "pairedGameBootstrapCI95": [
+            -0.012630398629720666,
+            0.010726762618076285
+          ],
+          "regretGameBootstrapCI95": [
+            0.0028815566764554545,
+            0.01598832246208449
+          ],
+          "p95InferenceOnlyMs": 0.14049699999999632
+        }
+      },
+      "observed": {
+        "production": {
+          "roots": 144,
+          "games": 48,
+          "meanRegretBP": 0.0015674724068348855,
+          "exactlyOptimal": 140,
+          "scratchSelections": 10,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0.0001168939744874975,
+            0.0036257874766271025
+          ],
+          "p95InferenceOnlyMs": 0.0034459999999967295
+        },
+        "bpiv_all_actions": {
+          "roots": 144,
+          "games": 48,
+          "meanRegretBP": 0.0015674724068348855,
+          "exactlyOptimal": 140,
+          "scratchSelections": 10,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0.0001168939744874975,
+            0.0036780237157547444
+          ],
+          "p95InferenceOnlyMs": 0.007519000000002052
+        },
+        "linear_residual": {
+          "roots": 144,
+          "games": 48,
+          "meanRegretBP": 0.005096225614652832,
+          "exactlyOptimal": 133,
+          "scratchSelections": 10,
+          "pairedMeanExtraRegretBP": 0.0035287532078179464,
+          "pairedGameBootstrapCI95": [
+            0.00010682003391031107,
+            0.008889232526480372
+          ],
+          "regretGameBootstrapCI95": [
+            0.001312476324247247,
+            0.010662498745436823
+          ],
+          "p95InferenceOnlyMs": 0.032582000000004996
+        },
+        "neural_residual": {
+          "roots": 144,
+          "games": 48,
+          "meanRegretBP": 0.0056155575631794035,
+          "exactlyOptimal": 131,
+          "scratchSelections": 9,
+          "pairedMeanExtraRegretBP": 0.004048085156344518,
+          "pairedGameBootstrapCI95": [
+            0.0007423815197712494,
+            0.009225887278035975
+          ],
+          "regretGameBootstrapCI95": [
+            0.0018419519751495745,
+            0.010971645009029295
+          ],
+          "p95InferenceOnlyMs": 0.07975800000002664
+        }
+      },
+      "possible_counterfactual_dice": {
+        "production": {
+          "roots": 48,
+          "games": 48,
+          "meanRegretBP": 0.012749603702693438,
+          "exactlyOptimal": 42,
+          "scratchSelections": 0,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0.0008888930308598164,
+            0.03450288664236606
+          ],
+          "p95InferenceOnlyMs": 0.0049259999999975435
+        },
+        "bpiv_all_actions": {
+          "roots": 48,
+          "games": 48,
+          "meanRegretBP": 0.012749603702693438,
+          "exactlyOptimal": 42,
+          "scratchSelections": 0,
+          "pairedMeanExtraRegretBP": 0,
+          "pairedGameBootstrapCI95": [
+            0,
+            0
+          ],
+          "regretGameBootstrapCI95": [
+            0.0008888930308598164,
+            0.034636484003366136
+          ],
+          "p95InferenceOnlyMs": 0.006310999999996625
+        },
+        "linear_residual": {
+          "roots": 48,
+          "games": 48,
+          "meanRegretBP": 0.010982439671656899,
+          "exactlyOptimal": 38,
+          "scratchSelections": 0,
+          "pairedMeanExtraRegretBP": -0.0017671640310365406,
+          "pairedGameBootstrapCI95": [
+            -0.0279677796647321,
+            0.016595608351128832
+          ],
+          "regretGameBootstrapCI95": [
+            0.0023818843481345033,
+            0.02334532076182454
+          ],
+          "p95InferenceOnlyMs": 0.010540000000005989
+        },
+        "neural_residual": {
+          "roots": 48,
+          "games": 48,
+          "meanRegretBP": 0.012717581582569137,
+          "exactlyOptimal": 38,
+          "scratchSelections": 0,
+          "pairedMeanExtraRegretBP": -0.000032022120124301313,
+          "pairedGameBootstrapCI95": [
+            -0.026059329555027395,
+            0.01903505662998507
+          ],
+          "regretGameBootstrapCI95": [
+            0.0026284839324097384,
+            0.025882302442795258
+          ],
+          "p95InferenceOnlyMs": 0.14049699999999632
+        }
+      }
+    },
+    "selectedRegret95CiExcludesZeroTowardImprovement": false,
+    "selectedBeatsProductionByMeanRegret": false,
+    "wallMs": 608.4235679999999,
+    "parentPeakRssBytes": 104460288,
+    "node": "v22.23.4",
+    "caveats": [
+      "Exact Q comes from Oracle2 Float64 finite-horizon solver, not formal 28-turn global proof",
+      "Same-seed roots within a game correlated; 95% CIs bootstrap independent seed/game clusters",
+      "Synthetic dice rolls are possible but selected adversarially, so overall mean is across a designed mixture, not population distribution",
+      "The regression model and shrinkage were chosen on separate validation games; this test is frozen",
+      "Direct Q decision regret is not achieved 28-turn final BP and cannot establish a better gameplay policy",
+      "Inference-only p95 excludes BPIV Q enumeration and feature extraction; total decision runtime separately required before deployment"
+    ]
+  },
+  "prospectiveFinalBigPointsSmoke": {
+    "status": "EXPLORATORY_32_GAME_FINAL_BP_SMOKE_NOT_DEPLOYMENT_GATE",
+    "commonRandomNumbers": "counter-based seed+turn+reroll_index, independent uniform dice per roll",
+    "n": 32,
+    "seeds": [
+      940000000,
+      940000031
+    ],
+    "student": {
+      "name": "linear_residual",
+      "alpha": 0.5
+    },
+    "productionMeanBP": 8.0625,
+    "studentMeanBP": 8.1875,
+    "meanPairedStudentMinusProductionBP": 0.125,
+    "normalApproxCi95": [
+      -0.0668059335084091,
+      0.31680593350840913
+    ],
+    "wholeGameBootstrapCi95": [
+      0,
+      0.34375
+    ],
+    "wins": 2,
+    "ties": 30,
+    "losses": 0,
+    "studentDecisions": 262,
+    "meanProductionMs": 4537.445778718748,
+    "meanStudentMs": 4501.87241703125,
+    "studentInferredDecisionP95Ms": 147.4867979999981,
+    "wallMs": 289269.337336,
+    "parentPeakRssBytes": 132325376,
+    "node": "v22.23.4",
+    "limitations": [
+      "Only 32 entire games; intervals are exploratory, not evidence of a material improvement",
+      "Student changes only last 3 turns, not globally optimally from first 28 rounds",
+      "Frozen production Oracle used in all earlier turns; all wins/losses include actual final nonlinear BP",
+      "Common-random-number stream uses fixed seed+turn+roll, not a stateful RNG that diverges when holds differ",
+      "Model selected on separate validation exact-Q references and frozen before these 32 fresh game seeds",
+      "No deployment or main branch updates"
+    ]
+  },
+  "improvementProved": false,
+  "globalOptimumProved": false,
+  "productionChanged": false,
+  "notes": [
+    "A linear residual model was chosen over the neural student by validation exact Q regret, but the frozen test did not confirm improvement.",
+    "The separate 32-game final-BP smoke has nonnegative observed delta but small sample and normal CI crossing zero; no effectiveness claim.",
+    "The locked test is a designed mixture including adversarial but possible dice, so aggregate Q regret is not a population-weighted prevalence estimate.",
+    "Native Oracle2 EXACT_FLOAT64 refers to full Bellman calculation for states with <=3 remaining turns, not rational certification of 28 turns."
+  ]
+}
