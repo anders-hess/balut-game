@@ -1,0 +1,39 @@
+name: Oracle 3.0 fresh exact Q scratch audit
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase4-fresh-q-*'
+    paths:
+      - 'research/oracle-3.0/oracle2/q-fresh.mjs'
+      - '.github/workflows/oracle3-fresh-q.yml'
+  workflow_dispatch:
+jobs:
+  fresh-exact-q:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile pinned Oracle 2.0 native exact solver
+        run: |
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-state.cpp -o research/oracle-3.0/oracle2/oracle2-state
+      - name: Regression and parity tests
+        run: |
+          node research/oracle-3.0/oracle2/test.mjs
+          node research/oracle-3.0/oracle2/test-exact-learning.mjs
+      - name: New 72-game exact Q corpus including reachable scratch trajectories
+        run: node research/oracle-3.0/oracle2/q-fresh.mjs 72 920200000 oracle3-q-fresh
+      - name: Archive independent reference data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-fresh-q-scratch-reference
+          path: |
+            oracle3-q-fresh.json
+            oracle3-q-fresh.summary.json
+          if-no-files-found: ignore
