@@ -18,7 +18,9 @@ jobs:
       - name: Phase 1 simulator tests
         run: node research/oracle-3.0/phase1/test.mjs
       - name: Production scoring parity and small baseline
-        run: node research/oracle-3.0/phase1/production-baseline.mjs 3 20261104 | tee oracle3-phase1-baseline.json
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/phase1/production-baseline.mjs 3 20261104 | tee oracle3-phase1-baseline.json
       - name: Archive baseline
         if: always()
         uses: actions/upload-artifact@v4
