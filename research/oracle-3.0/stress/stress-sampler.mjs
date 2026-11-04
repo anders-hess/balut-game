@@ -18,7 +18,7 @@ function shuffle(items,rand){
  }return a;
 }
 export function makeStressGame(seed){
- const rand=rng(seed),card0=initialScorecard();
+ const rand=rng(seed),card0=initialScorecard(),scenario=seed%4;
  let card=card0;
  // Every assignment is legal and physically achievable in a single
  // 5-die roll. Synthetic roll histories are not frequency weighted.
@@ -28,7 +28,6 @@ export function makeStressGame(seed){
   const before=card,remaining=28-turn;
   const {c,slot}=shuffled[turn];
   const pattern=diceByCategory[c];
-  const scenario=seed%4;
   // Scenario 0: near all high thresholds. Scenario 1: exactly two
   // strong upper-category scores. Scenario 2: mixed weak/strong with
   // strikes. Scenario 3: high Small Points + combination-heavy.
