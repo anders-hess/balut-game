@@ -74,3 +74,17 @@ jobs:
             oracle3-neural.weights.json
             oracle3-neural-output.json
           if-no-files-found: ignore
+
+      - name: Paired game-level value gate vs turn-conditioned baseline
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/phase2/evaluate-paired.mjs oracle3-trajectories oracle3-neural | tee oracle3-paired-output.json
+      - name: Archive paired value gate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-paired-value-gate
+          path: |
+            oracle3-neural.paired.json
+            oracle3-paired-output.json
+          if-no-files-found: ignore
