@@ -1,0 +1,36 @@
+{
+  "runId": 41808190178,
+  "commit": "e97aecf9372a19b47716e77be76e45f0479a8575",
+  "node": "v22.23.4",
+  "audit": {
+    "checks": 1878,
+    "uniqueDiceStates": 252,
+    "oracleGameDecisions": 80
+  },
+  "baseline": {
+    "policy": "production_Oracle_1.0_BPIV",
+    "n": 3,
+    "seed": 20261104,
+    "meanFinalBigPoints": 7.666666666666667,
+    "sd": 1.5275252316519465,
+    "ci95NormalApprox": [
+      5.938109143437801,
+      9.395224189895533
+    ],
+    "bonusFrequency": {
+      "0": 1,
+      "1": 1,
+      "-1": 1
+    },
+    "decisions": 229,
+    "wallMs": 14760.023791,
+    "peakRssBytes": 134328320
+  },
+  "limitations": [
+    "3 games only: smoke test, not statistical baseline",
+    "Normal CI unreliable at n=3",
+    "No neural model, no AI improvement",
+    "RSS is process RSS at measurement, not independently verified peak",
+    "~4.92 seconds per game; 100k games prohibitively slow without acceleration"
+  ]
+}
