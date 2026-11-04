@@ -1,0 +1,95 @@
+name: Oracle 3.0 mathematical threshold coverage and Bellman supervision
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase5-coverage-*'
+    paths:
+      - 'research/oracle-3.0/pure/coverage-*.mjs'
+      - '.github/workflows/oracle3-math-coverage.yml'
+  workflow_dispatch:
+concurrency:
+  group: oracle3-math-coverage-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  coverage-prerequisites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile unchanged Oracle 2.0 at-roll and pre-roll finite-horizon mathematics
+        run: |
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-state.cpp -o research/oracle-3.0/oracle2/oracle2-state
+      - name: Enforce zero production Oracle advisor dependencies
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/guard.mjs | tee oracle3-coverage-guard.log
+      - name: Replay positive-probability mathematically legal 28-turn witnesses
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/coverage-test.mjs | tee oracle3-coverage-unit.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: oracle3-coverage-witness-tests
+          path: |
+            oracle3-coverage-guard.log
+            oracle3-coverage-unit.log
+          if-no-files-found: ignore
+  exact-covered-supervision:
+    needs: coverage-prerequisites
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile unchanged Oracle 2.0 math teacher
+        run: |
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-state.cpp -o research/oracle-3.0/oracle2/oracle2-state
+      - name: Check imported mathematical source isolation again
+        run: node research/oracle-3.0/pure/guard.mjs
+      - name: Collect and score 120 independently reachable threshold/bonus/scratch games with exact Oracle2
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/coverage-collect.mjs 120 960200000 oracle3-math-coverage | tee oracle3-coverage-collection.log
+      - name: Independent 3360-score witness/Q-action/whole-seed-partition audit
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/coverage-audit.mjs oracle3-math-coverage | tee oracle3-coverage-audit.log
+      - name: Train stage / linear / neural from independent mathematical V-star
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/train-supervised.mjs oracle3-math-coverage oracle3-math-coverage | tee oracle3-coverage-training.log
+      - name: Freeze on validation Q and test against unseen Oracle 2.0 exact actions
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/coverage-evaluate.mjs oracle3-math-coverage | tee oracle3-coverage-heldout.log
+      - name: Verify native optimal and learned inference, never extrapolate beyond supported endgame
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/test-policy.mjs oracle3-math-coverage | tee oracle3-coverage-policy.log
+      - name: Archive full mathematically reachable evidence and model results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-reachable-threshold-math-ai
+          path: |
+            oracle3-coverage-*.log
+            oracle3-math-coverage.json
+            oracle3-math-coverage.collection.json
+            oracle3-math-coverage.weights.json
+            oracle3-math-coverage.train.json
+            oracle3-math-coverage.frozen-selection.json
+            oracle3-math-coverage.pure-test.json
+            oracle3-math-coverage.pure-summary.json
+          if-no-files-found: ignore

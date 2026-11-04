@@ -1,0 +1,52 @@
+{
+  "iteration": 16,
+  "parent": "research/oracle-3.0-phase5-pure-math-bellman-ai-2026-11-04",
+  "date": "2026-11-04",
+  "seedBase": 960200000,
+  "nGames": 120,
+  "distribution": "strictly reachable designed rare-score states with positive-probability 28-turn witnesses; NOT normal-frequency sample",
+  "kinds": [
+    "threshold",
+    "bonus",
+    "strike"
+  ],
+  "nEach": 40,
+  "gameSplits": {
+    "train": [
+      960200000,
+      960200071
+    ],
+    "validation": [
+      960200072,
+      960200095
+    ],
+    "lockedTest": [
+      960200096,
+      960200119
+    ]
+  },
+  "presentRollExactQRoots": 480,
+  "uniqueValueBoundaryRoots": 360,
+  "Oracle2PinnedSourceBlob": "4ce623ed663edffc4b1c9291f975aba778622227",
+  "nativeCapStates": 500000,
+  "nativeCapTimeoutMs": 20000,
+  "noProductionOracleInTrain": true,
+  "noLegacyAdvisingInPolicy": true,
+  "modelCandidates": [
+    "myopic_own_math",
+    "stage_exactV",
+    "linear_exactV",
+    "neural_exactV"
+  ],
+  "modelSelectedBy": "validation exact Q regret only",
+  "lockedEvaluation": [
+    "24 game-cluster Q regret bootstrap CI",
+    "independent exact optimal-action hit rate",
+    "V* holdout RMSE",
+    "threshold and scratch subgroup",
+    "latency/RSS"
+  ],
+  "noFullGameFinalBPClaim": true,
+  "formalGlobalOptimalityUnproven": true,
+  "executionStatus": "PENDING_CI"
+}
