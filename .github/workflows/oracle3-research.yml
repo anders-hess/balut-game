@@ -1,0 +1,28 @@
+name: Oracle 3.0 research parity and baseline
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-*'
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Phase 1 simulator tests
+        run: node research/oracle-3.0/phase1/test.mjs
+      - name: Production scoring parity and small baseline
+        run: node research/oracle-3.0/phase1/production-baseline.mjs 3 20261104 | tee oracle3-phase1-baseline.json
+      - name: Archive baseline
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-phase1-baseline
+          path: oracle3-phase1-baseline.json
+          if-no-files-found: ignore
