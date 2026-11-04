@@ -40,3 +40,20 @@ jobs:
           name: oracle3-cache-benchmark
           path: oracle3-cache-benchmark.json
           if-no-files-found: ignore
+
+      - name: Phase 2 deterministic trajectory tests
+        run: node research/oracle-3.0/phase2/test.mjs
+      - name: Collect phase 2 Oracle trajectories
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/phase2/collect.mjs 30 100000000 oracle3-trajectories | tee oracle3-collection-output.json
+      - name: Archive phase 2 training data and metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-phase2-trajectories
+          path: |
+            oracle3-trajectories.jsonl
+            oracle3-trajectories.metrics.json
+            oracle3-collection-output.json
+          if-no-files-found: ignore
