@@ -1,0 +1,57 @@
+name: Oracle 3.0 exact rational two-turn AI multicard fidelity
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase6-rational-multicard-fidelity-*'
+    paths:
+      - 'research/oracle-3.0/pure/rational-multicard-fidelity.mjs'
+      - '.github/workflows/oracle3-math-multicard-fidelity.yml'
+  workflow_dispatch:
+concurrency:
+  group: oracle3-rational-multicard-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  frozen-ai-versus-independent-proofs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile immutable Oracle2 Float64 numerical differential checker
+        run: |
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+      - name: Enforce math-only Oracle3 import boundary
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/guard.mjs | tee oracle3-multicard-guard.log
+      - name: Retrieve frozen independent mathematical neural weights from iteration16
+        uses: actions/download-artifact@v4
+        with:
+          name: oracle3-reachable-threshold-math-ai
+          run-id: 41897820339
+          repository: anders-hess/balut-game
+          github-token: ${{ github.token }}
+          path: math-student
+      - name: Verify frozen source model
+        run: |
+          test -s math-student/oracle3-math-coverage.weights.json
+          test -s math-student/oracle3-math-coverage.frozen-selection.json
+      - name: Generate 48 legal different mathematical scorecards and certify all two-turn actions and model choices
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/rational-multicard-fidelity.mjs | tee oracle3-multicard-proof.log
+      - name: Archive complete independent mathematical action certificates and untouched frozen-model evaluation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-48-math-cards-exact-rational-neural-fidelity
+          path: |
+            oracle3-multicard-*.log
+            oracle3-rational-multicard-fidelity.json
+            oracle3-rational-multicard-summary.json
+          if-no-files-found: ignore
