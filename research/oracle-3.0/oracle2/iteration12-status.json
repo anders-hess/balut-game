@@ -1,0 +1,36 @@
+{
+  "iteration": 12,
+  "date": "2026-11-04",
+  "researchBranch": "research/oracle-3.0-phase4-oracle2-exact-supervision-2026-11-04",
+  "upstreamOracle2BlobSha": "4ce623ed663edffc4b1c9291f975aba778622227",
+  "verifiedPriorRun": {
+    "url": "https://github.com/anders-hess/balut-game/actions/runs/41867806939",
+    "nGames": 12,
+    "productionMeanBP": 8.083333333333334,
+    "neuralMeanBP": 0.9166666666666666,
+    "stageMeanBP": 0.5833333333333334,
+    "neuralMinusProductionMeanBP": -7.166666666666667,
+    "normalCi95": [
+      -8.920297244074636,
+      -5.413036089258699
+    ]
+  },
+  "newIteration": {
+    "testStatus": "PENDING_GITHUB_ACTIONS",
+    "attemptedExactRootsPlanned": 9,
+    "fullGameComparisonPlanned": 4,
+    "verifiedExactQRoots": null,
+    "verifiedHybridMeanDeltaBP": null,
+    "performanceImprovementClaim": false,
+    "generatedArtifactNames": [
+      "oracle3-phase4-exact-reference.json",
+      "oracle3-phase4-exact-summary.json",
+      "oracle3-phase4-hybrid.json"
+    ]
+  },
+  "limitations": [
+    "Prior 12 games are diagnostic, not a certification of neural policy quality",
+    "No new CI run results are recorded as successful until GitHub Actions verifies them",
+    "Exact v46 solver is Float64 with explicit caps; cannot claim all-28-turn global optimum"
+  ]
+}
