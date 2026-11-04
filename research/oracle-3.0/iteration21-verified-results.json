@@ -1,0 +1,85 @@
+{
+  "iteration": 21,
+  "status": "VERIFIED_SUCCESS_BUT_NO_AI_SUPERIORITY",
+  "runUrl": "https://github.com/anders-hess/balut-game/actions/runs/41915058376",
+  "sourceSha": "fd7127b0132dce93b3b8d8c258b25b1a4b59c3e8",
+  "mathTeacher": "https://github.com/anders-hess/balut-game/actions/runs/41914403880",
+  "trainedIndependentModel": "https://github.com/anders-hess/balut-game/actions/runs/41897820339",
+  "result": {
+    "status": "FROZEN_ORACLE3_PURE_MATH_AI_VS_INDEPENDENT_EXACT_RATIONAL_CERTIFICATES",
+    "trainedModelProvenance": "Research-only Oracle3 iteration16, numeric Bellman V* labels generated from independent legal rare bonus/threshold/scratch games",
+    "sourceTrainingRun": "https://github.com/anders-hess/balut-game/actions/runs/41897820339",
+    "certifiedTeacherProvenance": "Independent mathematical BigInt 2-turn full Bellman all-actions proof; Native Oracle2 crosscheck; independently reimplemented in Python",
+    "sourceRationalRun": "https://github.com/anders-hess/balut-game/actions/runs/41914403880",
+    "modelFrozenBeforeNewProof": true,
+    "modelNotUpdatedByTest": true,
+    "certifiedRoots": 8,
+    "nIndependentScorecards": 1,
+    "candidateAbstraction": "same mathematically exact within-turn multinomial expectimax, with different independently trained mathematical future continuation estimates",
+    "proofScope": "exact integer-rational expected final Big Points for all legal hold and score actions with two remaining turns",
+    "metrics": {
+      "myopic": {
+        "nCertifiedPositions": 8,
+        "mathematicallyOptimalSelections": 8,
+        "meanExactRationalRegretBP": 0,
+        "maximumExactRationalRegretBP": 0,
+        "meanInferenceMs": 58.32204950000002,
+        "p95InferenceMs": 142.19745699999999,
+        "scoreSelections": 6,
+        "holdSelections": 2
+      },
+      "stage": {
+        "nCertifiedPositions": 8,
+        "mathematicallyOptimalSelections": 8,
+        "meanExactRationalRegretBP": 0,
+        "maximumExactRationalRegretBP": 0,
+        "meanInferenceMs": 62.07749162499999,
+        "p95InferenceMs": 160.61538700000006,
+        "scoreSelections": 6,
+        "holdSelections": 2
+      },
+      "linear": {
+        "nCertifiedPositions": 8,
+        "mathematicallyOptimalSelections": 8,
+        "meanExactRationalRegretBP": 0,
+        "maximumExactRationalRegretBP": 0,
+        "meanInferenceMs": 60.651496374999965,
+        "p95InferenceMs": 151.5818499999998,
+        "scoreSelections": 6,
+        "holdSelections": 2
+      },
+      "neural": {
+        "nCertifiedPositions": 8,
+        "mathematicallyOptimalSelections": 8,
+        "meanExactRationalRegretBP": 0,
+        "maximumExactRationalRegretBP": 0,
+        "meanInferenceMs": 62.93409850000002,
+        "p95InferenceMs": 155.10537,
+        "scoreSelections": 6,
+        "holdSelections": 2
+      }
+    },
+    "frozenSelectedPolicy": "neural",
+    "selectedMathModel": {
+      "nCertifiedPositions": 8,
+      "mathematicallyOptimalSelections": 8,
+      "meanExactRationalRegretBP": 0,
+      "maximumExactRationalRegretBP": 0,
+      "meanInferenceMs": 62.93409850000002,
+      "p95InferenceMs": 155.10537,
+      "scoreSelections": 6,
+      "holdSelections": 2
+    },
+    "wallMs": 1953.8608120000001,
+    "parentRssBytes": 75632640,
+    "node": "v22.23.4",
+    "caveats": [
+      "Eight roll states from ONE deliberately constructed positive-probability game scorecard; no population confidence interval or general gameplay claim",
+      "The frozen model was trained only on independent mathematical Oracle2 V* labels, never any legacy advisor behaviour",
+      "A learned value approximation can choose an action not proven optimal even though exact within-turn probability is complete",
+      "The finite two-turn exact-rational teacher proof does not prove global 28-turn optimality or final game score improvement",
+      "No deployment or live/main branch changes"
+    ]
+  },
+  "caveat": "All four math-only policies correctly selected exact rational 2turn decisions on eight correlated roots from ONE scorecard; therefore no neural superiority evidence."
+}
