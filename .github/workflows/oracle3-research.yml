@@ -118,3 +118,24 @@ jobs:
             oracle3-phase3-diagnostic.json
             oracle3-phase3-diagnostic-output.json
           if-no-files-found: ignore
+
+      - name: Build pinned Oracle 2.0 v46 exact Bellman (research-only)
+        run: |
+          g++ -std=c++20 -O2 -DNDEBUG research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+          g++ -std=c++20 -O2 -DNDEBUG research/oracle-3.0/oracle2/oracle2-state.cpp -o research/oracle-3.0/oracle2/oracle2-state
+      - name: Differential Oracle 2.0 exact parity and resource-limit tests
+        run: node research/oracle-3.0/oracle2/test.mjs
+      - name: Generate exact Bellman supervision from real Oracle 1.0 late-game states
+        run: node research/oracle-3.0/oracle2/evaluate.mjs
+      - name: Exploratory production vs Oracle 2.0 hybrid game comparison
+        run: node research/oracle-3.0/oracle2/benchmark.mjs 4
+      - name: Archive exact supervision and hybrid benchmark
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-oracle2-exact-supervision
+          path: |
+            oracle3-phase4-exact-reference.json
+            oracle3-phase4-exact-summary.json
+            oracle3-phase4-hybrid.json
+          if-no-files-found: ignore
