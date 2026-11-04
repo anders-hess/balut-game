@@ -1,0 +1,47 @@
+name: Oracle 3.0 / Oracle 2.0 exact integration gate
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase4-oracle2-*'
+  workflow_dispatch:
+jobs:
+  exact-bellman-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build pinned Oracle 2.0 Bellman for present-roll and state-boundary Q
+        run: |
+          g++ --version | head -1
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-state.cpp -o research/oracle-3.0/oracle2/oracle2-state
+      - name: Native-vs-JS scoring, Bellman action and resource-cap regression
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/test.mjs | tee oracle3-phase4-parity.log
+      - name: Collect Oracle 2.0 exact state and Q supervision on fresh production-Oracle endgame states
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/evaluate.mjs | tee oracle3-phase4-evaluate.log
+      - name: Four-game research hybrid-versus-production score smoke
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/benchmark.mjs 4 | tee oracle3-phase4-hybrid.log
+      - name: Upload complete exact-reference / hybrid results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-phase4-oracle2-exact-results
+          path: |
+            oracle3-phase4-parity.log
+            oracle3-phase4-evaluate.log
+            oracle3-phase4-hybrid.log
+            oracle3-phase4-exact-reference.json
+            oracle3-phase4-exact-summary.json
+            oracle3-phase4-hybrid.json
+          if-no-files-found: ignore
