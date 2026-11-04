@@ -59,6 +59,8 @@ jobs:
         run: |
           set -o pipefail
           node research/oracle-3.0/oracle2/collect-supervised.mjs 60 910100000 oracle3-phase4-supervised | tee oracle3-phase4-supervised-collection.log
+      - name: Independent dataset integrity and full legal-action Q audit
+        run: node research/oracle-3.0/oracle2/audit-supervised-dataset.mjs oracle3-phase4-supervised
       - name: Train stage, linear and neural value models using only train plus validation
         run: |
           set -o pipefail
