@@ -3,7 +3,14 @@ on:
   push:
     branches:
       - 'research/oracle-3.0-phase4-oracle2-*'
+    paths:
+      - 'research/oracle-3.0/oracle2/**/*.mjs'
+      - 'research/oracle-3.0/oracle2/**/*.cpp'
+      - '.github/workflows/oracle3-oracle2-integration.yml'
   workflow_dispatch:
+concurrency:
+  group: oracle3-phase4-oracle2-exact
+  cancel-in-progress: true
 jobs:
   exact-bellman-integration:
     runs-on: ubuntu-latest
