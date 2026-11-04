@@ -1,0 +1,25 @@
+{
+  "summary": {
+    "passed": 27,
+    "root": {
+      "scores": [
+        0,
+        0
+      ],
+      "remaining": [
+        0,
+        1
+      ],
+      "exact": "31/3",
+      "offline_upper": "31/3",
+      "gap": "0"
+    },
+    "elapsed_seconds": 0.001109,
+    "peak_rss_kb": 95504,
+    "early_balut_certificates": 0,
+    "early_balut_pruned": 0,
+    "original_Q_tests": 0,
+    "opening_actions_tested": 0,
+    "scope": "restricted toy only"
+  }
+}
