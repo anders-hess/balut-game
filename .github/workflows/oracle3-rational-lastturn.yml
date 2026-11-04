@@ -1,0 +1,45 @@
+name: Oracle 3.0 exact-rational last-turn mathematical certificate
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase6-exact-rational-*'
+    paths:
+      - 'research/oracle-3.0/pure/rational*.mjs'
+      - '.github/workflows/oracle3-rational-lastturn.yml'
+  workflow_dispatch:
+concurrency:
+  group: oracle3-rational-proof-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  exact-rational-one-turn-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build immutable Oracle2 Float64 numerical differential reference (not a rational proof source)
+        run: |
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+      - name: Enforce independent pure math import boundary
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/guard.mjs | tee oracle3-rational-import-guard.log
+      - name: BigInt exact rational proof of all legal last-turn actions across 36 roots
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/rational-test.mjs | tee oracle3-rational-proof.log
+      - name: Archive exact per-action rational numerators and mathematical certificates
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-rational-lastturn-certificates
+          path: |
+            oracle3-rational-import-guard.log
+            oracle3-rational-proof.log
+            oracle3-rational-last-turn-certificates.json
+            oracle3-rational-last-turn-summary.json
+          if-no-files-found: ignore

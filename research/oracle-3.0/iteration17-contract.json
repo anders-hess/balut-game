@@ -1,0 +1,28 @@
+{
+  "iteration": 17,
+  "date": "2026-11-04",
+  "branch": "research/oracle-3.0-phase6-exact-rational-endgame-2026-11-04",
+  "parent": "research/oracle-3.0-phase5-coverage-directed-2026-11-04",
+  "proofDomain": "One last unfilled Balut scorecard slot, 0/1/2 rerolls, all legal holds and scoring",
+  "maths": "BigInt exact rational Bellman numerator per common denominator 6^(5*r); exact multinomial chance integer coefficients",
+  "stateSeeds": [
+    970300000,
+    970300011
+  ],
+  "nIndependentLastTurnCards": 12,
+  "nCertifiedRootPosition": 36,
+  "expectedOutcomesCounts": [
+    1,
+    6,
+    21,
+    56,
+    126,
+    252
+  ],
+  "oracle2NativeFloat64IndependentCrossCheck": true,
+  "oracle2SourceBlob": "4ce623ed663edffc4b1c9291f975aba778622227",
+  "forbiddenProductionAdvisor": true,
+  "full28TurnGlobalOptimalityProved": false,
+  "certificationCondition": "Correct mathematics of Balut scoring, finite legal actions and exact BigInt computation; source correctness checked by tests, not formally verified",
+  "preResultsStatus": "NOT_EXECUTED_YET"
+}
