@@ -1,0 +1,44 @@
+name: Oracle 3.0 exact rational full two-turn reroll certificates
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase6-rational-rerolls-two-turn-*'
+    paths:
+      - 'research/oracle-3.0/pure/rational-two-rerolls*.mjs'
+      - '.github/workflows/oracle3-rational-two-rerolls.yml'
+  workflow_dispatch:
+concurrency:
+  group: oracle3-rational-two-rerolls-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  certify-two-turn-all-actions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build immutable native Oracle 2.0 finite-horizon numeric differential reference
+        run: |
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+      - name: Enforce pure Oracle 3.0 dependency isolation
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/guard.mjs | tee oracle3-two-rerolls-guard.log
+      - name: Exact BigInt mathematical two-turn all-action Bellman and native-Q differential tests
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/rational-two-rerolls-test.mjs | tee oracle3-two-rerolls-proof.log
+      - name: Archive complete exact Q numerator/denominator and replayable legal 26-turn witness
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-rational-two-turn-all-holds-certificate
+          path: |
+            oracle3-two-rerolls-*.log
+            oracle3-rational-rerolls-two-turn.json
+            oracle3-rational-rerolls-two-turn-summary.json
+          if-no-files-found: ignore
