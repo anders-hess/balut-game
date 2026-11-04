@@ -1,0 +1,17 @@
+{
+  "iteration": 22,
+  "status": "INDEPENDENT_PYTHON_INTEGER_BELLMAN_RECOMPUTATION_PASS",
+  "evidenceSource": "https://github.com/anders-hess/balut-game/actions/runs/41915546340/artifacts/13363463814",
+  "method": "Separate Python implementation of independent Balut category scoring, column placement, Big Points bonus, exact multinomial dice counts, exact BigInt/Python integer last-turn Bellman and exact two-turn all-action Q. Fully recomputed original frozen test states without importing JS/native mathematical oracle or production advisor.",
+  "independentScorecards": 48,
+  "exactRootPositions": 96,
+  "allLegalExactRationalQNumeratorsAndDenominatorsMatched": 2168,
+  "allBestActionsIdentical": true,
+  "independentBellmanLastTurnMemoStates": 326592,
+  "independentExactContinuationStates": 432,
+  "independentCurrentRollMemoStates": 24192,
+  "wallSeconds": 136.34787333100007,
+  "sourceCodeExternalLocalAudit": "oracle3_audit_multicard22.py and oracle3_verify_two_turn.py (independent Python verification against actual GitHub zip artifact)",
+  "caveat": "Python is independent implementation with exact integers but is not formal theorem-prover verification of all source/game-rule semantics. Designed scorecards are not natural-frequency weighted; no 28-turn theorem.",
+  "productionOracleUsed": false
+}
