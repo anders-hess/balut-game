@@ -88,3 +88,19 @@ jobs:
             oracle3-neural.paired.json
             oracle3-paired-output.json
           if-no-files-found: ignore
+
+      - name: Phase 3 exact-within-turn expectimax unit tests
+        run: node research/oracle-3.0/phase3/test.mjs
+      - name: Phase 3 neural expectimax unseen-seed smoke
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/phase3/smoke.mjs oracle3-neural.weights.json | tee oracle3-phase3-output.json
+      - name: Archive phase 3 smoke metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-phase3-smoke
+          path: |
+            oracle3-phase3-smoke.json
+            oracle3-phase3-output.json
+          if-no-files-found: ignore
