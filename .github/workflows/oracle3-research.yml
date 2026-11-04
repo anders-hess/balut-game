@@ -59,3 +59,18 @@ jobs:
             oracle3-trajectories.metrics.json
             oracle3-collection-output.json
           if-no-files-found: ignore
+
+      - name: Train and evaluate neural value model on whole-game holdout
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/phase2/train.mjs oracle3-trajectories oracle3-neural | tee oracle3-neural-output.json
+      - name: Archive neural holdout metrics and weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-neural-holdout
+          path: |
+            oracle3-neural.metrics.json
+            oracle3-neural.weights.json
+            oracle3-neural-output.json
+          if-no-files-found: ignore
