@@ -1,0 +1,106 @@
+{
+  "iteration": 18,
+  "status": "VERIFIED_GITHUB_ACTIONS_SUCCESS",
+  "sourceCommit": "2954212e7497d5d2adae93d312ef08b473840bc6",
+  "branch": "research/oracle-3.0-phase6-rational-two-turn-2026-11-04",
+  "runUrl": "https://github.com/anders-hess/balut-game/actions/runs/41900895628",
+  "artifactUrl": "https://github.com/anders-hess/balut-game/actions/runs/41900895628/artifacts/13358201297",
+  "architectureGuard": {
+    "status": "PASS",
+    "checkedModules": 22,
+    "activePureFiles": 17,
+    "permittedMathDependencies": [
+      "research/oracle-3.0/phase1/simulator.mjs",
+      "research/oracle-3.0/oracle2/adapter.mjs",
+      "research/oracle-3.0/oracle2/features.mjs",
+      "research/oracle-3.0/oracle2/model.mjs",
+      "research/oracle-3.0/oracle2/train-supervised.mjs"
+    ],
+    "productionOracleImports": 0
+  },
+  "exactRationalTwoTurn": {
+    "status": "EXACT_RATIONAL_CERTIFICATE_CURRENT_CATEGORY_CHOICE_WITH_TWO_TURNS_LEFT",
+    "nCertifiedTwoTurnRoots": 3,
+    "selectedReachableSeeds": [
+      980400000,
+      980400001,
+      980400002
+    ],
+    "currentRerollsRemaining": 0,
+    "legalPresentScoringActions": 6,
+    "totalExactLastTurnSubcertificates": 1512,
+    "exactFirstRollOutcomeMultisetsPerCategory": 252,
+    "allFloat64NativeOracle2QParity": true,
+    "uniqueOptimalChoices": 3,
+    "actionDifferences": [
+      {
+        "seed": 980400000,
+        "kind": "threshold",
+        "choiceCategories": [
+          "fives",
+          "choice"
+        ],
+        "exactActionKeys": [
+          "score:1:15"
+        ],
+        "expectedFinalBP": 20.025989609521496,
+        "actionMarginBP": 0.025989609521495538
+      },
+      {
+        "seed": 980400001,
+        "kind": "bonus",
+        "choiceCategories": [
+          "choice",
+          "balut"
+        ],
+        "exactActionKeys": [
+          "score:5:24"
+        ],
+        "expectedFinalBP": 22.101444132017555,
+        "actionMarginBP": 0.5587294918422394
+      },
+      {
+        "seed": 980400002,
+        "kind": "strike",
+        "choiceCategories": [
+          "sixes",
+          "balut"
+        ],
+        "exactActionKeys": [
+          "score:6:0"
+        ],
+        "expectedFinalBP": 7.709699995955662,
+        "actionMarginBP": 0.5920967263194274
+      }
+    ],
+    "wallMs": 241811.214626,
+    "averageCertificateMs": 80595.51782533333,
+    "parentPeakRssBytes": 136372224,
+    "node": "v22.23.4",
+    "limitations": [
+      "Mathematical proof covers current score/category choice with NO rerolls and exactly two turns left, not all 2-turn reroll actions",
+      "All future 1-turn actions are exact-rational optimal including all chance outcomes; current BigInt action comparisons exact",
+      "Created states are legally reachable but deliberately rare and not frequency-weighted",
+      "No global 28-turn proof or full-game student performance claim; no legacy production Oracle input"
+    ]
+  },
+  "independentAudit": {
+    "status": "PASS",
+    "method": "Python independently checked 3 exact rational roots and all 1512 stored next-turn multinomial weighted contributions, checked every per-action denominator 6^15, 252 first-roll weights sum to 6^5 per option, exact contributions sum to the action numerator, and optimal action argmax uses exact integer numerators",
+    "auditedRootCount": 3,
+    "auditedCurrentCategoryActions": 6,
+    "auditedFutureWeightedContributions": 1512,
+    "exactWeightedChanceArithmeticConsistent": true,
+    "caveat": "Independent audit checked full nested integer contribution traces, but did not recompute the 1512 entire last-turn DP subtrees; previous iteration 17 independently recomputed 36 last-turn trees in Python."
+  },
+  "mathematicalProofScope": "With precisely two category entries remaining and zero current rerolls, mathematically optimal current scoring-category choice under tested Balut game scoring and fair dice",
+  "mathematicalProofScopeExcluded": [
+    "Present turn with rerolls remaining",
+    "Three or more turns left",
+    "The globally optimal first decision across 28 turns",
+    "Formally verified code implementation in proof assistant"
+  ],
+  "productionOracleDependencyCount": 0,
+  "final28TurnBigPointsImprovementClaim": false,
+  "mainModified": false
+}
