@@ -104,3 +104,17 @@ jobs:
             oracle3-phase3-smoke.json
             oracle3-phase3-output.json
           if-no-files-found: ignore
+
+      - name: Phase 3 three-policy prospective diagnostic
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/phase3/diagnose.mjs | tee oracle3-phase3-diagnostic-output.json
+      - name: Archive phase 3 prospective diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-phase3-diagnostic
+          path: |
+            oracle3-phase3-diagnostic.json
+            oracle3-phase3-diagnostic-output.json
+          if-no-files-found: ignore
