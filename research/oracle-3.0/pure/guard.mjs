@@ -15,6 +15,8 @@ const pureDir='research/oracle-3.0/pure';
 const entries=readdirSync(pureDir).filter(f=>f.endsWith('.mjs')&&f!=='guard.mjs')
  .map(f=>pureDir+'/'+f);
 entries.push(...safeMath);
+const stressDir='research/oracle-3.0/stress';
+entries.push(...readdirSync(stressDir).filter(f=>f.endsWith('.mjs')).map(f=>stressDir+'/'+f));
 const visited=new Set(),errors=[];
 const forbiddenNames=['cache'+'dPolicy','production'+'Policy','bp'+'iv','oracle1'+'Policy'];
 const importPattern=/(?:from\s*|import\s*\(\s*|require\s*\(\s*)['"]([^'"]+)['"]/g;
@@ -25,7 +27,7 @@ for(const entry of entries){
   if(visited.has(rel))continue;
   visited.add(rel);
   if(!rel.endsWith('.mjs')){errors.push('unapproved non-ESM dependency '+rel);continue;}
-  if(!(rel.startsWith(pureDir+'/')||safeMath.includes(rel))){
+  if(!(rel.startsWith(pureDir+'/')||rel.startsWith(stressDir+'/')||safeMath.includes(rel))){
    errors.push('unapproved dependency '+rel);continue;
   }
   let source;try{source=readFileSync(path.join(ROOT,rel),'utf8');}

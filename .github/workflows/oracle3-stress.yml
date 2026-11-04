@@ -1,0 +1,37 @@
+name: Oracle 3.0 threshold stress math only
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase6-threshold-stress-*'
+    paths:
+      - 'research/oracle-3.0/stress/**'
+      - '.github/workflows/oracle3-stress.yml'
+  workflow_dispatch:
+jobs:
+  exact-stress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile unchanged Oracle2 native teacher
+        run: g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+      - name: Guard active mathematical dependency graph
+        run: node research/oracle-3.0/pure/guard.mjs
+      - name: Generate 120 independent legal threshold stress games and all-action native Q labels
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/stress/evaluate.mjs | tee oracle3-stress.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: oracle3-stress-native-exact-results
+          path: |
+            oracle3-stress.log
+            oracle3-stress-summary.json
+            oracle3-stress-results.json
+          if-no-files-found: ignore
