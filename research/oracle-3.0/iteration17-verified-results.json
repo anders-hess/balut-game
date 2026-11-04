@@ -1,0 +1,72 @@
+{
+  "iteration": 17,
+  "status": "VERIFIED_GITHUB_ACTIONS_SUCCESS",
+  "branch": "research/oracle-3.0-phase6-exact-rational-endgame-2026-11-04",
+  "sourceCommit": "02042f87f6c291bf80bd5f795466f4b034c8bc7d",
+  "runUrl": "https://github.com/anders-hess/balut-game/actions/runs/41899717310",
+  "artifactUrl": "https://github.com/anders-hess/balut-game/actions/runs/41899717310/artifacts/13357637801",
+  "architectureGuard": {
+    "status": "PASS",
+    "checkedModules": 20,
+    "activePureFiles": 15,
+    "permittedMathDependencies": [
+      "research/oracle-3.0/phase1/simulator.mjs",
+      "research/oracle-3.0/oracle2/adapter.mjs",
+      "research/oracle-3.0/oracle2/features.mjs",
+      "research/oracle-3.0/oracle2/model.mjs",
+      "research/oracle-3.0/oracle2/train-supervised.mjs"
+    ],
+    "productionOracleImports": 0
+  },
+  "rationalCertificates": {
+    "status": "FORMALLY_EXACT_RATIONAL_ONE_TURN_ACTION_CERTIFICATES",
+    "seedBase": 970300000,
+    "nIndependentScorecards": 12,
+    "nTestPositions": 36,
+    "rerollBudgets": [
+      0,
+      1,
+      2
+    ],
+    "categories": [
+      "balut",
+      "choice",
+      "fours",
+      "fullHouse",
+      "sixes",
+      "straight"
+    ],
+    "allLegalActionsVerified": 460,
+    "allNativeFloatQParity": true,
+    "exactMultinomialCoefficientConservation": true,
+    "uniqueBestPositions": 22,
+    "tiedBestPositions": 14,
+    "totalMemoizedDiceStateOccurrences": 9072,
+    "avgCertificateMs": 57.52349636111111,
+    "p95CertificateMs": 182.67776700000002,
+    "maxCertificateMs": 187.632681,
+    "totalWallMs": 2231.685159,
+    "parentPeakRssBytes": 74170368,
+    "node": "v22.23.4",
+    "proofDomain": "All legal holds and scoring choices in the LAST one turn only, with 0/1/2 rerolls; exact integer BigInt numerators and denominator 6^(5*rerolls)",
+    "limitations": [
+      "No proof of optimal decisions with two or more turns remaining",
+      "Exact rational arithmetic validates mathematical Bellman action comparisons; correctness still depends on tested game scoring implementation and enumeration",
+      "The native Oracle2 reference is Float64 and is used only as differential corroboration, not as rational teacher in this certificate",
+      "Chosen dice and states intentionally cover special outcomes and are not population-frequency samples",
+      "No production Oracle, policy or fallback imports or data used"
+    ]
+  },
+  "independentSecondImplementation": {
+    "method": "Independent Python integer Bellman reimplementation from the archived exact rational certificates",
+    "lastTurnStatesIndependentlyRecomputed": 36,
+    "legalActionQNumeratorsRecomputed": 460,
+    "denominatorAndOptimalActionSetEquality": true,
+    "allExactIntegerNumeratorsMatch": true,
+    "observedRecalculationWallSeconds": 1.56
+  },
+  "mathematicallyProved": "Optimal decisions for last one unfilled category with 0/1/2 rerolls, under tested game rules and fair-dice model",
+  "notProved": "Two-or-more remaining turns, 28-turn global optimum, source-level code correctness in a formal proof assistant",
+  "productionOracleUsed": false,
+  "mainModified": false
+}
