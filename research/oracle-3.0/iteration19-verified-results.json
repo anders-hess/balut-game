@@ -1,0 +1,212 @@
+{
+  "iteration": 19,
+  "status": "VERIFIED_GITHUB_ACTIONS_SUCCESS_BUT_DEGENERATE_ALL_ACTIONS_TIED",
+  "runUrl": "https://github.com/anders-hess/balut-game/actions/runs/41912571398",
+  "artifactUrl": "https://github.com/anders-hess/balut-game/actions/runs/41912571398/artifacts/13363471809",
+  "sourceSha": "69e519ca8f1d23d1750728263ce05b4c637cb096",
+  "nativeOracle2SourceBlob": "4ce623ed663edffc4b1c9291f975aba778622227",
+  "results": {
+    "status": "CERTIFIED_EXACT_RATIONAL_TWO_TURN_ALL_CURRENT_HOLDS_AND_SCORING",
+    "mathematicalProofScope": "Two category slots remain, 0/1/2 current rerolls, full last turn optimal",
+    "legalWitnessScoredTurns": 26,
+    "sourceSeed": 990500000,
+    "availableCategories": [
+      "fours",
+      "straight"
+    ],
+    "exactRationalQRoots": 5,
+    "exactRationalLegalActionQ": 82,
+    "uniqueOptimalRoots": 0,
+    "ties": 5,
+    "independentNativeOracle2QParity": true,
+    "sharedDenominator": "6^(15+5*current rerolls)",
+    "afterScoreStatesCached": 9,
+    "exactLastTurnProofsReused": 2268,
+    "memoizedCurrentRollDiceStates": 504,
+    "resultChoices": [
+      {
+        "dice": [
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "rerolls": 0,
+        "bestActionKeys": [
+          "score:0:20",
+          "score:3:0"
+        ],
+        "optimalExpectedFinalBP": 16,
+        "exactGapNumerator": null,
+        "exactDenominator": "470184984576",
+        "actions": 2,
+        "caseWallMs": 80191.419347
+      },
+      {
+        "dice": [
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "rerolls": 1,
+        "bestActionKeys": [
+          "score:0:20",
+          "score:3:0",
+          "hold:000000",
+          "hold:000100",
+          "hold:000200",
+          "hold:000300",
+          "hold:000400"
+        ],
+        "optimalExpectedFinalBP": 16,
+        "exactGapNumerator": null,
+        "exactDenominator": "3656158440062976",
+        "actions": 7,
+        "caseWallMs": 279396.45964
+      },
+      {
+        "dice": [
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "rerolls": 2,
+        "bestActionKeys": [
+          "score:0:20",
+          "score:3:0",
+          "hold:000000",
+          "hold:000100",
+          "hold:000200",
+          "hold:000300",
+          "hold:000400"
+        ],
+        "optimalExpectedFinalBP": 16,
+        "exactGapNumerator": null,
+        "exactDenominator": "28430288029929701376",
+        "actions": 7,
+        "caseWallMs": 147.38040699996054
+      },
+      {
+        "dice": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "rerolls": 1,
+        "bestActionKeys": [
+          "score:0:4",
+          "score:3:15",
+          "hold:000000",
+          "hold:100000",
+          "hold:010000",
+          "hold:110000",
+          "hold:001000",
+          "hold:101000",
+          "hold:011000",
+          "hold:111000",
+          "hold:000100",
+          "hold:100100",
+          "hold:010100",
+          "hold:110100",
+          "hold:001100",
+          "hold:101100",
+          "hold:011100",
+          "hold:111100",
+          "hold:000010",
+          "hold:100010",
+          "hold:010010",
+          "hold:110010",
+          "hold:001010",
+          "hold:101010",
+          "hold:011010",
+          "hold:111010",
+          "hold:000110",
+          "hold:100110",
+          "hold:010110",
+          "hold:110110",
+          "hold:001110",
+          "hold:101110",
+          "hold:011110"
+        ],
+        "optimalExpectedFinalBP": 16,
+        "exactGapNumerator": null,
+        "exactDenominator": "3656158440062976",
+        "actions": 33,
+        "caseWallMs": 1.531633000005968
+      },
+      {
+        "dice": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "rerolls": 2,
+        "bestActionKeys": [
+          "score:0:4",
+          "score:3:15",
+          "hold:000000",
+          "hold:100000",
+          "hold:010000",
+          "hold:110000",
+          "hold:001000",
+          "hold:101000",
+          "hold:011000",
+          "hold:111000",
+          "hold:000100",
+          "hold:100100",
+          "hold:010100",
+          "hold:110100",
+          "hold:001100",
+          "hold:101100",
+          "hold:011100",
+          "hold:111100",
+          "hold:000010",
+          "hold:100010",
+          "hold:010010",
+          "hold:110010",
+          "hold:001010",
+          "hold:101010",
+          "hold:011010",
+          "hold:111010",
+          "hold:000110",
+          "hold:100110",
+          "hold:010110",
+          "hold:110110",
+          "hold:001110",
+          "hold:101110",
+          "hold:011110"
+        ],
+        "optimalExpectedFinalBP": 16,
+        "exactGapNumerator": null,
+        "exactDenominator": "28430288029929701376",
+        "actions": 33,
+        "caseWallMs": 1.520682000031229
+      }
+    ],
+    "wallMs": 359767.94603,
+    "parentPeakRssBytes": 128974848,
+    "node": "v22.23.4",
+    "limitations": [
+      "The proof is finite-horizon for two remaining score slots and up to 2 rerolls; not 3–28 remaining turns",
+      "Constructed, lawful witness has strictly positive but generally tiny probability in a natural game",
+      "All integer numerator Q comparisons exact, but the Balut scoring implementation is validated by tests not a formal proof assistant",
+      "Native Oracle2 float Q is a separate differential check, not the source of integer optimum",
+      "No copied advisor-policy dataset and no external decision fallback"
+    ]
+  },
+  "architectureGuardPassed": true,
+  "productionOracleDependencies": 0,
+  "rigorousConclusion": "BigInt two-turn Q recursion verified for five roots but constructed card had fixed final Big Points=16 across all actions, so does NOT distinguish optimal actions or establish a useful policy test.",
+  "next": "Replace repeated 252 last-turn recalculations with one memoized full pre-roll rational Bellman per scored value, and test threshold-rich scorecard with nonzero mathematical action gaps.",
+  "globalOptimality28Turns": false,
+  "liveChanged": false
+}
