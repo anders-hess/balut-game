@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - 'research/oracle-3.0-phase4-action-q-*'
+    paths:
+      - 'research/oracle-3.0/oracle2/q-*.mjs'
   workflow_dispatch:
 concurrency:
   group: oracle3-action-q-${{ github.ref }}
