@@ -2,7 +2,8 @@ name: Oracle 3.0 exact Bellman and supervised holdout
 on:
   push:
     branches:
-      - 'research/oracle-3.0-phase4-*'
+      - 'research/oracle-3.0-phase4-exact-label-*'
+      - 'research/oracle-3.0-phase4-oracle2-*'
     paths:
       - 'research/oracle-3.0/oracle2/**/*.mjs'
       - 'research/oracle-3.0/oracle2/**/*.cpp'

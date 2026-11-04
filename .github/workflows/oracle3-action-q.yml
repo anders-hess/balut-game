@@ -1,0 +1,82 @@
+name: Oracle 3.0 iteration 14 - exact action Q distillation
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase4-action-q-*'
+  workflow_dispatch:
+concurrency:
+  group: oracle3-action-q-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  train-q-teacher:
+    runs-on: ubuntu-latest
+    timeout-minutes: 38
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build original Oracle 2.0 v46 exact at-roll solver
+        run: |
+          g++ --version | head -1
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+      - name: Download frozen iteration13 exact Q teacher artifact (60 games / 3984 actions)
+        uses: actions/download-artifact@v4
+        with:
+          name: oracle3-phase4-exact-supervised
+          run-id: 41881936877
+          repository: anders-hess/balut-game
+          github-token: ${{ github.token }}
+          path: oracle3-prior-artifact
+      - name: Verify downloaded teacher reference
+        run: |
+          test -s oracle3-prior-artifact/oracle3-phase4-supervised.json
+          node -e "const d=require('./oracle3-prior-artifact/oracle3-phase4-supervised.json'); if(d.summary.nGames!==60||d.summary.availableActionQLabels!==3984||d.rows.length!==180)process.exit(2); console.log('PINNED_ORACLE2_Q_TRAIN',d.summary.nGames,d.summary.availableActionQLabels)"
+      - name: Oracle2 exact legal-action and BPIV-proxy parity unit tests
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/q-test.mjs | tee oracle3-q14-unit.log
+      - name: Generate 96 new whole games incl reachable scratches and 384 exact Q roots
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/q-fresh.mjs 96 920200000 oracle3-q-fresh | tee oracle3-q14-collection.log
+      - name: Prepare action features / BPIV residuals with game-level separation
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/q-prep.mjs oracle3-prior-artifact/oracle3-phase4-supervised.json oracle3-q-fresh.json oracle3-q | tee oracle3-q14-prep.log
+      - name: Independent all-action-Q feature and split data integrity gate
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/q-data-test.mjs oracle3-q | tee oracle3-q14-data-audit.log
+      - name: Fit weighted linear and neural BPIV residuals using validation Q regret only
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/q-train.mjs oracle3-q | tee oracle3-q14-training.log
+      - name: Locked unseen 48-game exact-Q regret, scratch and stage diagnostics
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/q-holdout.mjs oracle3-q | tee oracle3-q14-heldout.log
+      - name: Independent 32-game final Big Points smoke using counter-based common random dice
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/oracle2/q-smoke.mjs oracle3-q 32 | tee oracle3-q14-game.log
+      - name: Archive exact labels, trained student and all statistical evaluation JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-iteration14-exact-q-supervision
+          path: |
+            oracle3-q14-*.log
+            oracle3-q-fresh.json
+            oracle3-q-fresh.summary.json
+            oracle3-q.groups.json
+            oracle3-q.preparation.json
+            oracle3-q.q.weights.json
+            oracle3-q.q.train.json
+            oracle3-q.q.holdout.json
+            oracle3-q.q.holdout-summary.json
+            oracle3-q.q.game-smoke.json
+          if-no-files-found: ignore

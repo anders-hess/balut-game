@@ -1,0 +1,77 @@
+{
+  "iteration": 14,
+  "experiment": "Exact Bellman action-Q distillation using production BPIV residual prior",
+  "researchOnly": true,
+  "date": "2026-11-04",
+  "timezone": "Europe/Copenhagen",
+  "parent": "research/oracle-3.0-phase4-exact-label-learning-2026-11-04",
+  "oracle2SourceBlob": "4ce623ed663edffc4b1c9291f975aba778622227",
+  "frozenPriorRun": 41881936877,
+  "priorTrainingArtifactId": 13349458382,
+  "oldTrainingGames": 60,
+  "oldTrainingQRoots": 180,
+  "oldTrainingActionQ": 3984,
+  "newGames": {
+    "n": 96,
+    "base": 920200000,
+    "trainScratch": [
+      920200000,
+      920200023
+    ],
+    "validation": [
+      920200024,
+      920200047
+    ],
+    "lockedTest": [
+      920200048,
+      920200095
+    ],
+    "newRootPerGame": 4
+  },
+  "finalBPExploratoryTest": {
+    "n": 32,
+    "seeds": [
+      940000000,
+      940000031
+    ],
+    "rng": "counter-based by seed/turn/rollIndex",
+    "effect": "student only last 3 turns"
+  },
+  "nativeSolver": {
+    "stateCap": 250000,
+    "timeoutMs": 12000,
+    "truthLevel": "EXACT_FLOAT64_1to3_turns"
+  },
+  "models": [
+    "frozen_production",
+    "full_action_BPIV",
+    "linear_BPIV_residual",
+    "neural_43_24_1_BPIV_residual"
+  ],
+  "selectedUsing": "validation mean exact-Q regret only",
+  "alphaCandidates": [
+    0.15,
+    0.3,
+    0.5,
+    0.75,
+    1
+  ],
+  "lockedTestPrimary": "mean seed-cluster paired regret BP vs frozen Oracle",
+  "lockedTestSecondary": [
+    "95% bootstrap CI",
+    "stage",
+    "legal score-zero alternatives",
+    "scratch trajectory subgroup",
+    "observed vs synthetic dice"
+  ],
+  "cannotClaimGlobalOptimality": true,
+  "cannotClaimImprovedFinalBPFromQOnly": true,
+  "requireVerifiedCI": true,
+  "sourceTestsResults": "PENDING_EXECUTION",
+  "guardrails": [
+    "never modify main",
+    "never modify live Oracle",
+    "never modify Oracle 2.0",
+    "do not inspect locked test for tuning"
+  ]
+}
