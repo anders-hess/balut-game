@@ -1,0 +1,60 @@
+name: Oracle 3.0 math-only AI fidelity versus rational Bellman proof
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase6-rational-ai-fidelity-*'
+    paths:
+      - 'research/oracle-3.0/pure/rational-ai-fidelity.mjs'
+      - '.github/workflows/oracle3-rational-ai-fidelity.yml'
+  workflow_dispatch:
+concurrency:
+  group: oracle3-rational-ai-fidelity-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  proof-fidelity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enforce pure mathematical research import boundary
+        run: node research/oracle-3.0/pure/guard.mjs
+      - name: Download immutable rational teacher certificate from successful iteration20
+        uses: actions/download-artifact@v4
+        with:
+          name: oracle3-rational-hard-two-turn-certificate
+          run-id: 41914403880
+          repository: anders-hess/balut-game
+          github-token: ${{ github.token }}
+          path: math-reference
+      - name: Download independently trained mathematical neural/linear/stage student from iteration16
+        uses: actions/download-artifact@v4
+        with:
+          name: oracle3-reachable-threshold-math-ai
+          run-id: 41897820339
+          repository: anders-hess/balut-game
+          github-token: ${{ github.token }}
+          path: math-student
+      - name: Verify frozen mathematical artifacts without using prior advising policy
+        run: |
+          test -s math-reference/oracle3-math-two-reroll-nondegenerate.json
+          test -s math-student/oracle3-math-coverage.weights.json
+          test -s math-student/oracle3-math-coverage.frozen-selection.json
+      - name: Run all four mathematical inference policies against 8 exact rational all-action Q certificates
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/rational-ai-fidelity.mjs | tee oracle3-rational-ai-fidelity.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: oracle3-math-neural-versus-exact-rational-two-turn
+          path: |
+            oracle3-rational-ai-fidelity.log
+            oracle3-rational-ai-fidelity.json
+            oracle3-rational-ai-fidelity-summary.json
+          if-no-files-found: ignore
