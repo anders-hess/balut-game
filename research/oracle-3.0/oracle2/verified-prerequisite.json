@@ -1,0 +1,40 @@
+{
+  "iteration": 12,
+  "evidenceType": "previous_iteration_verified_prerequisite_NOT_new_phase4_experiment",
+  "sourceRun": "https://github.com/anders-hess/balut-game/actions/runs/41867806939",
+  "sourceBranch": "research/oracle-3.0-phase3-negative-smoke-diagnostics-2026-11-04",
+  "independentGameSeeds": {
+    "start": 900010000,
+    "end": 900010011,
+    "n": 12
+  },
+  "meanFinalBP": {
+    "cachedProductionOracle": 8.083333333333334,
+    "neuralContinuation": 0.9166666666666666,
+    "stageContinuation": 0.5833333333333334
+  },
+  "meanWallMsPerGame": {
+    "cachedProductionOracle": 3985.658347500003,
+    "neuralContinuation": 4524.1668493333345,
+    "stageContinuation": 4127.019642999999
+  },
+  "pairedMeanBP": {
+    "neuralMinusProduction": -7.166666666666667,
+    "stageMinusProduction": -7.5
+  },
+  "nominalNormalCi95": {
+    "neuralMinusProduction": [
+      -8.920297244074636,
+      -5.413036089258699
+    ],
+    "stageMinusProduction": [
+      -9.109400415362721,
+      -5.890599584637279
+    ]
+  },
+  "improvedFinalBPClaim": false,
+  "phase4NativeParityVerified": false,
+  "phase4ExactLabelResults": null,
+  "phase4HybridResults": null,
+  "note": "Previous CI result preserved as the measured negative motivation for Oracle 2.0 integration. Phase4 native tests remain pending GitHub Actions runner; no phase4 result is asserted."
+}
