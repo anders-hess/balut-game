@@ -1,0 +1,9 @@
+# Oracle 3.0 phase 2: actual training-data collection
+
+This research-only iteration builds on phase 1's **verified** BPIV cache: GitHub Actions run [41809550758](https://github.com/anders-hess/balut-game/actions/runs/41809550758) passed 336 sampled state comparisons (0 absolute BPIV difference), 5 identical full-game comparisons, and measured 30.12 s production vs 20.16 s cached (1.494x speedup; small timing sample). This is a computational speedup, **not a higher Big Points policy**.
+
+New `collect.mjs` records complete real-Oracle-equivalent trajectories, all 28 turn boundaries, 59-feature after-state vectors (28 fill flags + 28 scores + progress + Small Points + current Big Points), dice decisions, terminal Big Points Monte Carlo targets, and metadata. Every training row has an immutable game seed; never split rows of the same game between train and test. The after-state is the input to a post-turn continuation value function. The `targetFinalBigPoints` field is the **observed terminal return**, not an exact expected value. For residual learning use `remainingBigPoints`, which subtracts the *current* scorecard's Big Points, but check that its definition is consistent with terminal bonus and partial-state scoring before model training.
+
+Run from repo root: `node research/oracle-3.0/phase2/test.mjs` then `node research/oracle-3.0/phase2/collect.mjs 30 100000000 oracle3-trajectories`. CI runs both and archives JSONL and metrics. Locked seed ranges: train 100000000+, validation 500000000+, test 900000000+ (do not leak across partitions). 30 games = 840 turn rows, still a smoke dataset; not enough to claim useful generalization. Increase n only after speed and correctness validation. No model trained in this iteration.
+
+**Next gate:** verify CI success, inspect sample/metrics; then implement a deterministic feature baseline and held-out prediction evaluation before a neural model. Separate research branch; main and Oracle 2.0 untouched.
