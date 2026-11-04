@@ -1,0 +1,95 @@
+{
+  "iteration": 22,
+  "date": "2026-11-04",
+  "status": "VERIFIED_GITHUB_ACTIONS_SUCCESS",
+  "runUrl": "https://github.com/anders-hess/balut-game/actions/runs/41915546340",
+  "rawArtifactUrl": "https://github.com/anders-hess/balut-game/actions/runs/41915546340/artifacts/13363463814",
+  "sourceCommit": "708f99cc649197e27fb710bea6eb35485d93b409",
+  "mathematicalModelWeights": "https://github.com/anders-hess/balut-game/actions/runs/41897820339",
+  "sourceExactRationalMath": "https://github.com/anders-hess/balut-game/actions/runs/41914403880",
+  "allMathematicalActionsNumericalOracle2Parity": true,
+  "importGuard": {
+    "testedModules": 28,
+    "forbiddenProductionAdvisorImports": 0
+  },
+  "actualResult": {
+    "status": "FROZEN_PURE_MATH_NEURAL_VS_PROVEN_TWO_TURN_Q_MULTICARD",
+    "nIndependentMathematicallyReachableScorecards": 48,
+    "nExactRationalRootDecisions": 96,
+    "nCertifiedLegalActionQ": 2168,
+    "oldAdvisorDependencies": 0,
+    "completeProofScope": "2 remaining score boxes, all score and hold actions with 1 or 2 current rerolls",
+    "scorecardsAreDesignedNotFrequencyWeighted": true,
+    "modelIsFrozenBeforeCertification": true,
+    "modelNotRetrainedOrTuned": true,
+    "seedBase": 991000000,
+    "seedEnd": 991000047,
+    "scorecardBeforeSP": {
+      "min": 350,
+      "max": 546,
+      "mean": 449.9583333333333
+    },
+    "proofWithNonzeroActionQSpread": 90,
+    "mathStudentMetrics": {
+      "myopic": {
+        "positions": 96,
+        "independentScorecards": 48,
+        "optimalActions": 80,
+        "meanExactQRegretBP": 0.018975975016201588,
+        "medianExactQRegretBP": 0,
+        "maxExactQRegretBP": 0.5745620042871382,
+        "averageInferenceMs": 50.01618048958333
+      },
+      "stage": {
+        "positions": 96,
+        "independentScorecards": 48,
+        "optimalActions": 80,
+        "meanExactQRegretBP": 0.018975975016201588,
+        "medianExactQRegretBP": 0,
+        "maxExactQRegretBP": 0.5745620042871382,
+        "averageInferenceMs": 50.227033937499975
+      },
+      "linear": {
+        "positions": 96,
+        "independentScorecards": 48,
+        "optimalActions": 81,
+        "meanExactQRegretBP": 0.01741746620943734,
+        "medianExactQRegretBP": 0,
+        "maxExactQRegretBP": 0.5745620042871382,
+        "averageInferenceMs": 51.00668458333366
+      },
+      "neural": {
+        "positions": 96,
+        "independentScorecards": 48,
+        "optimalActions": 82,
+        "meanExactQRegretBP": 0.015565707097237966,
+        "medianExactQRegretBP": 0,
+        "maxExactQRegretBP": 0.5745620042871382,
+        "averageInferenceMs": 52.08589788541759
+      }
+    },
+    "neuralMinusMyopicGameMeanQRegretBP": -0.0034102679189636216,
+    "neuralMinusMyopicGameBootstrapCI95": [
+      -0.010306944329855872,
+      0.0031319047149247496
+    ],
+    "fullGameScoreClaim": false,
+    "wallMs": 108302.296504,
+    "parentRssBytes": 132005888,
+    "node": "v22.23.4",
+    "limitations": [
+      "Cards intentionally mathematically constructed with positive-probability dice; distribution is not actual natural play",
+      "Each seed defines an independent constructed scorecard, with two correlated dice examples; bootstrap clusters by scorecard",
+      "A prior trained math-only student is frozen and evaluated: no training on these certified rational labels",
+      "Exact BigInt teacher confirms up to 2 turns only; no global 28-turn optimum theorem or observed final-game BP effect"
+    ]
+  },
+  "caveats": [
+    "96 decisions occur in 48 independent legal but deliberately constructed scorecards, not naturally frequency-weighted final-game simulations.",
+    "Neural Q-regret improvement vs myopic math baseline is not statistically significant at 95% game-cluster bootstrap.",
+    "All 2168 Q references were computed via exact BigInt rational two-turn Bellman and checked against independent native Oracle2 numeric Q.",
+    "The model is frozen from prior independent math-only training; no test leakage, no new neural training here.",
+    "No claim of mathematical 28-turn global optimum or improved realized final Big Points."
+  ],
+  "mainOrLiveModified": false
+}
