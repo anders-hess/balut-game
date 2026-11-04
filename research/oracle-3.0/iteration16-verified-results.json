@@ -1,0 +1,1199 @@
+{
+  "iteration": 16,
+  "status": "VERIFIED_GITHUB_ACTIONS_SUCCESS",
+  "runUrl": "https://github.com/anders-hess/balut-game/actions/runs/41897820339",
+  "artifactUrl": "https://github.com/anders-hess/balut-game/actions/runs/41897820339/artifacts/13357431453",
+  "sourceCommit": "3ff7fd175b6999c9a6a749449b4a5f54ef2cb94a",
+  "architecture": "PURE_ORACLE2_MATH_TEACHER_AI_WITHOUT_LEGACY_ORACLE",
+  "sourceOracle2Blob": "4ce623ed663edffc4b1c9291f975aba778622227",
+  "collection": {
+    "status": "MATH_ONLY_COVERAGE_CONSTRUCTED_VALID_REACHABLE_STATES",
+    "sourceBlobSha": "4ce623ed663edffc4b1c9291f975aba778622227",
+    "featureVersion": "oracle2-v46-markov-17-v1",
+    "simulation": "independent legal positive-probability dice witness; deliberately stratified, not game-frequency distributed",
+    "seedBase": 960200000,
+    "nGames": 120,
+    "seeds": [
+      960200000,
+      960200119
+    ],
+    "gameSplit": {
+      "train": {
+        "games": 72,
+        "seedRange": [
+          960200000,
+          960200071
+        ]
+      },
+      "validation": {
+        "games": 24,
+        "seedRange": [
+          960200072,
+          960200095
+        ]
+      },
+      "test": {
+        "games": 24,
+        "seedRange": [
+          960200096,
+          960200119
+        ]
+      }
+    },
+    "nRoots": 480,
+    "boundaryAttempted": 360,
+    "qAttempted": 480,
+    "solvedBoundary": 360,
+    "solvedQ": 480,
+    "actionQLabels": 8881,
+    "zeroScoreActionAlternatives": 476,
+    "legalWitnessTurns": 3360,
+    "bySplitKindHorizon": {
+      "train_threshold_3_observed": {
+        "attempted": 24,
+        "solvedQ": 24,
+        "solvedBoundary": 24
+      },
+      "train_threshold_3_designed_possible_roll": {
+        "attempted": 24,
+        "solvedQ": 24,
+        "solvedBoundary": 0
+      },
+      "train_threshold_2_observed": {
+        "attempted": 24,
+        "solvedQ": 24,
+        "solvedBoundary": 24
+      },
+      "train_threshold_1_observed": {
+        "attempted": 24,
+        "solvedQ": 24,
+        "solvedBoundary": 24
+      },
+      "train_bonus_3_observed": {
+        "attempted": 24,
+        "solvedQ": 24,
+        "solvedBoundary": 24
+      },
+      "train_bonus_3_designed_possible_roll": {
+        "attempted": 24,
+        "solvedQ": 24,
+        "solvedBoundary": 0
+      },
+      "train_bonus_2_observed": {
+        "attempted": 24,
+        "solvedQ": 24,
+        "solvedBoundary": 24
+      },
+      "train_bonus_1_observed": {
+        "attempted": 24,
+        "solvedQ": 24,
+        "solvedBoundary": 24
+      },
+      "train_strike_3_observed": {
+        "attempted": 24,
+        "solvedQ": 24,
+        "solvedBoundary": 24
+      },
+      "train_strike_3_designed_possible_roll": {
+        "attempted": 24,
+        "solvedQ": 24,
+        "solvedBoundary": 0
+      },
+      "train_strike_2_observed": {
+        "attempted": 24,
+        "solvedQ": 24,
+        "solvedBoundary": 24
+      },
+      "train_strike_1_observed": {
+        "attempted": 24,
+        "solvedQ": 24,
+        "solvedBoundary": 24
+      },
+      "validation_threshold_3_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "validation_threshold_3_designed_possible_roll": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 0
+      },
+      "validation_threshold_2_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "validation_threshold_1_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "validation_bonus_3_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "validation_bonus_3_designed_possible_roll": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 0
+      },
+      "validation_bonus_2_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "validation_bonus_1_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "validation_strike_3_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "validation_strike_3_designed_possible_roll": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 0
+      },
+      "validation_strike_2_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "validation_strike_1_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "test_threshold_3_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "test_threshold_3_designed_possible_roll": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 0
+      },
+      "test_threshold_2_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "test_threshold_1_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "test_bonus_3_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "test_bonus_3_designed_possible_roll": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 0
+      },
+      "test_bonus_2_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "test_bonus_1_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "test_strike_3_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "test_strike_3_designed_possible_roll": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 0
+      },
+      "test_strike_2_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      },
+      "test_strike_1_observed": {
+        "attempted": 8,
+        "solvedQ": 8,
+        "solvedBoundary": 8
+      }
+    },
+    "failedLabels": 0,
+    "kindCounts": {
+      "threshold": 40,
+      "bonus": 40,
+      "strike": 40
+    },
+    "coverage": {
+      "meanBigPointsBefore3Turns": 13.616666666666667,
+      "meanSmallPointsBefore3Turns": 492.475,
+      "beforeSmallAtLeast300Games": 119,
+      "nearThresholdWithAvailableSlotGames": 92,
+      "beforeSmallRange": [
+        285,
+        673
+      ],
+      "nonzeroPositiveBalutGames": 119,
+      "nonzeroPositiveStraightGames": 117,
+      "nonzeroPositiveFullHouseGames": 115,
+      "zeroScoreEntries": 496
+    },
+    "wallMs": 14330.028909,
+    "parentPeakRssBytes": 66125824,
+    "node": "v22.23.4",
+    "limitations": [
+      "All scorecards have an explicit 28-turn witness with dice outcomes of positive probability, not necessarily common outcomes",
+      "This is a designed reward-rich test distribution, not an unbiased natural game performance estimate",
+      "The designed extra roll has a possible outcome but not a frequency-weighted sample",
+      "Native exact teacher is complete Float64 finite-horizon DP for up to three remaining turns, not a formal 28-turn proof",
+      "Exact native cap/resource errors are explicitly captured, no fabricated labels",
+      "Parent RSS excludes native C++ child peak RSS"
+    ]
+  },
+  "dataAudit": {
+    "status": "PASS",
+    "nWitnessGames": 120,
+    "legallyReplayedTurnScores": 3360,
+    "independentTrainGames": 72,
+    "validationGames": 24,
+    "lockedTestGames": 24,
+    "QRootCount": 480,
+    "preRollOptimalValues": 360,
+    "allLegalQ": 8881,
+    "zeroScoreAlternatives": 476,
+    "rootProfiles": {
+      "threshold": 160,
+      "bonus": 160,
+      "strike": 160
+    },
+    "bonusRichStates": 119,
+    "nearThresholdStates": 92,
+    "productionOracleDependencies": 0,
+    "failures": 0
+  },
+  "mathematicalModelTraining": {
+    "status": "TRAINED_VALIDATION_ONLY_TEST_LOCKED",
+    "training": {
+      "exactLabels": 216,
+      "games": 72
+    },
+    "validation": {
+      "exactLabels": 72,
+      "games": 24,
+      "models": {
+        "stage": {
+          "rows": 72,
+          "rmseBP": 1.1782223185761709,
+          "maeBP": 0.9548888444981836
+        },
+        "linear": {
+          "rows": 72,
+          "rmseBP": 0.8575200028346385,
+          "maeBP": 0.700340054677005
+        },
+        "neural": {
+          "rows": 72,
+          "rmseBP": 0.8631948681343391,
+          "maeBP": 0.7070068304544969
+        }
+      }
+    },
+    "selectedByValidationRMSE": "linear",
+    "neuralBestEpoch": 287,
+    "linearBestEpoch": 47,
+    "trainingWallMs": 249.583408,
+    "node": "v22.23.4",
+    "limitations": [
+      "Supervised V* labels only for naturally observed final 1-3 turn states",
+      "No test labels or test-Q used for model/epoch selection",
+      "No global 28-turn optimality proof, no final-BP policy improvement claim",
+      "Stage and linear regressors are required stronger ablations; neural may be worse"
+    ]
+  },
+  "heldOutExactQ": {
+    "status": "COMPLETE_INDEPENDENT_MATH_Q_HOLDOUT_NO_PRODUCTION_POLICY",
+    "numericalTeacher": "Oracle 2.0 finite horizon EXACT_FLOAT64 for 1-3 remaining turns",
+    "independentTestGames": 24,
+    "testRoots": 96,
+    "nativeQTestActionLabels": 1776,
+    "selectedUsingValidationOnly": "neural",
+    "validation": {
+      "myopic": {
+        "roots": 96,
+        "games": 24,
+        "meanExactQRegretBP": 0.031364184204792145,
+        "mathematicalOptimalActions": 72,
+        "zeroScoreSelections": 7,
+        "meanDecisionMs": 34.672371593749965,
+        "p95DecisionMs": 108.29873399999997
+      },
+      "stage": {
+        "roots": 96,
+        "games": 24,
+        "meanExactQRegretBP": 0.031364184204792145,
+        "mathematicalOptimalActions": 72,
+        "zeroScoreSelections": 7,
+        "meanDecisionMs": 35.169572489583345,
+        "p95DecisionMs": 105.39528799999971
+      },
+      "linear": {
+        "roots": 96,
+        "games": 24,
+        "meanExactQRegretBP": 0.029552103694310022,
+        "mathematicalOptimalActions": 75,
+        "zeroScoreSelections": 6,
+        "meanDecisionMs": 35.8764738125,
+        "p95DecisionMs": 107.8478610000002
+      },
+      "neural": {
+        "roots": 96,
+        "games": 24,
+        "meanExactQRegretBP": 0.028939869916681595,
+        "mathematicalOptimalActions": 73,
+        "zeroScoreSelections": 6,
+        "meanDecisionMs": 36.397602041666715,
+        "p95DecisionMs": 111.36877800000002
+      }
+    },
+    "test": {
+      "myopic": {
+        "roots": 96,
+        "games": 24,
+        "meanExactQRegretBP": 0.040347025709729784,
+        "mathematicalOptimalActions": 64,
+        "zeroScoreSelections": 7,
+        "meanDecisionMs": 38.80180056250009,
+        "p95DecisionMs": 105.73208200000226,
+        "regretCI95GameBootstrap": [
+          0.010249802197028183,
+          0.08158445511260738
+        ],
+        "deltaRegretVsMyopicGameBootstrap": {
+          "nIndependentGames": 24,
+          "meanGame": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        }
+      },
+      "stage": {
+        "roots": 96,
+        "games": 24,
+        "meanExactQRegretBP": 0.040347025709729784,
+        "mathematicalOptimalActions": 64,
+        "zeroScoreSelections": 7,
+        "meanDecisionMs": 39.04076181249987,
+        "p95DecisionMs": 105.78447399999823,
+        "regretCI95GameBootstrap": [
+          0.010249802197028183,
+          0.08158445511260738
+        ],
+        "deltaRegretVsMyopicGameBootstrap": {
+          "nIndependentGames": 24,
+          "meanGame": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        }
+      },
+      "linear": {
+        "roots": 96,
+        "games": 24,
+        "meanExactQRegretBP": 0.021568645465246505,
+        "mathematicalOptimalActions": 71,
+        "zeroScoreSelections": 5,
+        "meanDecisionMs": 39.80790561458341,
+        "p95DecisionMs": 107.55027000000337,
+        "regretCI95GameBootstrap": [
+          0.004950164200273814,
+          0.04662947520822127
+        ],
+        "deltaRegretVsMyopicGameBootstrap": {
+          "nIndependentGames": 24,
+          "meanGame": -0.018778380244483278,
+          "ci95": [
+            -0.047865525682076186,
+            -0.0014215806068845944
+          ]
+        }
+      },
+      "neural": {
+        "roots": 96,
+        "games": 24,
+        "meanExactQRegretBP": 0.017299624781005368,
+        "mathematicalOptimalActions": 72,
+        "zeroScoreSelections": 5,
+        "meanDecisionMs": 40.33887289583322,
+        "p95DecisionMs": 109.80176100000244,
+        "regretCI95GameBootstrap": [
+          0.004950164200273814,
+          0.03348294729314497
+        ],
+        "deltaRegretVsMyopicGameBootstrap": {
+          "nIndependentGames": 24,
+          "meanGame": -0.023047400928724416,
+          "ci95": [
+            -0.054948779850866936,
+            -0.0014215806068845944
+          ]
+        }
+      }
+    },
+    "breakdown": {
+      "threshold": {
+        "myopic": {
+          "roots": 32,
+          "games": 8,
+          "meanExactQRegretBP": 0.011175847850266929,
+          "mathematicalOptimalActions": 22,
+          "zeroScoreSelections": 4,
+          "meanDecisionMs": 33.8198839062498,
+          "p95DecisionMs": 105.04924600000231,
+          "regretCI95GameBootstrap": [
+            0.001690393450483385,
+            0.023092508805664047
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 8,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "stage": {
+          "roots": 32,
+          "games": 8,
+          "meanExactQRegretBP": 0.011175847850266929,
+          "mathematicalOptimalActions": 22,
+          "zeroScoreSelections": 4,
+          "meanDecisionMs": 33.986601874999735,
+          "p95DecisionMs": 107.6191519999993,
+          "regretCI95GameBootstrap": [
+            0.001690393450483385,
+            0.023092508805664047
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 8,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "linear": {
+          "roots": 32,
+          "games": 8,
+          "meanExactQRegretBP": 0.008272275903956627,
+          "mathematicalOptimalActions": 26,
+          "zeroScoreSelections": 4,
+          "meanDecisionMs": 34.708266062500115,
+          "p95DecisionMs": 107.55027000000337,
+          "regretCI95GameBootstrap": [
+            0.0008002398859789928,
+            0.018973764962817663
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 8,
+            "meanGame": -0.0029035719463103016,
+            "ci95": [
+              -0.006885403726591521,
+              0.00010017803902678812
+            ]
+          }
+        },
+        "neural": {
+          "roots": 32,
+          "games": 8,
+          "meanExactQRegretBP": 0.008272275903956627,
+          "mathematicalOptimalActions": 26,
+          "zeroScoreSelections": 4,
+          "meanDecisionMs": 34.81358481249987,
+          "p95DecisionMs": 106.73635900000227,
+          "regretCI95GameBootstrap": [
+            0.0008002398859789928,
+            0.018973764962817663
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 8,
+            "meanGame": -0.0029035719463103016,
+            "ci95": [
+              -0.006885403726591521,
+              0.00010017803902678812
+            ]
+          }
+        }
+      },
+      "bonus": {
+        "myopic": {
+          "roots": 32,
+          "games": 8,
+          "meanExactQRegretBP": 0.07030497744450381,
+          "mathematicalOptimalActions": 17,
+          "zeroScoreSelections": 1,
+          "meanDecisionMs": 39.6159809375003,
+          "p95DecisionMs": 105.73208200000226,
+          "regretCI95GameBootstrap": [
+            0.011716706115414088,
+            0.15863726094683428
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 8,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "stage": {
+          "roots": 32,
+          "games": 8,
+          "meanExactQRegretBP": 0.07030497744450381,
+          "mathematicalOptimalActions": 17,
+          "zeroScoreSelections": 1,
+          "meanDecisionMs": 40.08409315624999,
+          "p95DecisionMs": 105.02234300000055,
+          "regretCI95GameBootstrap": [
+            0.011716706115414088,
+            0.15863726094683428
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 8,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "linear": {
+          "roots": 32,
+          "games": 8,
+          "meanExactQRegretBP": 0.054204286891301856,
+          "mathematicalOptimalActions": 20,
+          "zeroScoreSelections": 1,
+          "meanDecisionMs": 40.836706406249675,
+          "p95DecisionMs": 106.31314399999974,
+          "regretCI95GameBootstrap": [
+            0.010053624415104268,
+            0.11797860609736743
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 8,
+            "meanGame": -0.016100690553201957,
+            "ci95": [
+              -0.040950148386106444,
+              -0.0005556751995823284
+            ]
+          }
+        },
+        "neural": {
+          "roots": 32,
+          "games": 8,
+          "meanExactQRegretBP": 0.04139722483857844,
+          "mathematicalOptimalActions": 21,
+          "zeroScoreSelections": 1,
+          "meanDecisionMs": 41.42739234374994,
+          "p95DecisionMs": 106.3735740000011,
+          "regretCI95GameBootstrap": [
+            0.010053624415104268,
+            0.08033031233783883
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 8,
+            "meanGame": -0.028907752605925374,
+            "ci95": [
+              -0.0793713345442767,
+              -0.0005556751995823284
+            ]
+          }
+        }
+      },
+      "strike": {
+        "myopic": {
+          "roots": 32,
+          "games": 8,
+          "meanExactQRegretBP": 0.03956025183441861,
+          "mathematicalOptimalActions": 25,
+          "zeroScoreSelections": 2,
+          "meanDecisionMs": 42.96953684375018,
+          "p95DecisionMs": 103.53506299999935,
+          "regretCI95GameBootstrap": [
+            0.0009029139878817816,
+            0.11410721575605814
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 8,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "stage": {
+          "roots": 32,
+          "games": 8,
+          "meanExactQRegretBP": 0.03956025183441861,
+          "mathematicalOptimalActions": 25,
+          "zeroScoreSelections": 2,
+          "meanDecisionMs": 43.051590406249886,
+          "p95DecisionMs": 104.86539099999936,
+          "regretCI95GameBootstrap": [
+            0.0009029139878817816,
+            0.11410721575605814
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 8,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "linear": {
+          "roots": 32,
+          "games": 8,
+          "meanExactQRegretBP": 0.0022293736004810327,
+          "mathematicalOptimalActions": 25,
+          "zeroScoreSelections": 0,
+          "meanDecisionMs": 43.87874437500045,
+          "p95DecisionMs": 105.82237800000075,
+          "regretCI95GameBootstrap": [
+            0.0007733403406101624,
+            0.003988429838603869
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 8,
+            "meanGame": -0.037330878233937576,
+            "ci95": [
+              -0.11128250340471812,
+              0.00034311939636805233
+            ]
+          }
+        },
+        "neural": {
+          "roots": 32,
+          "games": 8,
+          "meanExactQRegretBP": 0.0022293736004810327,
+          "mathematicalOptimalActions": 25,
+          "zeroScoreSelections": 0,
+          "meanDecisionMs": 44.775641531249846,
+          "p95DecisionMs": 111.11379900000247,
+          "regretCI95GameBootstrap": [
+            0.0007733403406101624,
+            0.003988429838603869
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 8,
+            "meanGame": -0.037330878233937576,
+            "ci95": [
+              -0.11128250340471812,
+              0.00034311939636805233
+            ]
+          }
+        }
+      },
+      "remaining_1": {
+        "myopic": {
+          "roots": 24,
+          "games": 24,
+          "meanExactQRegretBP": 0,
+          "mathematicalOptimalActions": 24,
+          "zeroScoreSelections": 5,
+          "meanDecisionMs": 16.961882708333178,
+          "p95DecisionMs": 100.84928000000218,
+          "regretCI95GameBootstrap": [
+            0,
+            0
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "stage": {
+          "roots": 24,
+          "games": 24,
+          "meanExactQRegretBP": 0,
+          "mathematicalOptimalActions": 24,
+          "zeroScoreSelections": 5,
+          "meanDecisionMs": 16.988300624999738,
+          "p95DecisionMs": 100.41910999999891,
+          "regretCI95GameBootstrap": [
+            0,
+            0
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "linear": {
+          "roots": 24,
+          "games": 24,
+          "meanExactQRegretBP": 0,
+          "mathematicalOptimalActions": 24,
+          "zeroScoreSelections": 5,
+          "meanDecisionMs": 16.873442333333895,
+          "p95DecisionMs": 100.3864250000006,
+          "regretCI95GameBootstrap": [
+            0,
+            0
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "neural": {
+          "roots": 24,
+          "games": 24,
+          "meanExactQRegretBP": 0,
+          "mathematicalOptimalActions": 24,
+          "zeroScoreSelections": 5,
+          "meanDecisionMs": 17.089907791666672,
+          "p95DecisionMs": 100.50897699999769,
+          "regretCI95GameBootstrap": [
+            0,
+            0
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "remaining_2": {
+        "myopic": {
+          "roots": 24,
+          "games": 24,
+          "meanExactQRegretBP": 0.04366083211778097,
+          "mathematicalOptimalActions": 15,
+          "zeroScoreSelections": 1,
+          "meanDecisionMs": 31.144158875000056,
+          "p95DecisionMs": 103.03331299999991,
+          "regretCI95GameBootstrap": [
+            0.005283014512170281,
+            0.10830264808842949
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "stage": {
+          "roots": 24,
+          "games": 24,
+          "meanExactQRegretBP": 0.04366083211778097,
+          "mathematicalOptimalActions": 15,
+          "zeroScoreSelections": 1,
+          "meanDecisionMs": 31.574216999999937,
+          "p95DecisionMs": 101.87670499999876,
+          "regretCI95GameBootstrap": [
+            0.005283014512170281,
+            0.10830264808842949
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "linear": {
+          "roots": 24,
+          "games": 24,
+          "meanExactQRegretBP": 0.016953021846103773,
+          "mathematicalOptimalActions": 19,
+          "zeroScoreSelections": 0,
+          "meanDecisionMs": 32.231746458332964,
+          "p95DecisionMs": 102.58313999999882,
+          "regretCI95GameBootstrap": [
+            0.002407771073355769,
+            0.03630184475381933
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": -0.026707810271677197,
+            "ci95": [
+              -0.09380845251652807,
+              0.01668475725744149
+            ]
+          }
+        },
+        "neural": {
+          "roots": 24,
+          "games": 24,
+          "meanExactQRegretBP": 0.016953021846103773,
+          "mathematicalOptimalActions": 19,
+          "zeroScoreSelections": 0,
+          "meanDecisionMs": 32.682700083332826,
+          "p95DecisionMs": 102.81339200000002,
+          "regretCI95GameBootstrap": [
+            0.002407771073355769,
+            0.03630184475381933
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": -0.026707810271677197,
+            "ci95": [
+              -0.09380845251652807,
+              0.01668475725744149
+            ]
+          }
+        }
+      },
+      "remaining_3": {
+        "myopic": {
+          "roots": 48,
+          "games": 24,
+          "meanExactQRegretBP": 0.05886363536056908,
+          "mathematicalOptimalActions": 25,
+          "zeroScoreSelections": 1,
+          "meanDecisionMs": 53.55058033333356,
+          "p95DecisionMs": 106.65243999999984,
+          "regretCI95GameBootstrap": [
+            0.015769554230901577,
+            0.12429009816508223
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "stage": {
+          "roots": 48,
+          "games": 24,
+          "meanExactQRegretBP": 0.05886363536056908,
+          "mathematicalOptimalActions": 25,
+          "zeroScoreSelections": 1,
+          "meanDecisionMs": 53.800264812499904,
+          "p95DecisionMs": 106.06965599999967,
+          "regretCI95GameBootstrap": [
+            0.015769554230901577,
+            0.12429009816508223
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "linear": {
+          "roots": 48,
+          "games": 24,
+          "meanExactQRegretBP": 0.034660780007441126,
+          "mathematicalOptimalActions": 28,
+          "zeroScoreSelections": 0,
+          "meanDecisionMs": 55.0632168333334,
+          "p95DecisionMs": 108.42842199999905,
+          "regretCI95GameBootstrap": [
+            0.005650083809321545,
+            0.08100360995608087
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": -0.024202855353127956,
+            "ci95": [
+              -0.05158698648544661,
+              -0.0032367273691507235
+            ]
+          }
+        },
+        "neural": {
+          "roots": 48,
+          "games": 24,
+          "meanExactQRegretBP": 0.026122738638958847,
+          "mathematicalOptimalActions": 29,
+          "zeroScoreSelections": 0,
+          "meanDecisionMs": 55.79144185416669,
+          "p95DecisionMs": 111.11379900000247,
+          "regretCI95GameBootstrap": [
+            0.005650083809321545,
+            0.05418132028245193
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": -0.032740896721610235,
+            "ci95": [
+              -0.07591566039613806,
+              -0.0032367273691507235
+            ]
+          }
+        }
+      },
+      "observed": {
+        "myopic": {
+          "roots": 72,
+          "games": 24,
+          "meanExactQRegretBP": 0.03312534490866495,
+          "mathematicalOptimalActions": 52,
+          "zeroScoreSelections": 7,
+          "meanDecisionMs": 50.95134715277777,
+          "p95DecisionMs": 106.10276099999828,
+          "regretCI95GameBootstrap": [
+            0.004214374255721366,
+            0.07392876757825004
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "stage": {
+          "roots": 72,
+          "games": 24,
+          "meanExactQRegretBP": 0.03312534490866495,
+          "mathematicalOptimalActions": 52,
+          "zeroScoreSelections": 7,
+          "meanDecisionMs": 51.026977930555354,
+          "p95DecisionMs": 106.06965599999967,
+          "regretCI95GameBootstrap": [
+            0.004214374255721366,
+            0.07392876757825004
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "linear": {
+          "roots": 72,
+          "games": 24,
+          "meanExactQRegretBP": 0.012169316013171148,
+          "mathematicalOptimalActions": 58,
+          "zeroScoreSelections": 5,
+          "meanDecisionMs": 51.648345125000105,
+          "p95DecisionMs": 107.68058200000087,
+          "regretCI95GameBootstrap": [
+            0.0015920274062287932,
+            0.028165957512168254
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": -0.020956028895493802,
+            "ci95": [
+              -0.05889847485650951,
+              0.0022479332947694785
+            ]
+          }
+        },
+        "neural": {
+          "roots": 72,
+          "games": 24,
+          "meanExactQRegretBP": 0.006477288434182962,
+          "mathematicalOptimalActions": 59,
+          "zeroScoreSelections": 5,
+          "meanDecisionMs": 52.206276222222186,
+          "p95DecisionMs": 110.19909600000028,
+          "regretCI95GameBootstrap": [
+            0.001568106172568319,
+            0.012821827066491279
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": -0.026648056474481985,
+            "ci95": [
+              -0.06802621238409154,
+              0.0018743506360854312
+            ]
+          }
+        }
+      },
+      "designed_possible_roll": {
+        "myopic": {
+          "roots": 24,
+          "games": 24,
+          "meanExactQRegretBP": 0.06201206811292429,
+          "mathematicalOptimalActions": 12,
+          "zeroScoreSelections": 0,
+          "meanDecisionMs": 2.353160791667051,
+          "p95DecisionMs": 2.8834920000008424,
+          "regretCI95GameBootstrap": [
+            0.014949285647370303,
+            0.12845884847596664
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "stage": {
+          "roots": 24,
+          "games": 24,
+          "meanExactQRegretBP": 0.06201206811292429,
+          "mathematicalOptimalActions": 12,
+          "zeroScoreSelections": 0,
+          "meanDecisionMs": 3.082113458333424,
+          "p95DecisionMs": 3.676305000000866,
+          "regretCI95GameBootstrap": [
+            0.014949285647370303,
+            0.12845884847596664
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        },
+        "linear": {
+          "roots": 24,
+          "games": 24,
+          "meanExactQRegretBP": 0.04976663382147258,
+          "mathematicalOptimalActions": 13,
+          "zeroScoreSelections": 0,
+          "meanDecisionMs": 4.28658708333334,
+          "p95DecisionMs": 4.874418999999762,
+          "regretCI95GameBootstrap": [
+            0.009629255752603982,
+            0.10515222803816064
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": -0.012245434291451715,
+            "ci95": [
+              -0.031771613241324825,
+              0.000620552574845723
+            ]
+          }
+        },
+        "neural": {
+          "roots": 24,
+          "games": 24,
+          "meanExactQRegretBP": 0.04976663382147258,
+          "mathematicalOptimalActions": 13,
+          "zeroScoreSelections": 0,
+          "meanDecisionMs": 4.736662916666319,
+          "p95DecisionMs": 5.5702669999991485,
+          "regretCI95GameBootstrap": [
+            0.009629255752603982,
+            0.10515222803816064
+          ],
+          "deltaRegretVsMyopicGameBootstrap": {
+            "nIndependentGames": 24,
+            "meanGame": -0.012245434291451715,
+            "ci95": [
+              -0.031771613241324825,
+              0.000620552574845723
+            ]
+          }
+        }
+      }
+    },
+    "valueErrors": {
+      "stage": {
+        "states": 72,
+        "maeBP": 1.008252701179604,
+        "rmseBP": 1.296594629827683
+      },
+      "linear": {
+        "states": 72,
+        "maeBP": 0.8871868785617021,
+        "rmseBP": 1.1311347786821138
+      },
+      "neural": {
+        "states": 72,
+        "maeBP": 0.8936137589834884,
+        "rmseBP": 1.1365136405955087
+      }
+    },
+    "selectedRegretVsMathematicallyOptimal": 0.017299624781005368,
+    "selectedMinusMyopicBootstrap": {
+      "nIndependentGames": 24,
+      "meanGame": -0.023047400928724416,
+      "ci95": [
+        -0.054948779850866936,
+        -0.0014215806068845944
+      ]
+    },
+    "teacherOptimalExpectedQRegret": 0,
+    "testElapsedMs": 28979.741987999998,
+    "parentPeakRssBytes": 115884032,
+    "node": "v22.23.4",
+    "claims": [
+      "The locked test measures exact Q regret relative to Oracle2, not improvement versus production Oracle",
+      "These test states cover only 1-3 remaining turns, with mathematical teacher exact within Float64 accuracy",
+      "The student cannot infer a certified globally optimal 28-turn policy from these labels",
+      "Synthetic dice examples are deliberately sampled and must be reported separately",
+      "Training, selection, sampling and evaluation use zero production Oracle dependencies",
+      "No improvement claim for full final Big Points is supported by this isolated endgame evaluation"
+    ]
+  },
+  "policyIntegrity": {
+    "status": "PASS",
+    "oneTurnTeacherExact": true,
+    "oneTurnLearnerExact": true,
+    "earlyHorizonRefusesExtrapolation": true,
+    "productionFallbacks": 0,
+    "selectedUsingValidationOnly": "neural"
+  },
+  "validationSelectionOnly": true,
+  "populationFrequencyRepresentation": false,
+  "mathDecisionOptimumProof": "numeric Float64 complete Bellman for <=3 turns only; no formal certified rational error bounds",
+  "improvedFull28TurnBigPointsProven": false,
+  "productionOracleUsedAnywhereInNewPath": false,
+  "mainModified": false
+}
