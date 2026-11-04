@@ -1,0 +1,15 @@
+{
+  "checks": 24,
+  "root_exact_fraction": "35/16",
+  "root_action_q": {
+    "A": "7/4",
+    "B": "35/16"
+  },
+  "dp_states": 24,
+  "seconds": 0.001074603,
+  "maxrss_kb": 95500,
+  "original_balut_Q_verified": false,
+  "locked_30_actions_verified": false,
+  "early_global_certificates": 0,
+  "pruned_early_rivals": 0
+}
