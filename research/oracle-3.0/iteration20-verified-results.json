@@ -1,0 +1,218 @@
+{
+  "iteration": 20,
+  "date": "2026-11-04",
+  "status": "VERIFIED_GITHUB_ACTIONS_SUCCESS_AND_INDEPENDENT_PYTHON_RECOMPUTATION",
+  "runUrl": "https://github.com/anders-hess/balut-game/actions/runs/41914403880",
+  "archiveUrl": "https://github.com/anders-hess/balut-game/actions/runs/41914403880/artifacts/13363074178",
+  "sourceSha": "6cdd0e31027d3189db8916a8c1bb078bfbddb809",
+  "exactRationalCertificate": {
+    "status": "CERTIFIED_EXACT_RATIONAL_TWO_TURN_ALL_HOLDS_NONDEGENERATE",
+    "nTestPositions": 8,
+    "nWitnessScores": 26,
+    "independentDesignedState": "Four-or-Straight bonus decision with 372 Small Points and both category bonuses unresolved",
+    "currentSmallPoints": 372,
+    "currentBigPoints": 3,
+    "activeCategories": [
+      "fours",
+      "straight"
+    ],
+    "exactActionsComparedWithOracle2": 134,
+    "uniquelyOptimalRoots": 6,
+    "rootsWithOptimalHold": 4,
+    "rootsWithOptimalScore": 6,
+    "positiveGapRoots": 8,
+    "sharedDenominators": "6^(15+5*r), r=0..2",
+    "continuationScorecardCacheCount": 9,
+    "lastTurnInitialRollProofBranches": 2268,
+    "currentRerollMemoStates": 504,
+    "rootChoices": [
+      {
+        "dice": [
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "rerollsRemaining": 0,
+        "bestActions": [
+          "score:0:20"
+        ],
+        "expectedFinalBP": 6.305475083670571,
+        "gapNumerator": "1455985407080",
+        "exactDenominator": "470184984576",
+        "legalActions": 2,
+        "caseMs": 344.75932900000004
+      },
+      {
+        "dice": [
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "rerollsRemaining": 1,
+        "bestActions": [
+          "score:0:20",
+          "hold:000400"
+        ],
+        "expectedFinalBP": 6.305475083670571,
+        "gapNumerator": "5360598458150400",
+        "exactDenominator": "3656158440062976",
+        "legalActions": 7,
+        "caseMs": 1083.83335
+      },
+      {
+        "dice": [
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "rerollsRemaining": 2,
+        "bestActions": [
+          "score:0:20",
+          "hold:000400"
+        ],
+        "expectedFinalBP": 6.305475083670571,
+        "gapNumerator": "28947231674012160000",
+        "exactDenominator": "28430288029929701376",
+        "legalActions": 7,
+        "caseMs": 71.66536700000006
+      },
+      {
+        "dice": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "rerollsRemaining": 0,
+        "bestActions": [
+          "score:3:15"
+        ],
+        "expectedFinalBP": 7.313278860576184,
+        "gapNumerator": "1536987128868",
+        "exactDenominator": "470184984576",
+        "legalActions": 2,
+        "caseMs": 0.041641999999910695
+      },
+      {
+        "dice": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "rerollsRemaining": 1,
+        "bestActions": [
+          "score:3:15"
+        ],
+        "expectedFinalBP": 7.313278860576184,
+        "gapNumerator": "7514253694471680",
+        "exactDenominator": "3656158440062976",
+        "legalActions": 33,
+        "caseMs": 0.8310999999998785
+      },
+      {
+        "dice": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "rerollsRemaining": 2,
+        "bestActions": [
+          "score:3:15"
+        ],
+        "expectedFinalBP": 7.313278860576184,
+        "gapNumerator": "36137338882701189120",
+        "exactDenominator": "28430288029929701376",
+        "legalActions": 33,
+        "caseMs": 0.978689999999915
+      },
+      {
+        "dice": [
+          4,
+          4,
+          1,
+          2,
+          5
+        ],
+        "rerollsRemaining": 1,
+        "bestActions": [
+          "hold:110110"
+        ],
+        "expectedFinalBP": 4.614161709265141,
+        "gapNumerator": "467177591687616",
+        "exactDenominator": "3656158440062976",
+        "legalActions": 25,
+        "caseMs": 0.654104999999845
+      },
+      {
+        "dice": [
+          4,
+          4,
+          1,
+          2,
+          5
+        ],
+        "rerollsRemaining": 2,
+        "bestActions": [
+          "hold:110110"
+        ],
+        "expectedFinalBP": 5.080526021297362,
+        "gapNumerator": "159607047651747840",
+        "exactDenominator": "28430288029929701376",
+        "legalActions": 25,
+        "caseMs": 0.8905879999999797
+      }
+    ],
+    "exactNativeOracle2AllActionParity": true,
+    "wallMs": 1543.4400190000001,
+    "parentRssBytes": 74620928,
+    "node": "v22.23.4",
+    "limitations": [
+      "One deliberately designed and legally reachable scorecard, 8 selected roll states, not a random game population",
+      "Mathematical proof covers all legal actions with 2 turns left and r=0,1,2 rerolls; not 3–28 turns",
+      "Exact rational comparisons rely on tested scoring rules and fair independent dice, not proof assistant verification",
+      "No production advisor input, no copied training policy, no live changes"
+    ]
+  },
+  "independentPythonAudit": {
+    "status": "PASS",
+    "fullyIndependentImplementation": "Python independent Balut scoring+column rules, exact 0/1/2-reroll last-turn BigInt Bellman, exact initial-roll boundary and exact current two-turn BigInt all-action Bellman",
+    "nRoots": 8,
+    "allLegalActionQIndependentlyRecomputed": 134,
+    "exactNumeratorAndDenominatorAgreement": 134,
+    "exactOptimalActionSetAgreement": 8,
+    "scorecardStates": 1,
+    "uniqueMathematicalContinuationScorecards": 9,
+    "independentCurrentDiceMemoStates": 504,
+    "independentLastTurnMemoStates": 6804,
+    "PythonWallSeconds": 2.71,
+    "productionOracleUsed": false
+  },
+  "speedComparison": {
+    "previousCI": "https://github.com/anders-hess/balut-game/actions/runs/41912571398",
+    "oldSeconds": 359.768,
+    "newSeconds": 1.5434400190000002,
+    "oldRoots": 5,
+    "newRoots": 8,
+    "ratioTotalWall": 233.09490201834654,
+    "technique": "Memoize shared one-turn rational Bellman state over all 252 possible first rolls and all reroll states for each next scorecard, plus post-score state cache"
+  },
+  "limitations": [
+    "One hand-constructed, legally reachable scorecard (rare), 8 root dice/reroll positions",
+    "2-turn BigInt proof with all current actions does not prove 3-28-turn optimality",
+    "No neural-policy superiority or whole-game expected Big Points gain claimed"
+  ],
+  "nativeOracle2MathReference": "4ce623ed663edffc4b1c9291f975aba778622227",
+  "noLegacyAdvisorDependencies": true,
+  "mainLiveUnchanged": true
+}
