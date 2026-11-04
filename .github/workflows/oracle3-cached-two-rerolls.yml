@@ -1,0 +1,46 @@
+name: Oracle 3.0 fast exact-rational two-turn hard decision certificates
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase6-cached-rational-two-turn-*'
+    paths:
+      - 'research/oracle-3.0/pure/rational-boundary-memo.mjs'
+      - 'research/oracle-3.0/pure/rational-two-rerolls.mjs'
+      - 'research/oracle-3.0/pure/rational-two-rerolls-hard-test.mjs'
+      - '.github/workflows/oracle3-cached-two-rerolls.yml'
+  workflow_dispatch:
+concurrency:
+  group: oracle3-cached-two-rerolls-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  certify-nondegenerate-two-turn:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile unchanged Oracle 2.0 numeric differential reference
+        run: |
+          g++ -O3 -std=c++20 research/oracle-3.0/oracle2/oracle2-exact-v46.cpp -o research/oracle-3.0/oracle2/oracle2-roll
+      - name: Guard independence from original advisor and historical imitation
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/guard.mjs | tee oracle3-hard-guard.log
+      - name: Prove all score and hold decisions on threshold-relevant two-turn scorecard with BigInt
+        run: |
+          set -o pipefail
+          node research/oracle-3.0/pure/rational-two-rerolls-hard-test.mjs | tee oracle3-hard-proof.log
+      - name: Archive machine-checkable exact-rational Q and legal scoring witness
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-rational-hard-two-turn-certificate
+          path: |
+            oracle3-hard-*.log
+            oracle3-math-two-reroll-nondegenerate.json
+            oracle3-math-two-reroll-nondegenerate-summary.json
+          if-no-files-found: ignore

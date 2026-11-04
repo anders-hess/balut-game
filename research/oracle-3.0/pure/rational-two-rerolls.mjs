@@ -1,11 +1,12 @@
 // Oracle3: fully exact-rational 2-turn Bellman INCLUDING current rerolls.
 // All 5-dice chance weights are multinomial integer coefficients; all
-// comparisons use BigInt. No production policy, BPIV or numeric Q teacher.
+// comparisons use BigInt. No legacy advisor or approximate Q teacher.
 // Domain: precisely TWO remaining category entries, 0/1/2 current rerolls.
 import assert from 'node:assert/strict';
 import {CATEGORIES,score,applyScore,totals,uniqueHolds} from '../phase1/simulator.mjs';
 import {encodeCard,actionKey} from '../oracle2/adapter.mjs';
-import {rationalOutcomes,exactRationalLastTurn} from './rational.mjs';
+import {rationalOutcomes} from './rational.mjs';
+import {exactRationalLastBoundaryMemo} from './rational-boundary-memo.mjs';
 
 const SIX=6n, DEN_LAST=SIX**15n;
 const OUTCOMES=Array.from({length:6},(_,n)=>rationalOutcomes(n));
@@ -24,13 +25,10 @@ export function createTwoTurnRationalSolver(card){
   if(continuation.has(key))return continuation.get(key);
   const after=applyScore(card,category,ds).card;
   assert.equal(encodeCard(after).remaining,1);
-  let num=0n;
-  for(const outcome of OUTCOMES[5]){
-   const proof=exactRationalLastTurn({card:after,dice:outcome.dice,rollsRemaining:2});
-   assert.equal(proof.denominator,(SIX**10n).toString());
-   num+=outcome.coefficient*BigInt(proof.optimalNumerator);
-   oneTurnProofs++;
-  }
+  const proof=exactRationalLastBoundaryMemo(after);
+  assert.equal(proof.denominator,DEN_LAST.toString());
+  const num=BigInt(proof.numerator);
+  oneTurnProofs+=252n;
   const result={numerator:num,denominator:DEN_LAST,
    category,value,afterRemainingCategory:open.filter(c=>c!==category)};
   continuation.set(key,result);scoreCards.set(key,after);
