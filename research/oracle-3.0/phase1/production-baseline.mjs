@@ -53,7 +53,7 @@ export function auditParity() {
 
 export function productionBaseline(n=20,seed=20261104) {
   if(!Number.isSafeInteger(n)||n<2||!Number.isSafeInteger(seed))throw Error('n>=2 and integer seed required');
-  const started=performance.now(),scores=[],bonusFrequency={},stageDecisions=0;
+  const started=performance.now(),scores=[],bonusFrequency={};let stageDecisions=0;
   for(let i=0;i<n;i++){
     const result=play((seed+i)>>>0,productionPolicy);
     scores.push(result.big);stageDecisions+=result.decisions;
