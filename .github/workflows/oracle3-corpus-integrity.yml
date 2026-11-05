@@ -1,0 +1,38 @@
+name: Oracle 3.0 exact action-Q corpus integrity
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase7-corpus-integrity-gates-*'
+    paths:
+      - 'research/oracle-3.0/pure/fresh-action-q-integrity.mjs'
+      - 'research/oracle-3.0/pure/fresh-rational-action-q-corpus.mjs'
+      - '.github/workflows/oracle3-corpus-integrity.yml'
+  workflow_dispatch:
+concurrency:
+  group: oracle3-action-q-integrity-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enforce pure mathematics architecture
+        run: node research/oracle-3.0/pure/guard.mjs
+      - name: Generate fresh exact BigInt action-Q labels
+        run: node research/oracle-3.0/pure/fresh-rational-action-q-corpus.mjs
+      - name: Audit legal witnesses, split leakage, Q maxima, rational denominators and margins
+        run: node research/oracle-3.0/pure/fresh-action-q-integrity.mjs
+      - name: Archive raw labels and integrity results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-action-q-integrity-and-labels
+          path: |
+            oracle3-action-q-*.json
+          if-no-files-found: ignore
