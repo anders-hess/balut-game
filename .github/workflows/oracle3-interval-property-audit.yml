@@ -1,0 +1,25 @@
+name: Oracle 3.0 three-turn interval property audit
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase8-interval-bellman-property-audit-2026-11-05'
+  workflow_dispatch:
+jobs:
+  rational-property-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify original interval Bellman core
+        run: node research/oracle-3.0/pure/three-turn-interval-bellman.test.mjs
+      - name: Verify independent exhaustive-path interval properties
+        run: node research/oracle-3.0/pure/three-turn-interval-property-audit.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: oracle3-iteration37-property-audit
+          path: oracle3-iteration37-property-audit.json
+          if-no-files-found: warn
