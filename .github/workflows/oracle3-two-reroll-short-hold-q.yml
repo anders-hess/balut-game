@@ -1,0 +1,37 @@
+name: Oracle 3.0 independent two-reroll short-hold Q audit
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase7-two-reroll-short-hold-q-audit-*'
+  workflow_dispatch:
+concurrency:
+  group: oracle3-two-reroll-short-hold-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  exact-short-hold-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Architecture guard
+        run: node research/oracle-3.0/pure/guard.mjs
+      - name: Generate independent exact rational action-Q corpus
+        run: node research/oracle-3.0/pure/fresh-rational-action-q-corpus.mjs
+      - name: Verify corpus and all legal action keys
+        run: |
+          node research/oracle-3.0/pure/fresh-action-q-integrity.mjs
+          node research/oracle-3.0/pure/fresh-action-q-action-space-audit.mjs
+      - name: Independently audit two-reroll four-dice holds
+        run: node research/oracle-3.0/pure/independent-two-reroll-short-hold-q-audit.mjs
+      - name: Archive evidence, even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-iteration32-two-reroll-short-hold-q
+          path: oracle3-*.json
+          if-no-files-found: ignore
