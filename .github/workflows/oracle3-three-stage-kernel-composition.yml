@@ -1,0 +1,26 @@
+name: Oracle 3.0 three-stage exact dice kernel composition
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase8-three-turn-kernel-composition-*'
+  workflow_dispatch:
+jobs:
+  composition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact independent three-stage chance kernel
+        run: node research/oracle-3.0/pure/three-stage-kernel-composition.mjs
+      - name: Archive JSON measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-iteration35-kernel-composition
+          path: oracle3-iteration35-kernel-composition.json
+          if-no-files-found: error
