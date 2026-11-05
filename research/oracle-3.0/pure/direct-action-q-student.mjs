@@ -124,3 +124,6 @@ const result={
 };
 writeFileSync('oracle3-direct-action-q-student-validation.json',JSON.stringify(result,null,2)+'\n');
 console.log('ORACLE3_DIRECT_ACTION_Q_STUDENT='+JSON.stringify({...result,weights:'omitted'}));
+
+// Public mathematical training utilities for independent phase-7 ranking ablations.
+export {rows,features,dot,predict,evaluate};
