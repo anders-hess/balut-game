@@ -1,0 +1,37 @@
+name: Oracle 3.0 direct mathematical action-Q student validation
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase7-train-only-action-q-features-*'
+  workflow_dispatch:
+concurrency:
+  group: oracle3-direct-q-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mathematical-action-q-student:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enforce no production Oracle dependency
+        run: node research/oracle-3.0/pure/guard.mjs
+      - name: Generate independent exact rational corpus
+        run: node research/oracle-3.0/pure/fresh-rational-action-q-corpus.mjs
+      - name: Verify witnesses and scorecard partitions
+        run: node research/oracle-3.0/pure/fresh-action-q-integrity.mjs
+      - name: Verify exhaustive legal action set
+        run: node research/oracle-3.0/pure/fresh-action-q-action-space-audit.mjs
+      - name: Train direct Q student on TRAIN and select only on VALIDATION
+        run: node research/oracle-3.0/pure/direct-action-q-student.mjs
+      - name: Archive exact math labels and validation results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle3-iteration27-direct-action-q-validation
+          path: oracle3-*.json
+          if-no-files-found: ignore
