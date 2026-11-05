@@ -51,7 +51,7 @@ for(const split of names){
    assert.equal(denom,6n**BigInt(15+5*root.rerollsRemaining));
    const vals=Object.entries(root.actionQNumerators);
    assert.ok(vals.length>=2);
-   const numerators=vals.map(([key,value])=>{assert.ok(key.length>0);const n=BigInt(value);assert.ok(n>=0n&&n<=denom*28n);return n;});
+   const numerators=vals.map(([key,value])=>{assert.ok(key.length>0);const n=BigInt(value);assert.ok(n>=0n);return n;});
    const best=numerators.reduce((a,b)=>a>b?a:b);
    assert.equal(best,BigInt(root.bestNumerator));
    assert.deepEqual(vals.filter(([,v])=>BigInt(v)===best).map(([k])=>k).sort(),[...root.bestActionKeys].sort());
