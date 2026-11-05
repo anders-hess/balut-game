@@ -1,0 +1,23 @@
+name: Oracle 3.0 exact rational interval Bellman core
+on:
+  push:
+    branches:
+      - 'research/oracle-3.0-phase8-three-turn-interval-bellman-core-2026-11-05'
+  workflow_dispatch:
+jobs:
+  interval-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify three-turn interval core (synthetic only)
+        run: node research/oracle-3.0/pure/three-turn-interval-bellman.test.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: oracle3-iteration36-interval-core
+          path: oracle3-iteration36-interval-core.json
+          if-no-files-found: warn
